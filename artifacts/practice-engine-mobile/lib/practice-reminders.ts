@@ -6,6 +6,57 @@ export type ReminderSettings = {
   minute: number;
 };
 
+export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
+  enabled: false,
+  paused: false,
+  weekdays: [2, 3, 4, 5, 6],
+  hour: 9,
+  minute: 0,
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export function parseReminderSettings(saved: string | null): ReminderSettings {
+  let parsed: unknown;
+
+  try {
+    parsed = saved === null ? null : JSON.parse(saved);
+  } catch {
+    parsed = null;
+  }
+
+  if (!isRecord(parsed)) {
+    return { ...DEFAULT_REMINDER_SETTINGS, weekdays: [...DEFAULT_REMINDER_SETTINGS.weekdays] };
+  }
+
+  const validWeekdays = Array.isArray(parsed.weekdays)
+    ? [...new Set(parsed.weekdays.filter(
+      (weekday): weekday is number =>
+        Number.isInteger(weekday) && weekday >= 1 && weekday <= 7,
+    ))].sort((left, right) => left - right)
+    : [];
+
+  return {
+    enabled: typeof parsed.enabled === 'boolean'
+      ? parsed.enabled
+      : DEFAULT_REMINDER_SETTINGS.enabled,
+    paused: typeof parsed.paused === 'boolean'
+      ? parsed.paused
+      : DEFAULT_REMINDER_SETTINGS.paused,
+    weekdays: validWeekdays.length > 0
+      ? validWeekdays
+      : [...DEFAULT_REMINDER_SETTINGS.weekdays],
+    hour: Number.isInteger(parsed.hour) && (parsed.hour as number) >= 0 && (parsed.hour as number) <= 23
+      ? parsed.hour as number
+      : DEFAULT_REMINDER_SETTINGS.hour,
+    minute: Number.isInteger(parsed.minute) && (parsed.minute as number) >= 0 && (parsed.minute as number) <= 59
+      ? parsed.minute as number
+      : DEFAULT_REMINDER_SETTINGS.minute,
+  };
+}
+
 export type ReminderPermission = {
   granted: boolean;
   status: string;

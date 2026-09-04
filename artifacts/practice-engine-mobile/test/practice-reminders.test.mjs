@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  DEFAULT_REMINDER_SETTINGS,
   getReminderNavigationTarget,
+  parseReminderSettings,
   refreshRecommendationFromReminder,
   requestReminderPermissionAfterEnable,
   syncReminderSchedule,
@@ -27,6 +29,39 @@ function notificationRecorder() {
     },
   };
 }
+
+test('malformed saved reminder settings fall back to defaults', () => {
+  assert.deepEqual(parseReminderSettings('{not-json'), DEFAULT_REMINDER_SETTINGS);
+  assert.deepEqual(parseReminderSettings('[]'), DEFAULT_REMINDER_SETTINGS);
+});
+
+test('older saved settings preserve valid fields and repair invalid weekdays and time', () => {
+  assert.deepEqual(parseReminderSettings(JSON.stringify({
+    enabled: true,
+    weekdays: [8, 4, 0, 2, 4, 'Monday'],
+    hour: 24,
+    minute: 30,
+  })), {
+    enabled: true,
+    paused: false,
+    weekdays: [2, 4],
+    hour: 9,
+    minute: 30,
+  });
+
+  assert.deepEqual(parseReminderSettings(JSON.stringify({
+    paused: true,
+    weekdays: [-1, 0, 8],
+    hour: 18,
+    minute: 60,
+  })), {
+    enabled: false,
+    paused: true,
+    weekdays: [2, 3, 4, 5, 6],
+    hour: 18,
+    minute: 0,
+  });
+});
 
 test('permission is requested only after the explicit enable flow', async () => {
   let requests = 0;

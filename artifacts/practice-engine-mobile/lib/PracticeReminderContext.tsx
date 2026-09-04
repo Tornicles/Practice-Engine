@@ -3,6 +3,8 @@ import * as Notifications from 'expo-notifications';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { Linking, Platform } from 'react-native';
 import {
+  DEFAULT_REMINDER_SETTINGS,
+  parseReminderSettings,
   type ReminderSettings,
   requestReminderPermissionAfterEnable,
   syncReminderSchedule,
@@ -36,14 +38,6 @@ type ReminderContextValue = {
   openSettings: () => Promise<void>;
 };
 
-const defaults: ReminderSettings = {
-  enabled: false,
-  paused: false,
-  weekdays: [2, 3, 4, 5, 6],
-  hour: 9,
-  minute: 0,
-};
-
 const ReminderContext = createContext<ReminderContextValue | null>(null);
 
 async function schedule(settings: ReminderSettings) {
@@ -56,7 +50,7 @@ async function schedule(settings: ReminderSettings) {
 }
 
 export function PracticeReminderProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<ReminderSettings>(defaults);
+  const [settings, setSettings] = useState<ReminderSettings>(DEFAULT_REMINDER_SETTINGS);
   const [permission, setPermission] = useState<PermissionState>('unknown');
   const [canAskAgain, setCanAskAgain] = useState(true);
   const [isReady, setIsReady] = useState(false);
@@ -65,10 +59,7 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
   useEffect(() => {
     const load = async () => {
       const saved = await AsyncStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ReminderSettings>;
-        setSettings({ ...defaults, ...parsed });
-      }
+      setSettings(parseReminderSettings(saved));
       if (Platform.OS !== 'web') {
         const current = await Notifications.getPermissionsAsync();
         setPermission(current.granted ? 'granted' : current.status === 'denied' ? 'denied' : 'unknown');
