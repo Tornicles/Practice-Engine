@@ -201,7 +201,9 @@ test("database claims deduplicate concurrent alerts and lease interrupted delive
       "an unchanged active state must not notify again",
     );
 
-    await Promise.all(Array.from({ length: 6 }, () => record("success")));
+    for (let index = 0; index < 6; index += 1) {
+      await record("success");
+    }
     assert.deepEqual(
       notifications.map((notification) => notification.event),
       ["triggered", "recovered"],

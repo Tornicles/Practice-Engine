@@ -7,6 +7,8 @@
  */
 
 export type OnboardingDataFirstChallenge = {
+  /** @minimum 1 */
+  sessionId?: number;
   /** @maxLength 10000 */
   result?: string;
   /**

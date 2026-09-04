@@ -101,15 +101,8 @@ export function QuestionStepper({ questions, initialAnswers, onComplete, isSavin
   );
 }
 
-export function AILoadingState({ message, onComplete }: { message: string, onComplete?: () => void }) {
+export function AILoadingState({ message }: { message: string }) {
   const c = useColors();
-  useEffect(() => {
-    if (onComplete) {
-      const timer = setTimeout(onComplete, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [onComplete]);
-
   return (
     <View style={{ paddingVertical: 60, alignItems: 'center', justifyContent: 'center', gap: 24 }}>
       <ActivityIndicator size="large" color={c.primary} />

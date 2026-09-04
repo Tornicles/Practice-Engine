@@ -1,0 +1,1625 @@
+Practice Engine — Detailed Architecture
+Engines 1–4
+
+These four engines form the core operating foundation of Practice Engine. They should be designed as connected engines sharing one underlying data model—not four independent products.
+
+The dependency chain
+ENGINE 1
+Practice Operating System
+        │
+        ├──────────────┐
+        ↓              ↓
+ENGINE 2          ENGINE 3
+Coach             Client
+Development       Delivery
+        │              │
+        └──────┬───────┘
+               ↓
+          ENGINE 4
+       Experience →
+          Expertise
+
+The fundamental data flow is:
+
+Purpose
+  ↓
+Development Objective
+  ↓
+Practice
+  ↓
+Real Client Delivery
+  ↓
+Experience
+  ↓
+Reflection
+  ↓
+Evidence
+  ↓
+Expertise
+ENGINE 1 — PRACTICE OPERATING SYSTEM
+1.1 Purpose
+
+The Practice Operating System is the orchestration layer for the entire Practice Engine.
+
+It answers:
+
+What is the coach trying to accomplish, what is happening now, what needs to happen next, and how does every activity contribute to development and practice?
+
+It does not attempt to perform every function itself.
+
+Instead, it coordinates the other engines.
+
+1.2 Core architecture
+                    PRACTICE OPERATING SYSTEM
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ↓                     ↓                     ↓
+   DEVELOPMENT             DELIVERY             KNOWLEDGE
+        │                     │                     │
+        ↓                     ↓                     ↓
+    Practice              Clients              Experiences
+    Skills                Sessions              Lessons
+    Assessment            Outcomes              Principles
+        │                     │                     │
+        └─────────────────────┼─────────────────────┘
+                              ↓
+                          EVIDENCE
+                              ↓
+                       EVALUATION
+                              ↓
+                     NEXT-BEST ACTION
+
+The OS therefore acts as the central coordination layer.
+
+1.3 Primary objects
+
+The database architecture should establish these core objects.
+
+Coach
+
+The primary person operating the system.
+
+Coach
+- id
+- name
+- niche
+- audience
+- positioning
+- goals
+- experience
+- development focus
+- createdAt
+- updatedAt
+Coach Passport
+
+The persistent context layer for the coach.
+
+This is critical because every engine should understand who the coach is and where they are in their development.
+
+Coach Passport
+├── Identity
+├── Background
+├── Experience
+├── Niche
+├── Audience
+├── Goals
+├── Development priorities
+├── Skills
+├── Practice history
+├── Client history
+├── Methodology
+├── Evidence
+└── Current objectives
+
+The Passport should be readable by every downstream engine.
+
+Objective
+
+What the coach is trying to accomplish.
+
+Examples:
+
+Improve questioning
+Become better at handling resistance
+Develop a methodology
+Validate a framework
+Acquire clients
+Build a course
+Objective
+- id
+- coachId
+- title
+- description
+- type
+- priority
+- targetDate
+- status
+- successCriteria
+Development Focus
+
+The current highest-priority development area.
+
+Unlike a generic goal, this represents:
+
+What should the coach concentrate on right now?
+
+Activity
+
+Everything the coach actually does.
+
+Activity
+├── Learning
+├── Practice
+├── Simulation
+├── Client session
+├── Reflection
+├── Experience capture
+├── Assessment
+├── Content creation
+└── Product development
+Evidence
+
+A foundational object across the entire platform.
+
+Evidence
+- id
+- coachId
+- sourceType
+- sourceId
+- evidenceType
+- observation
+- result
+- validationStatus
+- createdAt
+
+Evidence should always preserve source lineage.
+
+Recommendation
+
+A system-generated proposed next action.
+
+Recommendation
+- reason
+- sourceData
+- priority
+- actionType
+- targetEngine
+- expectedOutcome
+- status
+1.4 Operating states
+
+The OS needs to understand the coach's current operating situation.
+
+For example:
+
+Onboarding
+Developing
+Practicing
+Delivering
+Reflecting
+Building
+Validating
+Improving
+Expanding
+
+These are operational states, not arbitrary labels.
+
+The state should be derived from actual system activity and rules where appropriate.
+
+1.5 Main operating loop
+1. Define Purpose
+        ↓
+2. Define Objective
+        ↓
+3. Determine Current State
+        ↓
+4. Identify Gap
+        ↓
+5. Select Action
+        ↓
+6. Execute
+        ↓
+7. Capture Result
+        ↓
+8. Record Evidence
+        ↓
+9. Evaluate
+        ↓
+10. Determine Next Action
+        ↓
+11. Repeat
+
+This is the fundamental Practice Engine loop.
+
+1.6 Next-Best-Action engine
+
+One of the most important components.
+
+The system should not simply show:
+
+“Here are 15 things you can do.”
+
+It should determine:
+
+“Given your current objective, skill level, recent activity, evidence, available time, and current work, this is the most useful next action.”
+
+Inputs
+Coach Passport
+Objective
+Development focus
+Recent practice
+Skill performance
+Client activity
+Recent experiences
+Evidence gaps
+Current methodology
+Available time
+Previous recommendations
+Outstanding actions
+Output
+Next Action
+├── What to do
+├── Why
+├── Expected result
+├── Estimated time
+├── Related skill
+├── Related objective
+└── Evidence to capture
+1.7 Daily operating layer
+
+The OS should generate a daily operating view.
+
+Example
+TODAY
+
+Primary Objective
+Improve resistance handling
+
+Priority Practice
+10-minute resistance simulation
+
+Real-World Application
+Use reflective questioning in today's client session
+
+Capture
+Record what happened
+
+Reflection
+What worked?
+What failed?
+
+Evidence
+Save the client's response
+
+Next Evaluation
+After completion
+
+This connects development directly to execution.
+
+1.8 Workflow engine
+
+Every significant process should be represented as a workflow.
+
+Examples:
+
+Practice Workflow
+Start → Exercise → Perform → Evaluate → Reflect → Save
+
+Client Workflow
+Intake → Session → Outcome → Follow-up → Evidence
+
+Experience Workflow
+Capture → Analyze → Edit → Validate → Structure
+
+Development Workflow
+Goal → Practice → Assessment → Correction → Reassessment
+
+The Workflow Engine should track:
+
+Current step
+Completed steps
+Required inputs
+Outputs
+Owner
+timestamps
+status
+blocked conditions
+next step
+1.9 Dashboard architecture
+
+The dashboard should not contain independent logic.
+
+It should aggregate data from the engines.
+
+Dashboard sections
+
+Current Focus
+
+Objective
+Development priority
+Current challenge
+
+Today's Work
+
+Practice
+Client work
+Capture
+Reflection
+
+Development
+
+Skills
+Recent performance
+Trends
+
+Evidence
+
+Recent evidence
+Missing evidence
+Validation
+
+Experience
+
+Recent experiences
+Lessons
+Principles
+
+Next Action
+
+Highest-value action
+1.10 AI architecture
+
+AI accesses the OS through a controlled context layer.
+
+User
+ ↓
+Intent Detection
+ ↓
+Current Context
+ ↓
+Coach Passport
+ ↓
+Relevant Engine Data
+ ↓
+Strategy Selection
+ ↓
+AI Action
+ ↓
+Evidence/Safety Review
+ ↓
+Response or Workflow Action
+
+The AI should not independently rewrite core system truth.
+
+It can:
+
+Interpret
+Recommend
+Generate
+Evaluate
+Simulate
+Structure
+Investigate
+Assist
+1.11 Engine 1 outputs
+
+The Practice OS produces:
+
+Current state
+Current objectives
+Current priorities
+Active workflows
+Next-best action
+Cross-engine context
+Progress summaries
+Evidence requirements
+Development recommendations
+ENGINE 2 — COACH DEVELOPMENT SYSTEM
+2.1 Purpose
+
+This engine develops the coach's actual capability.
+
+The objective is not merely:
+
+“Complete lessons.”
+
+It is:
+
+Increase demonstrated coaching ability through learning, practice, application, assessment, correction, and repetition.
+
+2.2 Development architecture
+Knowledge
+   ↓
+Learning
+   ↓
+Practice
+   ↓
+Simulation
+   ↓
+Application
+   ↓
+Observation
+   ↓
+Reflection
+   ↓
+Assessment
+   ↓
+Correction
+   ↓
+Repetition
+   ↓
+Improvement
+   ↓
+Mastery
+2.3 Core objects
+Skill
+Skill
+- id
+- name
+- definition
+- category
+- targetLevel
+- currentLevel
+- status
+
+Examples:
+
+Listening
+Questioning
+Reframing
+Challenging
+Reflection
+Facilitation
+Diagnosis
+Goal setting
+Accountability
+Communication
+
+The exact skill taxonomy should be configurable rather than hard-coded permanently.
+
+Competency
+
+A larger capability composed of multiple skills.
+
+Competency
+    ↓
+Skills
+    ↓
+Behaviors
+    ↓
+Evidence
+
+Example:
+
+Diagnostic Coaching
+├── Listening
+├── Questioning
+├── Pattern recognition
+├── Analysis
+└── Reframing
+Practice Exercise
+Exercise
+- objective
+- skill
+- difficulty
+- instructions
+- scenario
+- expected behavior
+- evaluation criteria
+Simulation
+
+The repository already has the foundation for this.
+
+Architecture:
+
+Scenario
+ ↓
+AI Client
+ ↓
+Coach Response
+ ↓
+AI Client Response
+ ↓
+Observation
+ ↓
+Skill Evaluation
+ ↓
+Score
+ ↓
+Reflection
+2.4 Simulation engine
+
+A simulation should contain:
+
+Scenario
+Client profile
+Context
+Problem
+Desired outcome
+Personality/context variables
+Difficulty
+Conversation
+Turn 1
+Coach → Client
+
+Turn 2
+Client → Coach
+
+Turn 3
+Coach → Client
+...
+Per-turn observation
+
+The evaluator should capture:
+
+What the coach did
+Which skill was demonstrated
+Strength
+Weakness
+Missed opportunity
+Client reaction
+Session evaluation
+
+At the end:
+
+Overall Score
+Skill Scores
+Strengths
+Weaknesses
+Critical Moments
+Recommendations
+Reflection
+2.5 Assessment architecture
+
+Assessment should be separated from ordinary AI commentary.
+
+Assessment types
+Knowledge assessment
+Simulation assessment
+Practice assessment
+Self-assessment
+Real-session assessment
+Evidence-based assessment
+Assessment record
+Assessment
+- subject
+- skill
+- context
+- evaluator
+- criteria
+- score
+- evidence
+- feedback
+- date
+2.6 Skill scoring
+
+This is where the current hard-coded skill numbers should eventually evolve.
+
+Instead of:
+
+Questioning = 82
+
+the system should calculate performance from evidence.
+
+Potential inputs:
+
+Simulation performance
++
+Practice performance
++
+Assessment results
++
+Real-session evidence
++
+Feedback
++
+Recency
++
+Consistency
+
+Then:
+
+Skill Score
+↓
+Trend
+↓
+Confidence
+↓
+Development Status
+
+The system should distinguish:
+
+Score from confidence in the score.
+
+For example:
+
+Questioning
+Score: 78
+Trend: Improving
+Evidence: 18 observations
+Confidence: High
+2.7 Development progression
+
+The coach should move through defined development stages.
+
+Introduced
+ ↓
+Practicing
+ ↓
+Developing
+ ↓
+Functional
+ ↓
+Consistent
+ ↓
+Advanced
+ ↓
+Demonstrated
+
+The exact progression rules should be configurable.
+
+Progression should depend on evidence, not simply course completion.
+
+2.8 Gap detection
+
+The system should continuously identify:
+
+Target capability
+       -
+Current demonstrated capability
+       =
+Development gap
+
+Example:
+
+Target:
+Handle client resistance consistently
+
+Current:
+Strong in low resistance
+Weak in high resistance
+
+Gap:
+High-resistance intervention
+2.9 Practice prescription
+
+Once a gap is identified, the system creates practice.
+
+Gap
+ ↓
+Practice Prescription
+ ↓
+Exercise
+ ↓
+Simulation
+ ↓
+Real-world application
+ ↓
+Evidence
+ ↓
+Reassessment
+
+This is much more powerful than simply recommending another lesson.
+
+2.10 Reflection engine
+
+After meaningful practice, the coach should be prompted to reflect.
+
+Reflection questions
+What happened?
+What did you notice?
+What did you do?
+Why did you do it?
+What worked?
+What did not work?
+What would you do differently?
+What did you learn?
+What principle might explain this?
+
+Reflection becomes input into Engine 4.
+
+2.11 Mastery architecture
+
+Mastery should require multiple forms of evidence.
+
+Conceptually:
+
+Knowledge
++
+Practice
++
+Simulation
++
+Real Application
++
+Consistency
++
+Outcome
+=
+Demonstrated Capability
+
+The system should avoid declaring mastery solely from:
+
+course completion
+AI praise
+self-report
+one successful simulation
+2.12 Engine 2 AI roles
+
+AI can function as:
+
+Coach
+
+Guides practice.
+
+Simulator
+
+Creates realistic client scenarios.
+
+Observer
+
+Analyzes behavior.
+
+Evaluator
+
+Scores against defined criteria.
+
+Trainer
+
+Explains techniques.
+
+Practice Designer
+
+Creates targeted exercises.
+
+Reflective Partner
+
+Helps process experience.
+
+Development Advisor
+
+Recommends what to practice next.
+
+2.13 Engine 2 outputs
+Skill state
+Competency state
+Practice history
+Assessment results
+Development gaps
+Practice prescriptions
+Progression
+Reflection records
+Demonstrated capability
+Evidence
+ENGINE 3 — CLIENT DELIVERY SYSTEM
+3.1 Purpose
+
+This engine connects the developing coach to actual client work.
+
+This is essential because coaching ability cannot be fully developed inside simulations.
+
+The system therefore creates a bridge:
+
+Practice
+ ↓
+Real Client
+ ↓
+Real Situation
+ ↓
+Real Intervention
+ ↓
+Real Outcome
+ ↓
+Evidence
+ ↓
+Development
+3.2 Client lifecycle
+Prospect
+ ↓
+Client
+ ↓
+Intake
+ ↓
+Diagnosis
+ ↓
+Objective
+ ↓
+Session
+ ↓
+Intervention
+ ↓
+Action
+ ↓
+Outcome
+ ↓
+Follow-up
+ ↓
+Review
+3.3 Core objects
+Client
+Client
+- id
+- coachId
+- profile
+- goals
+- status
+- createdAt
+Client Intake
+Intake
+- situation
+- challenges
+- objectives
+- context
+- desired outcome
+- constraints
+- baseline
+Coaching Objective
+
+A specific result the client wants.
+
+Client Objective
+- desired outcome
+- measurement
+- target date
+- current state
+- progress
+Session
+Session
+- client
+- objective
+- date
+- duration
+- session type
+- notes
+- observations
+- interventions
+- client response
+- outcome
+- follow-up
+3.4 Session architecture
+
+A coaching session should follow a structured but flexible lifecycle.
+
+Prepare
+ ↓
+Review
+ ↓
+Explore
+ ↓
+Diagnose
+ ↓
+Intervene
+ ↓
+Client Response
+ ↓
+Decision
+ ↓
+Commitment
+ ↓
+Close
+ ↓
+Follow-up
+
+The coach should not be forced into a rigid script.
+
+The architecture captures what actually happened.
+
+3.5 Intervention object
+
+One of the most important objects.
+
+Intervention
+- sessionId
+- type
+- purpose
+- coachAction
+- clientResponse
+- result
+- effectiveness
+
+Examples:
+
+Question
+Reflection
+Reframe
+Challenge
+Interpretation
+Exercise
+Goal setting
+Commitment
+Feedback
+3.6 Client response
+
+The system should separately capture what the client did.
+
+Client Response
+├── Answer
+├── Insight
+├── Resistance
+├── Agreement
+├── Disagreement
+├── Commitment
+├── Emotional response
+└── Behavioral change
+
+This prevents the system from evaluating the coach only from the coach's own account.
+
+3.7 Outcome architecture
+
+Every client engagement should eventually connect to measurable outcomes.
+
+Outcome types
+Behavioral
+Business
+Personal
+Performance
+Decision
+Goal completion
+Capability
+Satisfaction
+
+Example:
+
+Baseline
+↓
+Intervention
+↓
+Client action
+↓
+Result
+↓
+Measured outcome
+3.8 Client feedback
+
+Feedback should be a separate evidence source.
+
+Coach perspective
++
+Client perspective
++
+Observed result
+=
+Stronger evidence
+
+Feedback can include:
+
+Session rating
+Written feedback
+Outcome assessment
+Client comments
+Progress review
+3.9 Client confidentiality architecture
+
+Client data should be separated from general coach-development data.
+
+The system needs clear distinctions between:
+
+Private Client Data
+        │
+        ├── Restricted access
+        │
+        ↓
+Aggregated Development Evidence
+        │
+        ↓
+Coach Skill Evaluation
+
+The coach should be able to derive learning without unnecessarily exposing sensitive client information.
+
+3.10 Client-to-development connection
+
+After a session:
+
+Session
+ ↓
+Coach Reflection
+ ↓
+Observed Skill
+ ↓
+Assessment Evidence
+ ↓
+Skill Record
+
+Example:
+
+Client resisted a proposed action.
+
+Coach attempted reframing.
+
+Client became more engaged.
+
+Coach reflection:
+"I reframed too early."
+
+System:
+Potential development gap → Timing of reframing.
+
+That becomes a practice target in Engine 2.
+
+3.11 Client-to-expertise connection
+
+Repeated experiences can feed Engine 4.
+
+Session #1
+Session #7
+Session #14
+Session #22
+        ↓
+Recurring Pattern
+        ↓
+Experience
+        ↓
+Principle Candidate
+
+This is where Practice Engine begins generating genuine proprietary expertise.
+
+3.12 Client progress architecture
+
+For each client:
+
+Starting State
+       ↓
+Objectives
+       ↓
+Sessions
+       ↓
+Actions
+       ↓
+Progress
+       ↓
+Outcomes
+
+The system should distinguish:
+
+Activity
+Progress
+Outcome
+
+A coach holding ten sessions does not automatically mean the client improved.
+
+3.13 Engine 3 AI roles
+
+AI can:
+
+Prepare sessions
+Summarize prior sessions
+Identify patterns
+Suggest questions
+Surface previous commitments
+Help structure notes
+Analyze session performance
+Identify development opportunities
+Assist with follow-up drafts
+Extract evidence
+
+AI should not fabricate client outcomes or represent an unverified interpretation as fact.
+
+3.14 Engine 3 outputs
+Client records
+Client objectives
+Sessions
+Interventions
+Client responses
+Commitments
+Outcomes
+Feedback
+Coaching evidence
+Coach development evidence
+Experience candidates
+ENGINE 4 — EXPERIENCE → EXPERTISE SYSTEM
+4.1 Purpose
+
+This is the knowledge-generation engine.
+
+It converts what the coach actually experiences into structured, reusable expertise.
+
+The central principle is:
+
+Experience is the raw material. Expertise is the structured, tested result.
+
+4.2 Core architecture
+Experience
+ ↓
+Capture
+ ↓
+Context
+ ↓
+Observation
+ ↓
+Reflection
+ ↓
+Lesson
+ ↓
+Pattern
+ ↓
+Principle
+ ↓
+Hypothesis
+ ↓
+Testing
+ ↓
+Evidence
+ ↓
+Validated Expertise
+4.3 Experience object
+
+An experience should contain enough information to preserve context.
+
+Experience
+- id
+- coachId
+- sourceType
+- sourceId
+- title
+- date
+- context
+- situation
+- problem
+- action
+- reasoning
+- result
+- reflection
+- lesson
+- principles
+- evidence
+- validationStatus
+4.4 Experience sources
+
+Experiences can originate from:
+
+Client sessions
+Practice sessions
+Simulations
+Career history
+Business experience
+Teaching
+Projects
+Failures
+Successes
+Observations
+Experiments
+Feedback
+
+The source must be preserved.
+
+For example:
+
+Experience #91
+Source:
+Client Session #47
+
+rather than creating an orphaned AI-generated story.
+
+4.5 Experience capture workflow
+Capture
+ ↓
+Clarify
+ ↓
+Structure
+ ↓
+Reflect
+ ↓
+Extract
+ ↓
+Review
+ ↓
+Save
+Capture interface
+
+The coach should be able to enter the experience naturally.
+
+AI then structures it.
+
+For example:
+
+Raw experience
+        ↓
+AI extraction
+        ↓
+Situation
+Action
+Result
+Lesson
+Principle candidate
+Evidence gap
+
+The coach retains the ability to edit the structured result.
+
+4.6 Reflection architecture
+
+Reflection should distinguish what happened from what the coach thinks it means.
+
+Layer 1 — Facts
+What happened?
+Layer 2 — Interpretation
+What do you think happened?
+Layer 3 — Learning
+What did you learn?
+Layer 4 — Principle
+What broader principle might explain it?
+Layer 5 — Validation
+What evidence supports this principle?
+
+This separation is extremely important.
+
+4.7 Lesson object
+
+A lesson is a conclusion derived from an experience.
+
+Lesson
+- statement
+- sourceExperience
+- context
+- evidence
+- confidence
+- validationStatus
+
+Example:
+
+Experience:
+Client rejected advice.
+
+Lesson:
+Advice was introduced before the client fully articulated the problem.
+4.8 Pattern engine
+
+The system should identify recurring patterns across experiences.
+
+Experience A
+Experience B
+Experience C
+Experience D
+        ↓
+Common pattern
+
+Pattern detection can examine:
+
+Situation
+Problem
+Coach behavior
+Client behavior
+Intervention
+Result
+Context
+
+This is where the system moves beyond isolated stories.
+
+4.9 Principle engine
+
+A principle is more general than an individual lesson.
+
+Example:
+
+Lesson:
+Client resisted advice before diagnosis.
+
+Repeated lessons:
+Several clients showed similar behavior.
+
+Principle candidate:
+Premature prescription can increase resistance.
+
+The system should mark this as a candidate, not automatically as established truth.
+
+4.10 Hypothesis architecture
+
+Before a principle becomes part of methodology, the system should allow it to be treated as a hypothesis.
+
+Principle Candidate
+ ↓
+Hypothesis
+ ↓
+Test
+ ↓
+Evidence
+ ↓
+Supported
+or
+Rejected
+or
+Needs refinement
+
+This is the bridge between experience and rigorous methodology.
+
+4.11 Validation architecture
+
+Each expertise element needs a validation lifecycle.
+
+Captured
+ ↓
+AI Extracted
+ ↓
+Coach Reviewed
+ ↓
+Candidate
+ ↓
+Tested
+ ↓
+Evidence Accumulated
+ ↓
+Supported
+ ↓
+Validated
+
+Potential statuses:
+
+Raw
+Extracted
+Draft
+Candidate
+Testing
+Supported
+Validated
+Needs revision
+Rejected
+Retired
+4.12 Evidence lineage
+
+This should be one of the strongest features in the entire platform.
+
+Every expertise object should be traceable backward.
+
+Example:
+
+Method
+ ↓
+Principle
+ ↓
+Pattern
+ ↓
+Lesson
+ ↓
+Experience
+ ↓
+Client Session
+ ↓
+Observed Outcome
+
+Therefore, when viewing a methodology principle, the coach can ask:
+
+“Where did this come from?”
+
+And the system can show the lineage.
+
+4.13 Expertise graph
+
+The data model should eventually behave like a knowledge graph.
+
+Experience
+   │
+   ├── supports → Lesson
+   │
+   ├── relates → Experience
+   │
+   └── produces → Principle
+                    │
+                    ├── supported by → Evidence
+                    │
+                    └── used in → Framework
+
+This makes future methodology/IP generation much stronger.
+
+4.14 Contradiction detection
+
+The engine should not only find confirming experiences.
+
+It should also identify contradictions.
+
+Example:
+
+Principle:
+"Clients respond better when challenged directly."
+
+Experience #14:
+Challenge worked.
+
+Experience #29:
+Challenge caused disengagement.
+
+Experience #43:
+Challenge worked only after trust was established.
+
+The system should identify:
+
+Possible contextual limitation.
+
+That produces a better principle:
+
+Challenge may be effective when sufficient client trust exists.
+
+This is significantly more sophisticated than simple AI summarization.
+
+4.15 Expertise confidence
+
+Every generated insight should have a confidence/evidence profile.
+
+For example:
+
+Principle:
+Diagnostic questioning should precede prescription.
+
+Evidence:
+12 experiences
+8 client sessions
+3 repeated outcomes
+
+Status:
+Supported
+
+Confidence:
+High
+
+Confidence should be based on defined evidence rules rather than AI enthusiasm.
+
+4.16 AI architecture
+
+AI performs the heavy structuring work.
+
+AI can:
+Extract experiences
+Ask clarification questions
+Identify patterns
+Generate lesson candidates
+Generate principle candidates
+Find related experiences
+Identify contradictions
+Identify evidence gaps
+Suggest hypotheses
+Structure knowledge
+Suggest validation tests
+AI cannot legitimately transform:
+AI suggestion
+
+into:
+
+Validated expertise
+
+without the required evidence/validation workflow.
+
+4.17 Connection to Engine 2
+
+Engine 2 produces experience.
+
+Practice
+ ↓
+Performance
+ ↓
+Reflection
+ ↓
+Experience
+
+Engine 4 transforms it.
+
+Experience
+ ↓
+Lesson
+ ↓
+Principle
+ ↓
+Expertise
+
+Then the resulting expertise feeds back into development.
+
+Expertise
+ ↓
+New teaching
+ ↓
+New practice
+ ↓
+Better coaching
+4.18 Connection to Engine 3
+
+Real client delivery becomes the richest experience source.
+
+Client
+ ↓
+Session
+ ↓
+Intervention
+ ↓
+Response
+ ↓
+Outcome
+ ↓
+Reflection
+ ↓
+Experience
+
+Repeated experiences can eventually become methodology.
+
+4.19 Engine 4 outputs
+
+The engine produces:
+
+Structured experiences
+Lessons
+Patterns
+Principles
+Hypotheses
+Evidence
+Contradictions
+Expertise candidates
+Validated expertise
+Knowledge relationships
+Methodology inputs
+Evidence lineage
+THE FOUR ENGINES AS ONE SYSTEM
+
+The architecture should ultimately operate like this:
+
+                         PRACTICE OS
+                              │
+                 ┌────────────┴────────────┐
+                 ↓                         ↓
+          COACH DEVELOPMENT          CLIENT DELIVERY
+                 │                         │
+        Learn → Practice              Client → Session
+                 │                         │
+        Simulation → Assess           Intervention
+                 │                         │
+                 └──────────┬──────────────┘
+                            ↓
+                       EXPERIENCE
+                            ↓
+                     REFLECTION
+                            ↓
+                       EVIDENCE
+                            ↓
+                 EXPERIENCE → EXPERTISE
+                            ↓
+                    LESSONS / PATTERNS
+                            ↓
+                      PRINCIPLES
+                            ↓
+                     VALIDATION
+                            ↓
+                  DEMONSTRATED EXPERTISE
+                            │
+             ┌──────────────┴──────────────┐
+             ↓                             ↓
+       BETTER PRACTICE                BETTER DELIVERY
+             │                             │
+             └──────────────┬──────────────┘
+                            ↓
+                     MORE EXPERIENCE
+The critical data relationships
+Source	Produces	Feeds
+Coach Passport	Context	All engines
+Objective	Direction	Practice OS + Development
+Practice	Performance	Development + Experience
+Simulation	Assessment evidence	Development
+Client Session	Delivery evidence	Development + Experience
+Reflection	Learning	Experience
+Experience	Raw knowledge	Expertise
+Lesson	Structured learning	Expertise
+Pattern	Repeated behavior	Expertise
+Principle	Generalized knowledge	Methodology
+Evidence	Validation	Expertise + future IP
+Outcome	Proof	Development + Expertise
+What this means for the existing Practice Engine
+
+The existing repository already has important pieces of these four engines—particularly the Coach Passport, experiences, practice sessions, simulation/evaluation, knowledge assets, AI orchestration, and evidence lineage concepts.
+
+The next architectural work should therefore not start by creating four more dashboards.
+
+It should complete the underlying wiring:
+
+Existing UI
+     ↓
+Existing API
+     ↓
+Existing data model
+     ↓
+NEW / COMPLETE ENGINES
+     ↓
+Rules
+     ↓
+Evidence
+     ↓
+Statistics
+     ↓
+Evaluation
+     ↓
+Next Action
+
+The biggest architectural upgrade is moving from stored information + AI-generated responses toward stateful engines that calculate, evaluate, connect, and trigger the next workflow.

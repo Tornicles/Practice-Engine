@@ -377,7 +377,7 @@ components:
             discovery:
               type: object
               additionalProperties: { type: string, maxLength: 10000 }
-            reviewState: { type: string, enum: [draft, reviewed, accepted, editing] }
+            reviewState: { type: string, enum: [draft, reviewed, accepted, editing, rejected] }
         methodology:
           type: object
           properties:
@@ -427,11 +427,12 @@ components:
             lesson: { type: string, maxLength: 10000 }
             principle: { type: string, maxLength: 10000 }
             framework: { type: string, maxLength: 10000 }
-            reviewState: { type: string, enum: [draft, reviewed, accepted, editing] }
+            reviewState: { type: string, enum: [draft, reviewed, accepted, editing, rejected] }
             notes: { type: string, maxLength: 10000 }
         firstChallenge:
           type: object
           properties:
+            sessionId: { type: number, minimum: 1, multipleOf: 1 }
             result: { type: string, maxLength: 10000 }
             score: { type: number, minimum: 0, maximum: 100 }
             completed: { type: boolean }
@@ -542,6 +543,8 @@ components:
       properties:
         id:
           type: number
+        clientRequestId:
+          type: ["string", "null"]
         scenario:
           type: string
         category:
@@ -558,6 +561,7 @@ components:
           format: date-time
       required:
         - id
+        - clientRequestId
         - scenario
         - category
         - score
@@ -567,6 +571,10 @@ components:
     PracticeSessionInput:
       type: object
       properties:
+        clientRequestId:
+          type: string
+          minLength: 1
+          maxLength: 128
         scenario:
           type: string
           minLength: 1

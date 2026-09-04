@@ -8,6 +8,8 @@
 
 export interface PracticeSession {
   id: number;
+  /** @nullable */
+  clientRequestId: string | null;
   scenario: string;
   category: string;
   /** @nullable */

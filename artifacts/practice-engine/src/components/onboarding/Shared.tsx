@@ -8,23 +8,23 @@ export interface StepProps {
   isSaving: boolean;
 }
 
-export function MultiSelectCard({ 
-  title, 
-  selected, 
-  onClick, 
-  className = "" 
-}: { 
-  title: string; 
-  selected: boolean; 
+export function MultiSelectCard({
+  title,
+  selected,
+  onClick,
+  className = ""
+}: {
+  title: string;
+  selected: boolean;
   onClick: () => void;
   className?: string;
 }) {
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`p-4 rounded-md border cursor-pointer transition-all duration-200 ${
-        selected 
-          ? 'border-primary bg-primary/10 text-primary shadow-[0_0_10px_rgba(201,168,78,0.1)]' 
+        selected
+          ? 'border-primary bg-primary/10 text-primary shadow-[0_0_10px_rgba(201,168,78,0.1)]'
           : 'border-border/50 bg-card hover:border-primary/40'
       } ${className}`}
       role="checkbox"
@@ -65,17 +65,17 @@ export function StepHeader({ layer, title, description }: { layer: string; title
   );
 }
 
-export function FooterActions({ 
-  onBack, 
-  onNext, 
-  isSaving, 
+export function FooterActions({
+  onBack,
+  onNext,
+  isSaving,
   nextLabel = "Continue",
   nextDisabled = false,
   hideBack = false
-}: { 
-  onBack: () => void; 
-  onNext: () => void; 
-  isSaving: boolean; 
+}: {
+  onBack: () => void;
+  onNext: () => void;
+  isSaving: boolean;
   nextLabel?: string;
   nextDisabled?: boolean;
   hideBack?: boolean;
@@ -83,8 +83,8 @@ export function FooterActions({
   return (
     <div className="flex gap-4 p-6 border-t border-border/40 bg-background/40">
       {!hideBack && (
-        <button 
-          onClick={onBack} 
+        <button
+          onClick={onBack}
           disabled={isSaving}
           className="h-12 px-6 flex items-center justify-center border border-border rounded-md text-sm font-semibold uppercase tracking-[.08em] hover:bg-secondary/50 transition-colors disabled:opacity-50"
         >

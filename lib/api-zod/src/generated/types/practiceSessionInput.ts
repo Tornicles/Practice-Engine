@@ -7,6 +7,11 @@
  */
 
 export interface PracticeSessionInput {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  clientRequestId?: string;
   /** @minLength 1 */
   scenario: string;
   /** @minLength 1 */

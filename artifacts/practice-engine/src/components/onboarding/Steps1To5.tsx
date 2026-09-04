@@ -15,12 +15,12 @@ export function Step1Welcome({ onNext, isSaving }: StepProps) {
           Become a better coach. Improve your delivery. Build your methodology. Build your brand. Turn your experience into expertise, IP, courses, and products.
         </p>
       </div>
-      <FooterActions 
-        onBack={() => {}} 
-        onNext={() => onNext({})} 
-        isSaving={isSaving} 
-        nextLabel="Get Started" 
-        hideBack 
+      <FooterActions
+        onBack={() => {}}
+        onNext={() => onNext({})}
+        isSaving={isSaving}
+        nextLabel="Get Started"
+        hideBack
       />
     </div>
   );
@@ -50,25 +50,25 @@ export function Step2Goals({ profile, onNext, onBack, isSaving }: StepProps) {
 
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-8 duration-300">
-      <StepHeader 
-        layer="Layer 02" 
-        title="What Do You Want to Accomplish?" 
+      <StepHeader
+        layer="Layer 02"
+        title="What Do You Want to Accomplish?"
         description="Select all that apply. The engine will tailor your development path."
       />
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 overflow-y-auto max-h-[50vh]">
         {OPTIONS.map(opt => (
-          <MultiSelectCard 
-            key={opt} 
-            title={opt} 
-            selected={selected.includes(opt)} 
-            onClick={() => toggle(opt)} 
+          <MultiSelectCard
+            key={opt}
+            title={opt}
+            selected={selected.includes(opt)}
+            onClick={() => toggle(opt)}
           />
         ))}
       </div>
-      <FooterActions 
-        onBack={onBack} 
-        onNext={() => onNext({ onboardingData: { goals: { outcomes: selected } } })} 
-        isSaving={isSaving} 
+      <FooterActions
+        onBack={onBack}
+        onNext={() => onNext({ onboardingData: { goals: { outcomes: selected } } })}
+        isSaving={isSaving}
         nextDisabled={selected.length === 0}
       />
     </div>
@@ -91,16 +91,16 @@ export function Step3Profile({ profile, onNext, onBack, isSaving }: StepProps) {
 
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-8 duration-300">
-      <StepHeader 
-        layer="Layer 03" 
-        title="Coach Profile" 
+      <StepHeader
+        layer="Layer 03"
+        title="Coach Profile"
         description="Establish your basic identity and professional context."
       />
       <div className="p-6 space-y-6 flex-1 overflow-y-auto max-h-[60vh]">
         <div className="space-y-3">
           <label className="text-xs uppercase tracking-[.08em] text-muted-foreground font-semibold">Your Name</label>
-          <input 
-            value={name} 
+          <input
+            value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Enter your name"
             className="w-full h-12 px-4 rounded-md border border-input bg-background text-base focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none"
@@ -108,8 +108,8 @@ export function Step3Profile({ profile, onNext, onBack, isSaving }: StepProps) {
         </div>
         <div className="space-y-3">
           <label className="text-xs uppercase tracking-[.08em] text-muted-foreground font-semibold">What is your coaching niche?</label>
-          <input 
-            value={niche} 
+          <input
+            value={niche}
             onChange={e => setNiche(e.target.value)}
             placeholder="Example: Executive Coaching, Career Coaching"
             className="w-full h-12 px-4 rounded-md border border-input bg-background text-base focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none"
@@ -118,8 +118,8 @@ export function Step3Profile({ profile, onNext, onBack, isSaving }: StepProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-3">
             <label className="text-xs uppercase tracking-[.08em] text-muted-foreground font-semibold">How long have you been coaching?</label>
-            <select 
-              value={yearsCoaching} 
+            <select
+              value={yearsCoaching}
               onChange={e => setYearsCoaching(e.target.value)}
               className="w-full h-12 px-4 rounded-md border border-input bg-background text-base focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none appearance-none"
             >
@@ -134,8 +134,8 @@ export function Step3Profile({ profile, onNext, onBack, isSaving }: StepProps) {
           </div>
           <div className="space-y-3">
             <label className="text-xs uppercase tracking-[.08em] text-muted-foreground font-semibold">Where are you currently?</label>
-            <select 
-              value={experienceLevel} 
+            <select
+              value={experienceLevel}
               onChange={e => setExperienceLevel(e.target.value)}
               className="w-full h-12 px-4 rounded-md border border-input bg-background text-base focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none appearance-none"
             >
@@ -151,8 +151,8 @@ export function Step3Profile({ profile, onNext, onBack, isSaving }: StepProps) {
         </div>
         <div className="space-y-3">
           <label className="text-xs uppercase tracking-[.08em] text-muted-foreground font-semibold">Who do you currently coach?</label>
-          <input 
-            value={audience} 
+          <input
+            value={audience}
             onChange={e => setAudience(e.target.value)}
             placeholder="Example: Series B Founders, Career Pivoters"
             className="w-full h-12 px-4 rounded-md border border-input bg-background text-base focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none"
@@ -167,15 +167,15 @@ export function Step3Profile({ profile, onNext, onBack, isSaving }: StepProps) {
           </div>
         </div>
       </div>
-      <FooterActions 
-        onBack={onBack} 
-        onNext={() => onNext({ 
-          name, niche, audience, experienceLevel, 
-          onboardingData: { 
+      <FooterActions
+        onBack={onBack}
+        onNext={() => onNext({
+          name, niche, audience, experienceLevel,
+          onboardingData: {
             profileDetails: { yearsCoaching: yearsCoaching ? parseInt(yearsCoaching) : 0, coachingTypes, currentStage: experienceLevel }
-          } 
-        })} 
-        isSaving={isSaving} 
+          }
+        })}
+        isSaving={isSaving}
         nextDisabled={!name || !niche || !audience || !yearsCoaching || !experienceLevel || coachingTypes.length === 0}
       />
     </div>
@@ -221,9 +221,9 @@ export function Step4Experience({ profile, onNext, onBack, isSaving }: StepProps
 
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-300">
-      <StepHeader 
-        layer="Layer 04" 
-        title="Your Coaching Experience" 
+      <StepHeader
+        layer="Layer 04"
+        title="Your Coaching Experience"
         description="Discover the experience that will become your knowledge."
       />
       <div className="w-full h-1 bg-secondary">
@@ -232,7 +232,7 @@ export function Step4Experience({ profile, onNext, onBack, isSaving }: StepProps
       <div className="p-8 flex-1 flex flex-col justify-center min-h-[300px]">
         <div key={qIndex} className="animate-in slide-in-from-right-4 fade-in duration-300 space-y-6">
           <h3 className="text-xl font-medium text-foreground">{currentQ.text}</h3>
-          <textarea 
+          <textarea
             autoFocus
             value={answers[currentQ.id]}
             onChange={e => setAnswers({ ...answers, [currentQ.id]: e.target.value })}
@@ -241,10 +241,10 @@ export function Step4Experience({ profile, onNext, onBack, isSaving }: StepProps
           />
         </div>
       </div>
-      <FooterActions 
-        onBack={handleBack} 
-        onNext={handleNext} 
-        isSaving={isSaving} 
+      <FooterActions
+        onBack={handleBack}
+        onNext={handleNext}
+        isSaving={isSaving}
         nextDisabled={!answers[currentQ.id]?.trim()}
       />
     </div>
@@ -259,7 +259,7 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
     profile.onboardingData?.miniScenario?.choice || ""
   );
   const [practiceText, setPracticeText] = useState("");
-  
+
   const saveSession = useCreatePracticeSession();
 
   const SKILLS = [
@@ -289,11 +289,12 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
     if (practiceText.trim()) {
       try {
         const res = await saveSession.mutateAsync({
-          data: { 
-            scenario: "Initial Onboarding Assessment", 
-            category: "Assessment", 
-            score: 0, 
-            feedback: "Self-assessed initial practice" 
+          data: {
+            scenario: "Initial Onboarding Assessment",
+            category: "Assessment",
+            score: 0,
+            feedback: "Self-assessed initial practice",
+            clientRequestId: `${profile.id}-onboarding-assessment`
           }
         });
         sessionId = res.id;
@@ -302,16 +303,16 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
         return;
       }
     }
-    
+
     const choiceObj = SCENARIO_OPTIONS.find(o => o.text === scenarioChoice);
-    
+
     onNext({
       onboardingData: {
         skillRatings: ratings,
-        miniScenario: { 
-          choice: scenarioChoice, 
-          evaluation: choiceObj?.eval || "", 
-          score: choiceObj?.score || 0 
+        miniScenario: {
+          choice: scenarioChoice,
+          evaluation: choiceObj?.eval || "",
+          score: choiceObj?.score || 0
         },
         practice: practiceText.trim() ? { sessionId, result: practiceText } : undefined
       }
@@ -322,13 +323,18 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
 
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-8 duration-300">
-      <StepHeader 
-        layer="Layer 05" 
-        title="Coaching Skills Assessment" 
+      <StepHeader
+        layer="Layer 05"
+        title="Coaching Skills Assessment"
         description="Establish your starting skill baseline."
       />
       <div className="p-6 space-y-12 flex-1 overflow-y-auto max-h-[65vh]">
-        
+        {saveError && (
+          <div className="p-3 mb-4 border border-destructive/50 bg-destructive/10 text-destructive rounded-md text-sm">
+            {saveError}
+          </div>
+        )}
+
         <section className="space-y-6">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold border-b border-border/50 pb-2">Part A — Quick Self-Assessment</h3>
@@ -340,12 +346,12 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
                 <label className="text-sm font-medium">{skill.label}</label>
                 <div className="flex gap-2">
                   {[1,2,3,4,5].map(v => (
-                    <button 
+                    <button
                       key={v}
                       onClick={() => setRatings({ ...ratings, [skill.id]: v })}
                       className={`flex-1 h-10 rounded-md border font-mono text-sm transition-all ${
-                        ratings[skill.id] === v 
-                          ? 'bg-primary text-primary-foreground border-primary shadow-sm' 
+                        ratings[skill.id] === v
+                          ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                           : 'bg-background hover:border-primary/50 text-muted-foreground hover:text-foreground'
                       }`}
                     >
@@ -370,12 +376,12 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
             <label className="text-sm font-medium text-muted-foreground">Choose your response:</label>
             <div className="space-y-2">
               {SCENARIO_OPTIONS.map(opt => (
-                <div 
+                <div
                   key={opt.text}
                   onClick={() => setScenarioChoice(opt.text)}
                   className={`p-4 rounded-md border cursor-pointer transition-all ${
-                    scenarioChoice === opt.text 
-                      ? 'border-primary bg-primary/10 text-foreground' 
+                    scenarioChoice === opt.text
+                      ? 'border-primary bg-primary/10 text-foreground'
                       : 'border-border/50 bg-background hover:border-primary/40 text-muted-foreground'
                   }`}
                 >
@@ -391,7 +397,7 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
             <h3 className="text-lg font-semibold border-b border-border/50 pb-2">Part C — Optional Practice</h3>
             <p className="text-sm text-muted-foreground">Type a custom response to the client above.</p>
           </div>
-          <textarea 
+          <textarea
             value={practiceText}
             onChange={e => setPracticeText(e.target.value)}
             placeholder="Your live simulation response... (Optional)"
@@ -400,10 +406,10 @@ export function Step5Assessment({ profile, onNext, onBack, isSaving }: StepProps
         </section>
 
       </div>
-      <FooterActions 
-        onBack={onBack} 
-        onNext={handleNext} 
-        isSaving={isSaving} 
+      <FooterActions
+        onBack={onBack}
+        onNext={handleNext}
+        isSaving={isSaving}
         nextDisabled={!allRated || !scenarioChoice}
       />
     </div>

@@ -1,0 +1,1514 @@
+Practice Engine — Detailed Architecture
+Engines 9–12
+
+These four engines complete the architecture.
+
+Engines 1–4 create capability and expertise.
+Engines 5–8 turn expertise into methodology, authority, audience, and commercial activity.
+Engines 9–12 turn that knowledge into scalable products, measurable operating intelligence, corrective action, and the AI layer that connects everything.
+
+Dependency structure
+ENGINE 5
+Methodology & IP
+       │
+       ├──────────────┐
+       ↓              ↓
+ENGINE 9          ENGINE 12
+Courses &         AI Knowledge &
+Products          Prompt System
+       │              │
+       ↓              │
+Results              │
+       │              │
+       └──────┬───────┘
+              ↓
+         ENGINE 10
+ Statistics & Conditions
+              │
+              ↓
+         ENGINE 11
+ Investigation &
+ Correction
+              │
+              ↓
+       Improvement
+              │
+              └──────────→ Engines 1–9
+ENGINE 9 — COURSE & PRODUCT SYSTEM
+9.1 Purpose
+
+Engine 9 converts validated methodology and expertise into repeatable, teachable, scalable products.
+
+It answers:
+
+How do we package what the coach knows into something another person can learn, use, complete, and achieve a measurable result from?
+
+This is different from Engine 5.
+
+Engine 5 creates the intellectual property.
+
+Engine 9 productizes the intellectual property.
+
+9.2 Core architecture
+Validated Expertise
+       ↓
+Methodology
+       ↓
+Learning Objective
+       ↓
+Curriculum Architecture
+       ↓
+Course/Product
+       ↓
+Build
+       ↓
+Test
+       ↓
+Deliver
+       ↓
+Learner Activity
+       ↓
+Assessment
+       ↓
+Learner Outcome
+       ↓
+Product Evaluation
+       ↓
+Improve
+9.3 Product hierarchy
+
+The system should support several levels.
+
+Product
+│
+├── Program
+│   ├── Module
+│   │   ├── Lesson
+│   │   ├── Exercise
+│   │   └── Assessment
+│   │
+│   └── Project
+│
+├── Course
+│   ├── Module
+│   ├── Lesson
+│   ├── Exercise
+│   └── Assessment
+│
+├── Workshop
+├── Cohort
+├── Toolkit
+├── Workbook
+├── Assessment
+├── Certification
+└── Digital Product
+9.4 Core objects
+Product
+Product
+- id
+- coachId
+- name
+- type
+- description
+- audience
+- problem
+- desiredOutcome
+- methodologyId
+- status
+- version
+- price
+Curriculum
+Curriculum
+- id
+- productId
+- objective
+- structure
+- sequence
+- estimatedDuration
+- completionCriteria
+Module
+Module
+- id
+- curriculumId
+- title
+- objective
+- sequence
+Lesson
+Lesson
+- id
+- moduleId
+- title
+- objective
+- content
+- methodologyReferences
+- activities
+Exercise
+Exercise
+- id
+- lessonId
+- skill
+- instructions
+- expectedBehavior
+- difficulty
+- evidenceRequired
+Assessment
+Assessment
+- id
+- productId
+- skill
+- competency
+- criteria
+- passingCriteria
+9.5 Learning architecture
+
+A product should be designed backward from the desired outcome.
+
+Desired Outcome
+       ↓
+Required Capability
+       ↓
+Required Skills
+       ↓
+Learning Objectives
+       ↓
+Lessons
+       ↓
+Practice
+       ↓
+Assessment
+
+This prevents the common problem of creating courses that contain information but don't produce capability.
+
+9.6 Product development lifecycle
+Problem
+ ↓
+Product Hypothesis
+ ↓
+Curriculum Draft
+ ↓
+Prototype
+ ↓
+Pilot
+ ↓
+Learner Feedback
+ ↓
+Outcome Measurement
+ ↓
+Revision
+ ↓
+Validated Product
+ ↓
+Scale
+9.7 Product validation
+
+A product should not be considered validated because it was completed or published.
+
+Validation should consider:
+
+Demand
+People interested
+Enrollment
+Purchase rate
+Engagement
+Attendance
+Lesson completion
+Exercise completion
+Learning
+Assessment performance
+Skill improvement
+Outcomes
+Desired result achieved
+Behavioral change
+Practical application
+Commercial performance
+Revenue
+Margin
+Refunds
+Repeat purchases
+9.8 Learner journey
+Enrollment
+ ↓
+Orientation
+ ↓
+Baseline
+ ↓
+Learning
+ ↓
+Practice
+ ↓
+Assessment
+ ↓
+Application
+ ↓
+Outcome
+ ↓
+Completion
+ ↓
+Follow-up
+
+The system should preserve the learner's progression and evidence.
+
+9.9 Product analytics
+
+Track:
+
+Enrollment
+Completion
+Drop-off
+Lesson engagement
+Exercise completion
+Assessment scores
+Learner satisfaction
+Outcome achievement
+Refunds
+Revenue
+Retention
+
+The important distinction is:
+
+engagement ≠ learning ≠ outcome.
+
+9.10 Product-to-methodology connection
+
+A product should explicitly inherit its intellectual foundation.
+
+Course
+ ↓
+Methodology
+ ↓
+Framework
+ ↓
+Principles
+ ↓
+Exercises
+
+This allows the coach to update methodology and see which products are affected.
+
+9.11 Product versioning
+Product v1
+ ↓
+Feedback
+ ↓
+Product v2
+ ↓
+New evidence
+ ↓
+Product v3
+
+Every revision should record:
+
+What changed
+Why
+Evidence supporting change
+Previous version
+New version
+9.12 AI architecture
+
+AI can:
+
+Build curriculum drafts
+Break methodology into lessons
+Create exercises
+Create assessments
+Adapt difficulty
+Generate explanations
+Analyze learner performance
+Identify drop-off
+Recommend improvements
+Personalize learning paths
+
+AI should preserve methodology and source lineage rather than silently replacing the coach's methodology with generic AI-generated material.
+
+9.13 Engine 9 outputs
+Courses
+Programs
+Workshops
+Products
+Curricula
+Lessons
+Exercises
+Assessments
+Learner Results
+Product Performance
+Product Improvement
+ENGINE 10 — STATISTICS & CONDITION SYSTEM
+10.1 Purpose
+
+Engine 10 is the measurement and state-evaluation engine for the entire Practice Engine.
+
+It answers:
+
+What is actually happening?
+
+and then:
+
+What condition does the evidence indicate?
+
+This is one of the most important underlying engines because the other engines generate enormous amounts of activity and evidence.
+
+Without Engine 10, the system becomes a collection of records.
+
+10.2 Core architecture
+Raw Events
+    ↓
+Measurements
+    ↓
+Statistics
+    ↓
+Trends
+    ↓
+Evaluation Rules
+    ↓
+Condition
+    ↓
+Required Response
+10.3 Event layer
+
+Everything important creates an event.
+
+Examples:
+
+Practice completed
+Simulation completed
+Assessment completed
+Client session completed
+Outcome recorded
+Experience captured
+Principle validated
+Content published
+Lead created
+Sale completed
+Product enrolled
+Learner completed
+10.4 Measurement layer
+
+Events become measurable values.
+
+Example:
+
+Practice Sessions
+= 12
+
+Simulations
+= 8
+
+Assessments
+= 4
+
+Client Sessions
+= 15
+
+Validated Experiences
+= 9
+10.5 Statistics architecture
+
+Statistics should be categorized.
+
+Development statistics
+Practice volume
+Practice consistency
+Skill performance
+Assessment performance
+Simulation performance
+Improvement rate
+Delivery statistics
+Clients
+Sessions
+Outcomes
+Retention
+Feedback
+Expertise statistics
+Experiences
+Lessons
+Principles
+Evidence
+Validated methodology
+Authority statistics
+Published work
+Case studies
+Proof
+Speaking
+Recognition
+Content statistics
+Published assets
+Reach
+Engagement
+Leads
+Conversion
+Commercial statistics
+Leads
+Opportunities
+Sales
+Revenue
+Conversion
+Retention
+Product statistics
+Enrollment
+Completion
+Assessment
+Outcomes
+Revenue
+10.6 Statistical dimensions
+
+Every statistic should have dimensions.
+
+For example:
+
+Practice Sessions
+
+can be broken down by:
+
+Date
+Skill
+Exercise
+Difficulty
+Client/simulation
+Objective
+Coach
+Outcome
+
+This allows meaningful analysis.
+
+10.7 Trend engine
+
+A single number is insufficient.
+
+The system should calculate:
+
+Current
+Previous
+Change
+Trend
+Consistency
+
+Example:
+
+Questioning
+
+Current: 78
+Previous: 71
+Change: +7
+Trend: Improving
+Consistency: High
+10.8 Condition architecture
+
+Conditions interpret statistics.
+
+Conceptually:
+
+Statistics
++
+Evidence
++
+Rules
+=
+Condition
+
+Example:
+
+Practice frequency ↓
+Assessment performance ↓
+Skill consistency ↓
+       ↓
+Development Condition
+= Needs Attention
+10.9 Condition dimensions
+
+The system should be able to evaluate conditions across:
+
+Development
+Practice
+Client delivery
+Expertise
+Methodology
+Brand
+Content
+Commercial
+Products
+10.10 Condition lifecycle
+Condition Detected
+ ↓
+Condition Active
+ ↓
+Response Required
+ ↓
+Investigation
+ ↓
+Correction
+ ↓
+Monitoring
+ ↓
+Resolved
+
+Potential states:
+
+Healthy
+Stable
+Improving
+Declining
+At Risk
+Critical
+Insufficient Evidence
+
+The exact condition taxonomy should be defined centrally rather than allowing each dashboard to invent its own terminology.
+
+10.11 Evidence sufficiency
+
+A major requirement is distinguishing:
+
+bad condition
+
+from:
+
+not enough information.
+
+For example:
+
+Client Outcomes
+= 0
+
+does not necessarily mean:
+
+“The coach has poor outcomes.”
+
+It might mean:
+
+“Outcome data has not been recorded.”
+
+Therefore:
+
+No evidence
+≠
+Negative evidence
+
+This is essential.
+
+10.12 Rule engine
+
+Conditions should be based on explicit rules.
+
+Conceptually:
+
+IF
+practice_frequency < threshold
+AND
+assessment_trend = declining
+AND
+recent_evidence >= minimum
+
+THEN
+condition = Development Risk
+
+Rules should be:
+
+Versioned
+Testable
+Auditable
+Explainable
+Configurable
+10.13 Condition explanation
+
+Every condition should answer:
+
+What?
+Development Risk
+Why?
+Questioning performance declined 12%
+over three assessments.
+Evidence?
+3 assessments
+8 simulations
+5 practice sessions
+What next?
+Investigation recommended.
+10.14 AI relationship
+
+AI can interpret statistics and conditions.
+
+But the underlying condition should come from the defined measurement/evaluation system.
+
+AI can say:
+
+“The data suggests that resistance handling may be the main development constraint.”
+
+It should not arbitrarily rewrite the underlying system state.
+
+10.15 Engine 10 outputs
+Statistics
+Trends
+Performance Indicators
+Conditions
+Alerts
+Evidence Sufficiency
+Evaluation Results
+Monitoring State
+
+These feed Engine 11.
+
+ENGINE 11 — INVESTIGATION & CORRECTION SYSTEM
+11.1 Purpose
+
+Engine 11 is the problem-solving and improvement engine.
+
+Engine 10 tells the system:
+
+Something is happening.
+
+Engine 11 determines:
+
+Why is it happening, what should change, and did the correction work?
+
+11.2 Core architecture
+Condition
+ ↓
+Investigation
+ ↓
+Evidence Collection
+ ↓
+Analysis
+ ↓
+Possible Causes
+ ↓
+Root Cause
+ ↓
+Correction
+ ↓
+Execution
+ ↓
+Measurement
+ ↓
+Verification
+ ↓
+Resolved / Reinvestigate
+11.3 Core objects
+Investigation
+Investigation
+- id
+- trigger
+- condition
+- problem
+- scope
+- status
+- owner
+- startDate
+- conclusion
+Finding
+Finding
+- investigationId
+- observation
+- evidence
+- significance
+- confidence
+Hypothesis
+Hypothesis
+- investigationId
+- proposedCause
+- evidenceFor
+- evidenceAgainst
+- confidence
+- status
+Root Cause
+RootCause
+- investigationId
+- description
+- supportingEvidence
+- confidence
+Corrective Action
+Correction
+- investigationId
+- action
+- objective
+- owner
+- deadline
+- expectedResult
+- verificationCriteria
+11.4 Investigation lifecycle
+Triggered
+ ↓
+Defined
+ ↓
+Evidence Gathering
+ ↓
+Analysis
+ ↓
+Cause Identified
+ ↓
+Correction Planned
+ ↓
+Correction Executed
+ ↓
+Verification
+ ↓
+Closed
+11.5 Investigation triggers
+
+Investigations can be triggered by:
+
+Development
+Skill decline
+Failed assessment
+Repeated practice failure
+Client delivery
+Poor outcome
+Negative feedback
+Repeated client resistance
+Expertise
+Principle contradiction
+Methodology failure
+Insufficient evidence
+Content
+Persistent underperformance
+Audience disengagement
+Commercial
+Low conversion
+High loss rate
+Poor retention
+Product
+Low completion
+Poor outcomes
+High refunds
+11.6 Root-cause analysis
+
+The system should distinguish:
+
+Symptom
+ ↓
+Immediate Cause
+ ↓
+Underlying Cause
+ ↓
+Systemic Cause
+
+Example:
+
+Symptom:
+Sales conversion declining
+
+Immediate cause:
+Prospects not accepting offer
+
+Underlying cause:
+Offer does not clearly address the customer's problem
+
+Systemic cause:
+Offer was created from methodology without enough customer evidence
+
+That is much more useful than:
+
+“Generate a better sales script.”
+
+11.7 Evidence-based investigation
+
+Each hypothesis should have evidence.
+
+Hypothesis
+    │
+    ├── Supporting Evidence
+    │
+    └── Contradicting Evidence
+
+This prevents the AI from simply choosing the first plausible explanation.
+
+11.8 Correction types
+
+Corrections should be categorized.
+
+Development correction
+New practice
+Different exercise
+Additional simulation
+Coaching feedback
+Learning intervention
+Delivery correction
+Session structure
+Questioning
+Intervention timing
+Follow-up
+Client process
+Methodology correction
+Modify principle
+Modify framework
+Add condition
+Retire method
+Commercial correction
+Change offer
+Change audience
+Change pricing
+Change positioning
+Change sales process
+Product correction
+Change curriculum
+Change lesson
+Change assessment
+Change delivery
+11.9 Corrective action workflow
+Problem
+ ↓
+Cause
+ ↓
+Correction
+ ↓
+Action
+ ↓
+Evidence
+ ↓
+Measurement
+ ↓
+Verification
+
+The correction is not complete merely because the action was performed.
+
+It is complete when the expected effect has been verified.
+
+11.10 Verification
+
+Example:
+
+Problem:
+Resistance handling score = 58
+
+Correction:
+5 targeted simulations
+
+Expected:
+Score > 70
+
+Result:
+74
+
+Condition:
+Improving
+
+The system can therefore close the investigation.
+
+If:
+
+Result:
+61
+
+then:
+
+Correction ineffective
+ ↓
+Reinvestigate
+11.11 Prevention
+
+After solving a recurring problem, the system should ask:
+
+How can we prevent this from recurring?
+
+That can produce:
+
+New practice rule
+New methodology rule
+New workflow
+New assessment
+New content
+New product requirement
+
+This turns correction into organizational learning.
+
+11.12 AI architecture
+
+AI can:
+
+Investigate
+Search evidence
+Generate hypotheses
+Compare evidence
+Identify patterns
+Propose root causes
+Recommend corrections
+Design corrective exercises
+Analyze results
+
+But the system should preserve the distinction between:
+
+AI hypothesis
+
+and
+
+verified finding.
+
+11.13 Engine 11 outputs
+Investigations
+Findings
+Hypotheses
+Root Causes
+Corrective Actions
+Verification Results
+Preventive Actions
+Lessons Learned
+
+Those lessons can feed Engine 4.
+
+This creates another critical loop:
+
+Problem
+ ↓
+Investigation
+ ↓
+Correction
+ ↓
+Lesson
+ ↓
+Experience
+ ↓
+Expertise
+ENGINE 12 — AI KNOWLEDGE & PROMPT SYSTEM
+12.1 Purpose
+
+Engine 12 is the intelligence layer connecting the entire Practice Engine.
+
+It is not simply a chatbot.
+
+Its purpose is to determine:
+
+What knowledge, strategy, context, evidence, and system action should be used for this specific situation?
+
+12.2 Three major knowledge layers
+Layer 1 — Canonical Management Knowledge
+
+The Management Volumes:
+
+Management Volume 0
+Management Volume 1
+Management Volume 2
+Management Volume 3
+
+These should form a structured knowledge source where permitted by the product's source/licensing and safety architecture.
+
+Layer 2 — Prompt Intelligence
+
+The ~1,000 prompts should become strategy intelligence.
+
+Not:
+
+User opens:
+"1,000 Prompts"
+
+but:
+
+Situation
+ ↓
+Context
+ ↓
+Strategy Retrieval
+ ↓
+Prompt Pattern
+ ↓
+Adaptation
+ ↓
+AI Action
+
+The prompts are therefore an internal intelligence resource.
+
+Layer 3 — Coach Knowledge
+
+The coach's own knowledge:
+
+Coach Passport
+Skills
+Practice
+Simulations
+Clients
+Experiences
+Lessons
+Principles
+Methodology
+IP
+Brand
+Content
+Offers
+Products
+Statistics
+Conditions
+Investigations
+Evidence
+
+This is the most important contextual layer.
+
+12.3 Knowledge architecture
+                   AI KNOWLEDGE SYSTEM
+                           │
+        ┌──────────────────┼──────────────────┐
+        ↓                  ↓                  ↓
+ Management Knowledge  Prompt Intelligence  Coach Knowledge
+        │                  │                  │
+        └──────────────────┼──────────────────┘
+                           ↓
+                     Context Builder
+                           ↓
+                    Relevant Knowledge
+                           ↓
+                    Strategy Selection
+                           ↓
+                       AI Action
+12.4 Knowledge objects
+
+The knowledge layer should represent:
+
+Source
+Document
+Section
+Concept
+Principle
+Strategy
+Prompt pattern
+Coach knowledge
+Evidence
+Relationship
+Version
+Source authority
+12.5 Source hierarchy
+
+The AI needs to know what kind of information it is using.
+
+Conceptually:
+
+SOURCE
+│
+├── Canonical
+│
+├── Coach-specific
+│
+├── System-generated
+│
+├── User-provided
+│
+├── Observational
+│
+└── AI-generated
+
+This allows the system to distinguish:
+
+source knowledge from inference.
+
+12.6 Retrieval architecture
+
+When a user asks something, the AI should not blindly search everything.
+
+User Request
+ ↓
+Intent Classification
+ ↓
+Target Engine
+ ↓
+Context Requirements
+ ↓
+Relevant Data Retrieval
+ ↓
+Knowledge Retrieval
+ ↓
+Strategy Selection
+ ↓
+Context Assembly
+ ↓
+Generation
+ ↓
+Validation
+ ↓
+Response / Action
+12.7 Context builder
+
+The Context Builder should determine what the AI needs.
+
+For example:
+
+User:
+
+“Why am I struggling with resistance?”
+
+The AI might retrieve:
+
+Coach Passport
++
+Resistance-related skill
++
+Recent simulations
++
+Client sessions
++
+Assessments
++
+Reflections
++
+Relevant experiences
++
+Relevant methodology
++
+Relevant strategy
+
+It should not dump the entire database into the model.
+
+12.8 Strategy selection
+
+The 1,000 prompts should be categorized into reusable strategies.
+
+Potential categories:
+
+Explore
+Clarify
+Diagnose
+Challenge
+Reflect
+Evaluate
+Teach
+Simulate
+Plan
+Investigate
+Correct
+Generate
+Compare
+Decide
+Structure
+
+The system chooses a strategy based on context.
+
+12.9 Prompt strategy object
+PromptStrategy
+- id
+- family
+- purpose
+- situation
+- applicableContexts
+- inputRequirements
+- expectedOutput
+- constraints
+- version
+
+The actual prompt text can remain an internal implementation detail where appropriate.
+
+12.10 AI orchestration
+
+This is where the existing repository's intelligence architecture becomes important.
+
+The orchestration flow should be:
+
+Request
+ ↓
+Intent
+ ↓
+Strategy Selection
+ ↓
+Context Retrieval
+ ↓
+Structured Generation
+ ↓
+Safety / Evidence Review
+ ↓
+Operational Action
+ ↓
+Audit
+12.11 AI action types
+
+The AI should be able to perform controlled actions such as:
+
+Explain
+Explain a concept
+Evaluate
+Evaluate practice
+Simulate
+Run client simulation
+Structure
+Turn experience into lesson
+Recommend
+Recommend next action
+Investigate
+Analyze condition
+Generate
+Create draft content
+Transform
+Convert methodology into course outline
+Compare
+Compare two approaches
+Orchestrate
+Trigger the appropriate workflow
+12.12 Structured outputs
+
+The AI should use structured schemas whenever the output affects the system.
+
+Instead of:
+
+"Your skill seems to be improving."
+
+the system should receive something like:
+
+Evaluation
+├── skill
+├── score
+├── evidence
+├── confidence
+├── strengths
+├── weaknesses
+└── recommendation
+
+This allows the application to reliably use AI output.
+
+12.13 AI and evidence
+
+AI-generated claims should have an evidence relationship.
+
+AI Claim
+ ↓
+Supporting Evidence
+ ↓
+Confidence
+ ↓
+Source
+
+If no evidence exists:
+
+Evidence Status = Insufficient
+
+rather than presenting the claim as established fact.
+
+12.14 AI audit architecture
+
+Every significant AI operation should record:
+
+AI Operation
+- id
+- coachId
+- route
+- actionType
+- strategyId
+- strategyVersion
+- sourceClasses
+- inputContext
+- outputType
+- safetyOutcome
+- timestamp
+
+Where appropriate, raw prompts and sensitive free-form user content should not be unnecessarily persisted.
+
+The audit should answer:
+
+What strategy and context produced this AI action?
+
+12.15 AI safety architecture
+
+The intelligence system needs several boundaries.
+
+Boundary 1 — Source
+
+Know what information the AI is using.
+
+Boundary 2 — Evidence
+
+Distinguish evidence from inference.
+
+Boundary 3 — Authority
+
+Do not fabricate credentials, outcomes, clients, or expertise.
+
+Boundary 4 — System truth
+
+AI recommendations should not automatically overwrite system-computed states.
+
+Boundary 5 — User control
+
+Actions that materially change records should have controlled workflows.
+
+12.16 AI feedback loop
+
+The AI should learn from system outcomes without treating every AI output as correct.
+
+AI Recommendation
+ ↓
+Coach Action
+ ↓
+Result
+ ↓
+Evidence
+ ↓
+Outcome
+ ↓
+Evaluate Recommendation
+ ↓
+Strategy Performance
+
+This allows the system to determine:
+
+Which strategies work?
+For whom?
+In what context?
+Under what conditions?
+12.17 Strategy performance
+
+Each strategy can eventually have operational metadata:
+
+Strategy
+ ↓
+Used 142 times
+ ↓
+Successful outcomes 91
+ ↓
+Success rate
+ ↓
+Contexts
+ ↓
+Best use cases
+
+This turns the 1,000 prompts from a static library into a strategy intelligence system.
+
+12.18 AI-to-engine routing
+
+The AI should know which engine it needs.
+
+"Help me practice resistance"
+        ↓
+Engine 2
+
+"Prepare for my client session"
+        ↓
+Engine 3
+
+"What did I learn from this?"
+        ↓
+Engine 4
+
+"Build my framework"
+        ↓
+Engine 5
+
+"Improve my positioning"
+        ↓
+Engine 6
+
+"Create content"
+        ↓
+Engine 7
+
+"Why isn't my offer converting?"
+        ↓
+Engine 8 + Engine 11
+
+"Build a course"
+        ↓
+Engine 9
+
+"How am I doing?"
+        ↓
+Engine 10
+
+"Why is this declining?"
+        ↓
+Engine 11
+12.19 Engine 12 outputs
+Context
+Knowledge
+Strategy
+AI Response
+Evaluation
+Recommendation
+Generation
+Workflow Action
+Audit
+Strategy Performance
+THE COMPLETE 12-ENGINE ARCHITECTURE
+
+At this point, all 12 engines connect into one system:
+
+                         PRACTICE ENGINE
+                               │
+                     ┌─────────┴─────────┐
+                     │                   │
+              ENGINE 1              ENGINE 12
+          PRACTICE OPERATING OS     AI INTELLIGENCE
+                     │                   │
+          ┌──────────┼──────────┐        │
+          ↓          ↓          ↓        │
+      ENGINE 2   ENGINE 3   ENGINE 4 ←──┘
+      DEVELOPMENT DELIVERY  EXPERIENCE
+                              ↓
+                         EXPERTISE
+                              ↓
+                         ENGINE 5
+                     METHODOLOGY & IP
+                              │
+                ┌─────────────┼─────────────┐
+                ↓             ↓             ↓
+             ENGINE 6     ENGINE 7     ENGINE 8
+              BRAND       CONTENT       OFFERS
+                │             │             │
+                └─────────────┼─────────────┘
+                              ↓
+                         ENGINE 9
+                      PRODUCTS/COURSES
+                              │
+                              ↓
+                         REAL RESULTS
+                              │
+                              ↓
+                         ENGINE 10
+                   STATISTICS & CONDITIONS
+                              │
+                              ↓
+                         ENGINE 11
+                  INVESTIGATION & CORRECTION
+                              │
+                              ↓
+                          IMPROVEMENT
+                              │
+                              └────────────→ ENGINE 1
+The Complete Flywheel
+LEARN
+ ↓
+PRACTICE
+ ↓
+SIMULATE
+ ↓
+COACH
+ ↓
+DELIVER
+ ↓
+REFLECT
+ ↓
+CAPTURE EXPERIENCE
+ ↓
+EXTRACT EXPERTISE
+ ↓
+BUILD METHODOLOGY
+ ↓
+CREATE AUTHORITY
+ ↓
+CREATE CONTENT
+ ↓
+BUILD AUDIENCE
+ ↓
+CREATE OFFERS
+ ↓
+SELL
+ ↓
+CREATE PRODUCTS
+ ↓
+DELIVER
+ ↓
+MEASURE
+ ↓
+EVALUATE
+ ↓
+DETECT CONDITION
+ ↓
+INVESTIGATE
+ ↓
+CORRECT
+ ↓
+VERIFY
+ ↓
+LEARN
+
+And Engine 12 sits across the entire flywheel, providing contextual intelligence rather than being a separate destination.
+
+The most important architectural principle
+
+The final Practice Engine should therefore not be twelve dashboards.
+
+It should be:
+
+12 engines + shared data model + evidence layer + workflow layer + statistics/condition layer + AI orchestration layer.
+
+The dashboards are merely the interfaces through which the coach interacts with those engines.
+
+That distinction is what turns the current Practice Engine foundation into a genuine Coach Development Operating System rather than a collection of AI-assisted productivity features.

@@ -14,6 +14,26 @@ import { Step1Welcome, Step2Goals, Step3Profile, Step4Experience, Step5Assessmen
 import { Step6Development, Step7Brand, Step8Methodology, Step9Build, Step10FirstExperience } from "@/components/onboarding/Steps6To10";
 import { Step11Analysis, Step12Challenge, Step13Plan, Step14Passport } from "@/components/onboarding/Steps11To14";
 
+function deepMerge(target: any, source: any): any {
+  if (typeof target !== "object" || target === null) return source;
+  if (typeof source !== "object" || source === null) return source;
+  if (Array.isArray(target) && Array.isArray(source)) return source; // arrays are replaced
+
+  const output = { ...target };
+  Object.keys(source).forEach(key => {
+    if (typeof source[key] === "object" && source[key] !== null && !Array.isArray(source[key])) {
+      if (key in target) {
+        output[key] = deepMerge(target[key], source[key]);
+      } else {
+        output[key] = source[key];
+      }
+    } else {
+      output[key] = source[key];
+    }
+  });
+  return output;
+}
+
 export default function Onboarding() {
   const [, setLocation] = useLocation();
   const { signOut } = useClerk();
@@ -46,10 +66,10 @@ export default function Onboarding() {
       const complete = nextStep > 14;
 
       const currentOnboardingData = profile?.onboardingData || {};
-      const newOnboardingData = stepData.onboardingData ? {
-        ...currentOnboardingData,
-        ...stepData.onboardingData
-      } : currentOnboardingData;
+      const newOnboardingData = stepData.onboardingData ? deepMerge(
+        currentOnboardingData,
+        stepData.onboardingData
+      ) : currentOnboardingData;
 
       const payload = {
         ...stepData,
@@ -78,9 +98,21 @@ export default function Onboarding() {
     }
   };
 
-  const handleBack = () => {
-    setStep((s) => Math.max(1, s - 1));
-    window.scrollTo(0, 0);
+  const handleBack = async () => {
+    const prevStep = Math.max(1, step - 1);
+    if (prevStep === step) return;
+
+    setSaveError(null);
+    try {
+      const payload = { onboardingStep: prevStep };
+      const updatedProfile = await updateProfile.mutateAsync({ data: payload });
+      queryClient.setQueryData(getGetPracticeProfileQueryKey(), updatedProfile);
+
+      setStep(prevStep);
+      window.scrollTo(0, 0);
+    } catch (err: any) {
+      setSaveError(err.message || "Failed to go back. Please try again.");
+    }
   };
   
   const handleSignOut = () => {

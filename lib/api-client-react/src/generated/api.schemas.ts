@@ -28,6 +28,7 @@ export const OnboardingDataBrandReviewState = {
   reviewed: 'reviewed',
   accepted: 'accepted',
   editing: 'editing',
+  rejected: 'rejected',
 } as const;
 
 export type OnboardingDataMethodologyReviewState = typeof OnboardingDataMethodologyReviewState[keyof typeof OnboardingDataMethodologyReviewState];
@@ -57,6 +58,7 @@ export const OnboardingDataExperienceAnalysisReviewState = {
   reviewed: 'reviewed',
   accepted: 'accepted',
   editing: 'editing',
+  rejected: 'rejected',
 } as const;
 
 export type OnboardingDataGoals = {
@@ -259,6 +261,8 @@ export type OnboardingDataExperienceAnalysis = {
 };
 
 export type OnboardingDataFirstChallenge = {
+  /** @minimum 1 */
+  sessionId?: number;
   /** @maxLength 10000 */
   result?: string;
   /**
@@ -439,6 +443,8 @@ export interface ExperienceInput {
 
 export interface PracticeSession {
   id: number;
+  /** @nullable */
+  clientRequestId: string | null;
   scenario: string;
   category: string;
   /** @nullable */
@@ -451,6 +457,11 @@ export interface PracticeSession {
 }
 
 export interface PracticeSessionInput {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  clientRequestId?: string;
   /** @minLength 1 */
   scenario: string;
   /** @minLength 1 */

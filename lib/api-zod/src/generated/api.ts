@@ -145,6 +145,8 @@ export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisF
 
 export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisNotesMax = 10000;
 
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeSessionIdMultipleOf = 1;
+
 export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeResultMax = 10000;
 
 export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMin = 0;
@@ -262,7 +264,7 @@ export const GetPracticeOverviewResponse = zod.object({
 }).optional(),
   "brand": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(getPracticeOverviewResponseProfileOnboardingDataBrandDiscoveryMaxOne)).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional()
 }).optional(),
   "methodology": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(getPracticeOverviewResponseProfileOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
@@ -297,10 +299,11 @@ export const GetPracticeOverviewResponse = zod.object({
   "lesson": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisLessonMax).optional(),
   "principle": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisPrincipleMax).optional(),
   "framework": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisFrameworkMax).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional(),
   "notes": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisNotesMax).optional()
 }).optional(),
   "firstChallenge": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeSessionIdMultipleOf).optional(),
   "result": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeResultMax).optional(),
   "score": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMax).optional(),
   "completed": zod.boolean().optional(),
@@ -490,6 +493,8 @@ export const getPracticeProfileResponseOnboardingDataExperienceAnalysisFramework
 
 export const getPracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax = 10000;
 
+export const getPracticeProfileResponseOnboardingDataFirstChallengeSessionIdMultipleOf = 1;
+
 export const getPracticeProfileResponseOnboardingDataFirstChallengeResultMax = 10000;
 
 export const getPracticeProfileResponseOnboardingDataFirstChallengeScoreMin = 0;
@@ -606,7 +611,7 @@ export const GetPracticeProfileResponse = zod.object({
 }).optional(),
   "brand": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(getPracticeProfileResponseOnboardingDataBrandDiscoveryMaxOne)).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional()
 }).optional(),
   "methodology": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(getPracticeProfileResponseOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
@@ -641,10 +646,11 @@ export const GetPracticeProfileResponse = zod.object({
   "lesson": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisLessonMax).optional(),
   "principle": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisPrincipleMax).optional(),
   "framework": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisFrameworkMax).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional(),
   "notes": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax).optional()
 }).optional(),
   "firstChallenge": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(getPracticeProfileResponseOnboardingDataFirstChallengeSessionIdMultipleOf).optional(),
   "result": zod.string().max(getPracticeProfileResponseOnboardingDataFirstChallengeResultMax).optional(),
   "score": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeScoreMax).optional(),
   "completed": zod.boolean().optional(),
@@ -811,6 +817,8 @@ export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisFrameworkM
 
 export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisNotesMax = 10000;
 
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeSessionIdMultipleOf = 1;
+
 export const updatePracticeProfileBodyOnboardingDataFirstChallengeResultMax = 10000;
 
 export const updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMin = 0;
@@ -926,7 +934,7 @@ export const UpdatePracticeProfileBody = zod.object({
 }).optional(),
   "brand": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileBodyOnboardingDataBrandDiscoveryMaxOne)).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional()
 }).optional(),
   "methodology": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileBodyOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
@@ -961,10 +969,11 @@ export const UpdatePracticeProfileBody = zod.object({
   "lesson": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisLessonMax).optional(),
   "principle": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisPrincipleMax).optional(),
   "framework": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisFrameworkMax).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional(),
   "notes": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisNotesMax).optional()
 }).optional(),
   "firstChallenge": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(updatePracticeProfileBodyOnboardingDataFirstChallengeSessionIdMultipleOf).optional(),
   "result": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstChallengeResultMax).optional(),
   "score": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMax).optional(),
   "completed": zod.boolean().optional(),
@@ -1121,6 +1130,8 @@ export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisFramew
 
 export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax = 10000;
 
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeSessionIdMultipleOf = 1;
+
 export const updatePracticeProfileResponseOnboardingDataFirstChallengeResultMax = 10000;
 
 export const updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMin = 0;
@@ -1237,7 +1248,7 @@ export const UpdatePracticeProfileResponse = zod.object({
 }).optional(),
   "brand": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileResponseOnboardingDataBrandDiscoveryMaxOne)).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional()
 }).optional(),
   "methodology": zod.object({
   "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileResponseOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
@@ -1272,10 +1283,11 @@ export const UpdatePracticeProfileResponse = zod.object({
   "lesson": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisLessonMax).optional(),
   "principle": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisPrincipleMax).optional(),
   "framework": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisFrameworkMax).optional(),
-  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing', 'rejected']).optional(),
   "notes": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax).optional()
 }).optional(),
   "firstChallenge": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(updatePracticeProfileResponseOnboardingDataFirstChallengeSessionIdMultipleOf).optional(),
   "result": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstChallengeResultMax).optional(),
   "score": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMax).optional(),
   "completed": zod.boolean().optional(),
@@ -1361,6 +1373,7 @@ export const CreateExperienceResponse = zod.object({
  */
 export const ListPracticeSessionsResponseItem = zod.object({
   "id": zod.number(),
+  "clientRequestId": zod.string().nullable(),
   "scenario": zod.string(),
   "category": zod.string(),
   "score": zod.number().nullable(),
@@ -1374,6 +1387,8 @@ export const ListPracticeSessionsResponse = zod.array(ListPracticeSessionsRespon
 /**
  * @summary Save a practice session
  */
+export const createPracticeSessionBodyClientRequestIdMax = 128;
+
 
 
 export const createPracticeSessionBodyScoreMin = 0;
@@ -1383,6 +1398,7 @@ export const createPracticeSessionBodyScoreMax = 100;
 
 
 export const CreatePracticeSessionBody = zod.object({
+  "clientRequestId": zod.string().min(1).max(createPracticeSessionBodyClientRequestIdMax).optional(),
   "scenario": zod.string().min(1),
   "category": zod.string().min(1),
   "score": zod.number().min(createPracticeSessionBodyScoreMin).max(createPracticeSessionBodyScoreMax),
@@ -1391,6 +1407,7 @@ export const CreatePracticeSessionBody = zod.object({
 
 export const CreatePracticeSessionResponse = zod.object({
   "id": zod.number(),
+  "clientRequestId": zod.string().nullable(),
   "scenario": zod.string(),
   "category": zod.string(),
   "score": zod.number().nullable(),

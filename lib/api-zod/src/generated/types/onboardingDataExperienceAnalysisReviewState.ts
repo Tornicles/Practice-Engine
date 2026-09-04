@@ -14,4 +14,5 @@ export const OnboardingDataExperienceAnalysisReviewState = {
   reviewed: 'reviewed',
   accepted: 'accepted',
   editing: 'editing',
+  rejected: 'rejected',
 } as const;

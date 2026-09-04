@@ -66,7 +66,7 @@ export const onboardingDataSchema = z.object({
   }).optional(),
   brand: z.object({
     discovery: z.record(z.string(), onboardingText).optional(),
-    reviewState: z.enum(["draft", "reviewed", "accepted", "editing"]).optional(),
+    reviewState: z.enum(["draft", "reviewed", "accepted", "editing", "rejected"]).optional(),
   }).optional(),
   methodology: z.object({
     discovery: z.record(z.string(), onboardingText).optional(),
@@ -94,10 +94,11 @@ export const onboardingDataSchema = z.object({
     lesson: onboardingText.optional(),
     principle: onboardingText.optional(),
     framework: onboardingText.optional(),
-    reviewState: z.enum(["draft", "reviewed", "accepted", "editing"]).optional(),
+    reviewState: z.enum(["draft", "reviewed", "accepted", "editing", "rejected"]).optional(),
     notes: onboardingText.optional(),
   }).optional(),
   firstChallenge: z.object({
+    sessionId: z.number().int().positive().optional(),
     result: onboardingText.optional(),
     score: z.number().min(0).max(100).optional(),
     completed: z.boolean().optional(),
@@ -177,18 +178,28 @@ export const experiencesTable = pgTable(
   ],
 );
 
-export const practiceSessionsTable = pgTable("practice_sessions", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id").notNull().default("legacy"),
-  scenario: text("scenario").notNull(),
-  category: text("category").notNull(),
-  score: integer("score"),
-  feedback: text("feedback"),
-  completedAt: timestamp("completed_at", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const practiceSessionsTable = pgTable(
+  "practice_sessions",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull().default("legacy"),
+    clientRequestId: text("client_request_id"),
+    scenario: text("scenario").notNull(),
+    category: text("category").notNull(),
+    score: integer("score"),
+    feedback: text("feedback"),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("practice_sessions_user_client_request_unique").on(
+      table.userId,
+      table.clientRequestId,
+    ),
+  ],
+);
 
 export const knowledgeAssetsTable = pgTable("knowledge_assets", {
   id: serial("id").primaryKey(),

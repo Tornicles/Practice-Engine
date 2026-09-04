@@ -6,6 +6,7 @@ import {
   experiencesTable,
   knowledgeAssetsTable,
   practiceSessionsTable,
+  type OnboardingData,
 } from "@workspace/db";
 import {
   CreateExperienceBody,
@@ -62,14 +63,17 @@ async function getOrCreateProfile(userId: string) {
 
 async function validateOnboardingReferences(
   userId: string,
-  onboardingData: {
-    practice?: { sessionId?: number };
-    firstExperience?: { experienceId?: number };
-  } | undefined,
+  onboardingData: OnboardingData | undefined,
+  database: Pick<typeof db, "select"> = db,
 ): Promise<string | undefined> {
-  const sessionId = onboardingData?.practice?.sessionId;
-  if (sessionId) {
-    const [session] = await db
+  const sessionIds = new Set(
+    [
+      onboardingData?.practice?.sessionId,
+      onboardingData?.firstChallenge?.sessionId,
+    ].filter((id): id is number => typeof id === "number"),
+  );
+  for (const sessionId of sessionIds) {
+    const [session] = await database
       .select({ id: practiceSessionsTable.id })
       .from(practiceSessionsTable)
       .where(
@@ -84,7 +88,7 @@ async function validateOnboardingReferences(
 
   const experienceId = onboardingData?.firstExperience?.experienceId;
   if (experienceId) {
-    const [experience] = await db
+    const [experience] = await database
       .select({ id: experiencesTable.id })
       .from(experiencesTable)
       .where(
@@ -100,6 +104,175 @@ async function validateOnboardingReferences(
   return undefined;
 }
 
+function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/**
+ * Recursively merges JSON objects while treating arrays and scalar values as
+ * replacements. Neither input is mutated.
+ */
+function mergeOnboardingData(
+  current: OnboardingData,
+  patch: OnboardingData,
+): OnboardingData {
+  const merge = (
+    existing: Record<string, unknown>,
+    incoming: Record<string, unknown>,
+  ): Record<string, unknown> => {
+    const result = { ...existing };
+    for (const [key, value] of Object.entries(incoming)) {
+      result[key] =
+        isObject(value) && isObject(existing[key])
+          ? merge(existing[key], value)
+          : value;
+    }
+    return result;
+  };
+
+  return merge(current, patch) as OnboardingData;
+}
+
+const skillRatingKeys = [
+  "listening",
+  "questioning",
+  "reframing",
+  "challenging",
+  "accountability",
+  "sessionStructure",
+  "handlingResistance",
+  "interventionSelection",
+  "coachingJudgment",
+] as const;
+
+const firstExperienceAnswerKeys = [
+  "whatHappened",
+  "whoWasInvolved",
+  "whatDidYouDo",
+  "whatWereYouThinking",
+  "whatWorked",
+  "whatDidNotWork",
+  "whatDidYouLearn",
+  "whatWillYouDoDifferently",
+] as const;
+
+function hasText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function hasAnswers(
+  value: Record<string, string | number | boolean | string[]> | undefined,
+  keys: readonly string[],
+): boolean {
+  return Boolean(value && keys.every((key) => hasText(value[key])));
+}
+
+function validateCompletion(
+  onboardingStep: number,
+  onboardingData: OnboardingData,
+): string | undefined {
+  const missing: string[] = [];
+
+  if (onboardingStep !== 15) missing.push("onboardingStep=15");
+  if (!onboardingData.goals?.outcomes?.length) missing.push("goals");
+  if (
+    onboardingData.profileDetails?.yearsCoaching === undefined ||
+    !hasText(onboardingData.profileDetails.currentStage) ||
+    !onboardingData.profileDetails.coachingTypes?.length
+  ) {
+    missing.push("profileDetails");
+  }
+  if (
+    !hasAnswers(onboardingData.experienceDiscovery, ["q1", "q2", "q3", "q4"])
+  ) {
+    missing.push("experienceDiscovery");
+  }
+  if (
+    !onboardingData.skillRatings ||
+    !skillRatingKeys.every(
+      (key) => typeof onboardingData.skillRatings?.[key] === "number",
+    )
+  ) {
+    missing.push("all skillRatings");
+  }
+  if (!hasText(onboardingData.miniScenario?.choice)) missing.push("miniScenario");
+  if (
+    !onboardingData.development?.modes?.length ||
+    (onboardingData.development.minutesPerWeek === undefined &&
+      onboardingData.development.dailyTimeCommitment === undefined)
+  ) {
+    missing.push("development");
+  }
+  if (
+    !hasAnswers(onboardingData.brand?.discovery, [
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "q5",
+      "q6",
+    ]) ||
+    !["reviewed", "accepted", "editing", "rejected"].includes(
+      onboardingData.brand?.reviewState ?? "",
+    )
+  ) {
+    missing.push("brand review");
+  }
+  if (
+    !hasAnswers(onboardingData.methodology?.discovery, [
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "q5",
+      "q6",
+    ]) ||
+    !["keep", "edit", "discard"].includes(
+      onboardingData.methodology?.reviewState ?? "",
+    )
+  ) {
+    missing.push("methodology review");
+  }
+  if (
+    !onboardingData.build?.ambitions?.length ||
+    !hasText(onboardingData.build.firstBuild?.type)
+  ) {
+    missing.push("build");
+  }
+  if (
+    onboardingData.firstExperience?.captureState !== "saved" ||
+    !onboardingData.firstExperience.experienceId ||
+    !firstExperienceAnswerKeys.every((key) =>
+      hasText(onboardingData.firstExperience?.[key]),
+    )
+  ) {
+    missing.push("firstExperience");
+  }
+  if (
+    !["reviewed", "accepted", "editing", "rejected"].includes(
+      onboardingData.experienceAnalysis?.reviewState ?? "",
+    )
+  ) {
+    missing.push("experienceAnalysis review");
+  }
+  if (
+    onboardingData.firstChallenge?.completed !== true ||
+    !onboardingData.firstChallenge.sessionId
+  ) {
+    missing.push("completed firstChallenge");
+  }
+  if (onboardingData.thirtyDayPlan?.accepted === undefined) {
+    missing.push("thirtyDayPlan decision");
+  }
+  if (onboardingData.passport?.reviewed !== true) {
+    missing.push("passport review");
+  }
+
+  return missing.length
+    ? `Onboarding cannot be completed; missing or invalid: ${missing.join(", ")}.`
+    : undefined;
+}
+
 router.get("/practice/profile", async (req, res): Promise<void> => {
   const profile = await getOrCreateProfile(authenticatedUserId(req));
   res.json(GetPracticeProfileResponse.parse(profile));
@@ -108,29 +281,63 @@ router.get("/practice/profile", async (req, res): Promise<void> => {
 router.patch("/practice/profile", async (req, res): Promise<void> => {
   const parsed = UpdatePracticeProfileBody.safeParse(req.body);
   if (!parsed.success) {
-    req.log.warn({ errors: parsed.error.message }, "Invalid profile update");
+    req.log?.warn({ errors: parsed.error.message }, "Invalid profile update");
     res.status(400).json({ error: parsed.error.message });
     return;
   }
 
   const userId = authenticatedUserId(req);
-  const referenceError = await validateOnboardingReferences(
-    userId,
-    parsed.data.onboardingData,
-  );
-  if (referenceError) {
-    res.status(404).json({ error: referenceError });
+  await getOrCreateProfile(userId);
+
+  const result = await db.transaction(async (tx) => {
+    const [profile] = await tx
+      .select()
+      .from(coachProfilesTable)
+      .where(eq(coachProfilesTable.userId, userId))
+      .limit(1)
+      .for("update");
+    if (!profile) throw new Error("Unable to load the coach profile.");
+
+    const onboardingData = parsed.data.onboardingData
+      ? mergeOnboardingData(profile.onboardingData, parsed.data.onboardingData)
+      : profile.onboardingData;
+    const onboardingStep = parsed.data.onboardingStep ?? profile.onboardingStep;
+    const onboardingCompleted =
+      parsed.data.onboardingCompleted ?? profile.onboardingCompleted;
+
+    const referenceError = await validateOnboardingReferences(
+      userId,
+      onboardingData,
+      tx,
+    );
+    if (referenceError) return { status: 404 as const, error: referenceError };
+
+    if (onboardingCompleted) {
+      const completionError = validateCompletion(onboardingStep, onboardingData);
+      if (completionError) {
+        return { status: 400 as const, error: completionError };
+      }
+    }
+
+    const [updated] = await tx
+      .update(coachProfilesTable)
+      .set({ ...parsed.data, onboardingData })
+      .where(
+        and(
+          eq(coachProfilesTable.id, profile.id),
+          eq(coachProfilesTable.userId, userId),
+        ),
+      )
+      .returning();
+    if (!updated) throw new Error("Unable to update the coach profile.");
+    return { status: 200 as const, profile: updated };
+  });
+
+  if (result.status !== 200) {
+    res.status(result.status).json({ error: result.error });
     return;
   }
-
-  const profile = await getOrCreateProfile(userId);
-  const [updated] = await db
-    .update(coachProfilesTable)
-    .set(parsed.data)
-    .where(and(eq(coachProfilesTable.id, profile.id), eq(coachProfilesTable.userId, userId)))
-    .returning();
-
-  res.json(UpdatePracticeProfileResponse.parse(updated));
+  res.json(UpdatePracticeProfileResponse.parse(result.profile));
 });
 
 router.get("/practice/experiences", async (req, res): Promise<void> => {
@@ -188,6 +395,18 @@ router.post("/practice/sessions", async (req, res): Promise<void> => {
       ...parsed.data,
       userId,
       completedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [
+        practiceSessionsTable.userId,
+        practiceSessionsTable.clientRequestId,
+      ],
+      set: {
+        clientRequestId:
+          "clientRequestId" in parsed.data
+            ? (parsed.data.clientRequestId as string)
+            : null,
+      },
     })
     .returning();
   res.status(201).json(CreatePracticeSessionResponse.parse(session));

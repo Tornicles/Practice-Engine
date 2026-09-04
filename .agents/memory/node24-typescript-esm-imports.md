@@ -7,4 +7,4 @@ Use explicit `.ts` extensions for relative runtime imports reached by Node's bui
 
 **Why:** Node 24 rejects directory imports and extensionless ESM imports when tests execute TypeScript source directly, while TypeScript otherwise rejects `.ts` extensions.
 
-**How to apply:** When a database-backed or other integration test imports production source directly, ensure every runtime import in that path is explicit; type-only imports do not require changes.
+**How to apply:** When a database-backed or other integration test imports production source directly, ensure every runtime import in that path is explicit; type-only imports do not require changes. After OpenAPI regeneration, recheck generated runtime barrel exports because the generator may restore extensionless paths.

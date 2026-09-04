@@ -14,4 +14,5 @@ export const OnboardingDataBrandReviewState = {
   reviewed: 'reviewed',
   accepted: 'accepted',
   editing: 'editing',
+  rejected: 'rejected',
 } as const;

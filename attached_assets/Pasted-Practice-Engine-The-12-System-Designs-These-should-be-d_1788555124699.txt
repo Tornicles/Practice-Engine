@@ -1,0 +1,1109 @@
+Practice Engine — The 12 System Designs
+
+These should be designed as 12 connected systems, not 12 separate dashboards. Each design defines the underlying objects, logic, workflows, AI behavior, evidence, statistics, and connections to the other systems.
+
+The central architecture is:
+
+Develop → Practice → Deliver → Reflect → Capture → Structure → Prove → Build IP → Teach → Market → Sell → Measure → Correct → Improve
+
+1. Practice Operating System
+Purpose
+
+Define how the entire Practice Engine operates as one system.
+
+This is the master architecture that everything else plugs into.
+
+What it manages
+Coach identity
+Coach objectives
+Development priorities
+Current capabilities
+Practice activities
+Client work
+Experiences
+Evidence
+Knowledge
+Methodology
+IP
+Content
+Offers
+Courses
+Products
+Statistics
+Conditions
+Investigations
+Corrections
+Next-best actions
+Core objects
+Coach Passport
+Objective
+Development Focus
+Capability
+Activity
+Workflow
+Evidence
+Asset
+Outcome
+Recommendation
+Condition
+Action
+Core operating loop
+Purpose
+ ↓
+Organize
+ ↓
+Plan
+ ↓
+Do
+ ↓
+Produce
+ ↓
+Measure
+ ↓
+Evaluate
+ ↓
+Condition
+ ↓
+Investigate
+ ↓
+Correct
+ ↓
+Improve
+ ↓
+Expand
+Coach-development loop
+Learn
+ ↓
+Practice
+ ↓
+Coach
+ ↓
+Reflect
+ ↓
+Experience
+ ↓
+Expertise
+ ↓
+Methodology
+ ↓
+IP
+ ↓
+Teach
+ ↓
+Prove
+ ↓
+Grow
+Design requirement
+
+Every other system must have a defined place inside this operating model.
+
+This design answers:
+
+“How does Practice Engine function as one operating system rather than a collection of tools?”
+
+2. Coach Development System
+Purpose
+
+Turn a coach from learner → practitioner → competent coach → experienced coach → expert → methodology creator.
+
+This is the core developmental engine.
+
+Development stages
+Orientation
+ ↓
+Learning
+ ↓
+Practice
+ ↓
+Simulation
+ ↓
+Application
+ ↓
+Reflection
+ ↓
+Assessment
+ ↓
+Correction
+ ↓
+Repetition
+ ↓
+Mastery
+It manages
+Skills
+Competencies
+Knowledge areas
+Practice exercises
+Simulations
+Real coaching
+Reflections
+Assessments
+Development gaps
+Mastery
+Development history
+Skill model
+
+Each skill needs:
+
+Skill definition
+Current level
+Target level
+Evidence
+Practice history
+Assessment history
+Trend
+Weaknesses
+Strengths
+Recommended practice
+
+For example:
+
+Questioning
+Current: 72
+Target: 90
+Trend: Improving
+Evidence: 14 sessions
+Priority: Medium
+Next Practice: Diagnostic questioning
+Important distinction
+
+The existing repository's hard-coded skill values should eventually become computed development statistics, not permanent numbers.
+
+AI role
+
+AI can:
+
+Coach
+Simulate
+Observe
+Evaluate
+Explain
+Recommend
+Generate practice
+Identify gaps
+
+AI should not simply declare mastery without evidence.
+
+3. Client Delivery System
+Purpose
+
+Connect training to real-world coaching delivery.
+
+Practice Engine cannot become an isolated education platform. The coach needs to apply what they learn.
+
+Core flow
+Prospect
+ ↓
+Client
+ ↓
+Intake
+ ↓
+Diagnosis
+ ↓
+Coaching Objective
+ ↓
+Session
+ ↓
+Observation
+ ↓
+Intervention
+ ↓
+Client Response
+ ↓
+Outcome
+ ↓
+Follow-up
+ ↓
+Evidence
+Objects
+Client
+Client profile
+Intake
+Coaching objective
+Session
+Session notes
+Observation
+Intervention
+Client response
+Outcome
+Follow-up
+Client feedback
+Evidence
+Session record
+
+Every session should potentially capture:
+
+What happened?
+What was the client trying to achieve?
+What did the coach observe?
+What questions were asked?
+What intervention was used?
+What changed?
+What worked?
+What failed?
+What should happen next?
+Connection to development
+
+Real client sessions become developmental evidence.
+
+Client Session
+ ↓
+Coach Reflection
+ ↓
+Skill Evidence
+ ↓
+Experience
+ ↓
+Expertise
+Connection to IP
+
+Repeated successful interventions can become methodology candidates.
+
+4. Experience → Expertise System
+Purpose
+
+Convert lived experience into structured knowledge.
+
+This is one of the most important systems in Practice Engine.
+
+The repository already has the beginning of this capability.
+
+Core transformation
+Experience
+ ↓
+Event
+ ↓
+Observation
+ ↓
+Reflection
+ ↓
+Lesson
+ ↓
+Principle
+ ↓
+Pattern
+ ↓
+Framework Candidate
+ ↓
+Methodology
+Experience capture
+
+The coach records:
+
+Situation
+Context
+Problem
+What happened
+What they did
+Why they did it
+Result
+What surprised them
+What they learned
+What they would change
+AI extraction
+
+AI can identify:
+
+Lessons
+Principles
+Patterns
+Insights
+Framework candidates
+Questions
+Contradictions
+Evidence gaps
+Critical rule
+
+AI-generated insight remains a candidate until supported.
+
+For example:
+
+Experience
+ ↓
+AI identifies principle
+ ↓
+Principle Candidate
+ ↓
+Needs validation
+ ↓
+More evidence
+ ↓
+Validated principle
+Why this matters
+
+This creates a proprietary knowledge-generation machine.
+
+The coach's expertise isn't simply generated from generic AI knowledge.
+
+It emerges from:
+
+experience + reflection + repeated evidence + validation.
+
+5. Methodology & IP System
+Purpose
+
+Turn validated expertise into a proprietary coaching methodology and intellectual property.
+
+Core pipeline
+Experience
+ ↓
+Lesson
+ ↓
+Principle
+ ↓
+Pattern
+ ↓
+Method
+ ↓
+Framework
+ ↓
+Methodology
+ ↓
+IP Asset
+IP types
+Frameworks
+Models
+Methods
+Processes
+Diagnostic tools
+Assessment tools
+Coaching protocols
+Exercises
+Playbooks
+Guides
+Templates
+Courses
+Books
+Programs
+Every IP asset should have lineage.
+
+Example:
+
+Framework X
+ ↓
+Principle #12
+ ↓
+Experience #38
+ ↓
+Client Session #71
+ ↓
+Outcome Evidence
+
+This creates traceable intellectual property.
+
+Validation system
+
+Each methodology component needs a status such as:
+
+Candidate
+Draft
+Tested
+Supported
+Validated
+Needs revision
+Retired
+Critical design principle
+
+The system should prevent the coach from confusing:
+
+“AI generated this”
+
+with
+
+“I have demonstrated this.”
+
+6. Brand & Authority System
+Purpose
+
+Turn the coach's validated expertise into a recognizable professional identity.
+
+It manages
+Positioning
+Niche
+Audience
+Promise
+Philosophy
+Point of view
+Expertise
+Differentiators
+Credentials
+Proof
+Testimonials
+Case studies
+Authority assets
+Brand messaging
+Flow
+Expertise
+ ↓
+Positioning
+ ↓
+Point of View
+ ↓
+Messaging
+ ↓
+Proof
+ ↓
+Authority
+ ↓
+Reputation
+Brand knowledge should come from the coach's actual development.
+
+For example:
+
+Experiences
++
+Validated Principles
++
+Methodology
++
+Client Outcomes
++
+Evidence
+ ↓
+Distinctive Positioning
+Authority evidence
+Client outcomes
+Case studies
+Published frameworks
+Speaking
+Teaching
+Content
+Testimonials
+Certifications
+Research
+Demonstrated expertise
+AI role
+
+AI can help articulate and package authority.
+
+It should not fabricate authority.
+
+7. Content & Audience System
+Purpose
+
+Turn expertise into content and use audience response as another learning/evidence source.
+
+Core flow
+Expertise
+ ↓
+Content Idea
+ ↓
+Content Draft
+ ↓
+Review
+ ↓
+Publish
+ ↓
+Audience Response
+ ↓
+Performance
+ ↓
+Learning
+ ↓
+New Experience/Insight
+Content types
+Posts
+Articles
+Videos
+Short-form content
+Long-form content
+Podcasts
+Newsletters
+Case studies
+Educational content
+Framework explanations
+Stories
+Opinions
+Content intelligence
+
+Track:
+
+Topic
+Audience
+Platform
+Format
+Hook
+CTA
+Engagement
+Leads
+Responses
+Questions
+Shares
+Conversions
+Important connection
+
+Audience behavior should feed back into expertise.
+
+For example:
+
+Coach publishes idea
+ ↓
+Audience asks 30 questions
+ ↓
+Recurring problem identified
+ ↓
+New experience/research
+ ↓
+New methodology
+ ↓
+New content
+
+That creates a continuous knowledge loop.
+
+8. Offer & Commercial System
+Purpose
+
+Convert expertise into commercial offers.
+
+Flow
+Expertise
+ ↓
+Problem
+ ↓
+Audience
+ ↓
+Offer
+ ↓
+Prospect
+ ↓
+Conversation
+ ↓
+Sale
+ ↓
+Client
+ ↓
+Outcome
+ ↓
+Proof
+Offer types
+1:1 coaching
+Group coaching
+Consulting
+Workshops
+Programs
+Retainers
+Courses
+Assessments
+Digital products
+Certification
+Licensing
+Each offer needs
+Target customer
+Problem
+Desired outcome
+Method
+Deliverables
+Duration
+Price
+Proof
+Sales process
+Delivery process
+Commercial intelligence
+
+Track:
+
+Leads
+Opportunities
+Conversations
+Proposals
+Wins
+Losses
+Revenue
+Conversion
+Client acquisition
+Retention
+Offer performance
+Connection
+
+Poor sales performance should trigger investigation.
+
+Not:
+
+“Generate another sales page.”
+
+But:
+
+“Why is this offer not converting?”
+
+9. Course & Product System
+Purpose
+
+Turn validated methodology into scalable products.
+
+Product pipeline
+Validated Expertise
+ ↓
+Learning Objective
+ ↓
+Curriculum
+ ↓
+Course/Product
+ ↓
+Build
+ ↓
+Test
+ ↓
+Deliver
+ ↓
+Learner Results
+ ↓
+Improve
+Course structure
+Audience
+Outcome
+Modules
+Lessons
+Exercises
+Assessments
+Practice
+Resources
+Completion
+Results
+Product types
+Course
+Workshop
+Cohort
+Toolkit
+Workbook
+Assessment
+Certification
+Digital resource
+Coaching program
+Validation
+
+A course shouldn't be considered successful merely because it was published.
+
+Track:
+
+Enrollment
+Completion
+Participation
+Assessment results
+Learner feedback
+Outcomes
+Drop-off
+Repeat purchase
+Transformation
+Connection to methodology
+
+The course should inherit validated methodology rather than independently inventing concepts.
+
+10. Statistics & Condition System
+Purpose
+
+Determine what is actually happening in the practice.
+
+This is a major missing underlying engine.
+
+It should eventually replace hard-coded dashboard statistics.
+
+Statistics
+
+Measure production and outcomes across the system.
+
+Examples:
+
+Development
+
+Practice sessions
+Skills practiced
+Assessments
+Improvement
+Simulation performance
+
+Client delivery
+
+Sessions
+Clients
+Outcomes
+Retention
+Satisfaction
+
+Experience
+
+Experiences captured
+Lessons extracted
+Principles validated
+Frameworks developed
+
+Commercial
+
+Leads
+Sales
+Revenue
+Conversion
+
+Content
+
+Publications
+Reach
+Engagement
+Leads
+
+Products
+
+Enrollment
+Completion
+Results
+Condition system
+
+Statistics are interpreted into conditions.
+
+Conceptually:
+
+Statistics
+ ↓
+Evaluation
+ ↓
+Condition
+
+Example:
+
+Practice volume ↓
+Assessment score ↓
+Reflection quality ↓
+        ↓
+Development Condition = At Risk
+
+Or:
+
+Client outcomes ↑
+Evidence ↑
+Methodology validation ↑
+        ↓
+Expertise Condition = Advancing
+Critical design requirement
+
+Conditions must be computed from defined rules, not manually typed by the user or invented by AI.
+
+11. Investigation & Correction System
+Purpose
+
+When something is wrong, determine why and manage the correction.
+
+This is the system that converts:
+
+condition → diagnosis → correction → verification.
+
+Flow
+Condition
+ ↓
+Investigation
+ ↓
+Data/Evidence
+ ↓
+Root Cause
+ ↓
+Correction
+ ↓
+Action
+ ↓
+Measurement
+ ↓
+Verification
+Example
+
+Condition:
+
+Practice performance declining.
+
+Investigation examines:
+
+Frequency
+Skill type
+Session difficulty
+Feedback
+Reflection
+Client context
+Practice quality
+Recent changes
+
+Possible cause:
+
+Coach is practicing communication but not diagnostic questioning.
+
+Correction:
+
+Five diagnostic questioning drills + two simulations + one real-session application.
+
+Then:
+
+Correction
+ ↓
+New evidence
+ ↓
+Statistics
+ ↓
+Condition recalculated
+Investigation records
+
+Each investigation should contain:
+
+Trigger
+Problem
+Evidence
+Hypotheses
+Findings
+Root cause
+Decision
+Corrective action
+Owner
+Deadline
+Verification criteria
+Result
+AI role
+
+AI can investigate and recommend.
+
+The system should preserve:
+
+evidence → reasoning → decision → result.
+
+12. AI Knowledge & Prompt System
+Purpose
+
+Create the intelligence layer connecting the Practice Engine's knowledge with AI.
+
+This is where the Management Volumes + 1,000 prompts + coach-specific data become useful.
+
+Three knowledge layers
+Layer 1 — Canonical Management Knowledge
+
+Management Volume:
+
+0
+1
+2
+3
+
+This provides the foundational management/organizational knowledge layer.
+
+Layer 2 — Prompt Intelligence
+
+The approximately 1,000 prompts become reusable reasoning/interaction strategies.
+
+They should not simply be displayed to users as a giant prompt library.
+
+They become:
+
+Situation
+ ↓
+Context
+ ↓
+Strategy Selection
+ ↓
+Prompt/Instruction Pattern
+ ↓
+AI Action
+Layer 3 — Coach-Specific Knowledge
+
+This includes:
+
+Coach Passport
+Skills
+Practice history
+Client experiences
+Lessons
+Principles
+Methodology
+IP
+Brand
+Content
+Offers
+Courses
+Products
+Evidence
+Statistics
+Conditions
+Investigations
+Corrections
+AI architecture
+User Request
+     ↓
+Context Builder
+     ↓
+Coach Knowledge
+     +
+Management Knowledge
+     +
+Prompt Strategy
+     +
+Current Operating Data
+     ↓
+Strategy Selection
+     ↓
+AI Generation
+     ↓
+Safety / Evidence Review
+     ↓
+Action
+     ↓
+Audit
+     ↓
+System Data
+AI roles
+
+The AI can act as:
+
+Interpreter — explains information
+Coach — guides development
+Simulator — creates practice scenarios
+Evaluator — evaluates performance
+Architect — structures knowledge
+Advisor — recommends actions
+Investigator — analyzes problems
+Generator — creates drafts
+Orchestrator — coordinates system actions
+Prompt intelligence rule
+
+The 1,000 prompts should be treated as strategy intelligence, not as the coach's expertise.
+
+The coach's expertise comes from:
+
+experience + evidence + validation + methodology.
+
+How the 12 Designs Connect
+
+The important part is that these aren't isolated.
+
+                    ┌──────────────────────┐
+                    │ 1. PRACTICE OS       │
+                    │ Master Architecture   │
+                    └──────────┬───────────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        ↓                      ↓                      ↓
+┌───────────────┐      ┌───────────────┐      ┌───────────────┐
+│ 2. DEVELOPMENT│      │ 3. DELIVERY   │      │ 10. STATISTICS│
+└───────┬───────┘      └───────┬───────┘      └───────┬───────┘
+        │                      │                      │
+        └──────────────┬───────┘                      ↓
+                       ↓                       ┌───────────────┐
+              ┌─────────────────┐              │  CONDITION    │
+              │ 4. EXPERIENCE   │              └───────┬───────┘
+              └────────┬────────┘                      ↓
+                       ↓                       ┌───────────────┐
+              ┌─────────────────┐              │11. INVESTIGATE│
+              │ 5. METHODOLOGY  │              └───────┬───────┘
+              │      + IP        │                      ↓
+              └────────┬────────┘              ┌───────────────┐
+                       │                       │   CORRECT     │
+          ┌────────────┼────────────┐          └───────┬───────┘
+          ↓            ↓            ↓                  │
+   ┌───────────┐ ┌──────────┐ ┌──────────┐            │
+   │6. BRAND   │ │7.CONTENT │ │8.OFFERS  │            │
+   └─────┬─────┘ └────┬─────┘ └────┬─────┘            │
+         │             │             │                  │
+         └─────────────┼─────────────┘                  │
+                       ↓                                │
+                 ┌─────────────┐                        │
+                 │9. PRODUCTS  │                        │
+                 └──────┬──────┘                        │
+                        │                               │
+                        └───────────→ RESULTS ──────────┘
+                                      │
+                                      ↓
+                              EXPERIENCE / EVIDENCE
+                                      │
+                                      └────→ back to system
+
+And across all 11 systems:
+
+                 ┌─────────────────────────┐
+                 │ 12. AI KNOWLEDGE LAYER │
+                 │                         │
+                 │ Management Vol 0–3     │
+                 │ 1,000 Prompt Strategies │
+                 │ Coach-Specific Data     │
+                 │ Evidence                │
+                 │ Operating Context       │
+                 └────────────┬────────────┘
+                              │
+             ┌────────────────┼────────────────┐
+             ↓                ↓                ↓
+         Understand       Recommend        Execute
+             ↓                ↓                ↓
+          Evaluate        Generate         Orchestrate
+             └────────────────┼────────────────┘
+                              ↓
+                       Practice Engine
+The Most Important Architectural Distinction
+
+The 12 designs are not 12 pages.
+
+They are 12 underlying systems.
+
+For example, the existing dashboard may show:
+
+Skills → Questioning 82, Listening 76, Reframing 61.
+
+But the real architecture underneath should eventually be:
+
+Practice Session
+      ↓
+Observed Behavior
+      ↓
+Assessment
+      ↓
+Evidence
+      ↓
+Skill Calculation
+      ↓
+Statistics
+      ↓
+Condition
+      ↓
+Recommended Practice
+      ↓
+New Practice
+      ↓
+New Evidence
+
+The dashboard is simply the interface that exposes the result.
+
+What We Should Design First
+
+The correct design order is not 1 → 12 mechanically.
+
+I would build the architecture in this dependency order:
+
+Foundation
+
+1. Practice Operating System
+
+Defines everything.
+
+Core developmental engine
+
+2. Coach Development System
+
+3. Client Delivery System
+
+4. Experience → Expertise System
+
+Knowledge/IP engine
+
+5. Methodology & IP System
+
+Measurement/governance engine
+
+10. Statistics & Condition System
+
+11. Investigation & Correction System
+
+Commercialization
+
+6. Brand & Authority
+
+7. Content & Audience
+
+8. Offers & Commercial
+
+9. Courses & Products
+
+Intelligence layer
+
+12. AI Knowledge & Prompt System
+
+This gives us a coherent architecture rather than building disconnected features.
+
+The next step should be to write each of these 12 as a full technical product design: entities/data objects → screens → workflows → rules → AI actions → statistics → conditions → inputs/outputs → connections to the other 11 systems.

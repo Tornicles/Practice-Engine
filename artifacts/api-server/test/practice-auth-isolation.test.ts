@@ -368,6 +368,7 @@ test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked r
       method: "POST",
       userId: aliceId,
       body: {
+        clientRequestId: `alice-onboarding-practice-${testId}`,
         scenario: "Alice onboarding practice",
         category: "Questioning",
         score: 91,
@@ -376,8 +377,35 @@ test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked r
     });
     assert.equal(ownSession.status, 201);
 
+    const ownExperience = await server.request("/practice/experiences", {
+      method: "POST",
+      userId: aliceId,
+      body: {
+        clientRequestId: `alice-onboarding-experience-${testId}`,
+        title: "Decision hesitation",
+        situation: "A client hesitated over a decision.",
+        learning: "Leave more silence.",
+        principle: "Pause before advice.",
+      },
+    });
+    assert.equal(ownExperience.status, 201);
+
     const onboardingData = {
-      goals: { primaryGoal: "Build a durable coaching practice" },
+      goals: {
+        primaryGoal: "Build a durable coaching practice",
+        outcomes: ["Become a better coach"],
+      },
+      profileDetails: {
+        yearsCoaching: 3,
+        currentStage: "Developing",
+        coachingTypes: ["1:1"],
+      },
+      experienceDiscovery: {
+        q1: "Decision making",
+        q2: "Leadership transitions",
+        q3: "Clarifying assumptions",
+        q4: "Resistant client conversations",
+      },
       skillRatings: {
         questioning: 5,
         listening: 4,
@@ -389,9 +417,46 @@ test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked r
         interventionSelection: 4,
         coachingJudgment: 4,
       },
+      miniScenario: {
+        choice: "Reflect the client's concern",
+        evaluation: "Strong empathy",
+        score: 90,
+      },
       practice: { sessionId: ownSession.body.id, result: "completed" },
-      development: { dailyTimeCommitment: "30" },
+      development: {
+        modes: ["Scenario simulations"],
+        dailyTimeCommitment: "30",
+      },
+      brand: {
+        discovery: {
+          q1: "Clear decisions",
+          q2: "Growth leaders",
+          q3: "Decision paralysis",
+          q4: "Reflective challenge",
+          q5: "Silence creates insight",
+          q6: "Leadership experience",
+        },
+        reviewState: "accepted",
+      },
+      methodology: {
+        discovery: {
+          q1: "Clarify the goal",
+          q2: "Patterns",
+          q3: "What matters now?",
+          q4: "Client ownership",
+          q5: "Patient inquiry",
+          q6: "Premature advice",
+        },
+        candidates: [{ title: "Decision pause" }],
+        reviewState: "keep",
+      },
+      build: {
+        ambitions: ["Frameworks"],
+        firstBuild: { type: "Framework", title: "Decision pause" },
+      },
       firstExperience: {
+        experienceId: ownExperience.body.id,
+        captureState: "saved",
         whatHappened: "A client hesitated over a decision.",
         whoWasInvolved: "Coach and client",
         whatDidYouDo: "Asked a clarifying question.",
@@ -409,6 +474,7 @@ test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked r
         reviewState: "accepted",
       },
       firstChallenge: {
+        sessionId: ownSession.body.id,
         completed: true,
         result: "completed",
         overallScore: 82,
@@ -425,6 +491,18 @@ test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked r
       },
       passport: { reviewed: true },
     };
+    const invalidCompletion = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: {
+        onboardingStep: 15,
+        onboardingCompleted: true,
+        onboardingData: { goals: { outcomes: ["Become a better coach"] } },
+      },
+    });
+    assert.equal(invalidCompletion.status, 400);
+    assert.match(invalidCompletion.body.error, /profileDetails/);
+
     const saved = await server.request("/practice/profile", {
       method: "PATCH",
       userId: aliceId,
@@ -442,7 +520,147 @@ test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked r
     await server.close();
     await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, aliceId));
     await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, bobId));
+    await db.delete(experiencesTable).where(eq(experiencesTable.userId, aliceId));
     await db.delete(coachProfilesTable).where(eq(coachProfilesTable.userId, aliceId));
     await db.delete(coachProfilesTable).where(eq(coachProfilesTable.userId, bobId));
+  }
+});
+
+test("Profile onboarding patches recursively merge and validate merged references", async () => {
+  const testId = randomUUID();
+  const aliceId = `onboarding-merge-alice-${testId}`;
+  const bobId = `onboarding-merge-bob-${testId}`;
+  const server = await startServer();
+
+  try {
+    await server.request("/practice/profile", { userId: aliceId });
+    const bobSession = await server.request("/practice/sessions", {
+      method: "POST",
+      userId: bobId,
+      body: {
+        clientRequestId: `bob-merged-reference-${testId}`,
+        scenario: "Bob private retry",
+        category: "Resistance",
+        score: 77,
+        feedback: "Private",
+      },
+    });
+    assert.equal(bobSession.status, 201);
+
+    const firstPatch = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: {
+        onboardingData: {
+          goals: {
+            outcomes: ["Become a better coach", "Build a methodology"],
+            motivations: ["Serve clients"],
+          },
+          profileDetails: { coachingTypes: ["1:1"], currentStage: "Developing" },
+        },
+      },
+    });
+    assert.equal(firstPatch.status, 200);
+
+    const secondPatch = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: {
+        onboardingData: {
+          goals: { outcomes: ["Grow my coaching business"] },
+          profileDetails: { yearsCoaching: 3 },
+        },
+      },
+    });
+    assert.equal(secondPatch.status, 200);
+    assert.deepEqual(secondPatch.body.onboardingData.goals, {
+      outcomes: ["Grow my coaching business"],
+      motivations: ["Serve clients"],
+    });
+    assert.deepEqual(secondPatch.body.onboardingData.profileDetails, {
+      coachingTypes: ["1:1"],
+      currentStage: "Developing",
+      yearsCoaching: 3,
+    });
+
+    const crossAccountMergedReference = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: {
+        onboardingData: {
+          firstChallenge: {
+            completed: true,
+            sessionId: bobSession.body.id,
+          },
+        },
+      },
+    });
+    assert.equal(crossAccountMergedReference.status, 404);
+
+    const unchanged = await server.request("/practice/profile", { userId: aliceId });
+    assert.equal(unchanged.body.onboardingData.firstChallenge, undefined);
+    assert.deepEqual(unchanged.body.onboardingData.goals.outcomes, [
+      "Grow my coaching business",
+    ]);
+  } finally {
+    await server.close();
+    await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, bobId));
+    await db.delete(coachProfilesTable).where(eq(coachProfilesTable.userId, aliceId));
+    await db.delete(coachProfilesTable).where(eq(coachProfilesTable.userId, bobId));
+  }
+});
+
+test("Practice session creation is idempotent per user and client request", async () => {
+  const testId = randomUUID();
+  const aliceId = `session-idempotency-alice-${testId}`;
+  const bobId = `session-idempotency-bob-${testId}`;
+  const clientRequestId = `practice-session-${testId}`;
+  const server = await startServer();
+
+  try {
+    const body = {
+      clientRequestId,
+      scenario: "Ambiguous save retry",
+      category: "Questioning",
+      score: 88,
+      feedback: "Good pause",
+    };
+    const first = await server.request("/practice/sessions", {
+      method: "POST",
+      userId: aliceId,
+      body,
+    });
+    const retry = await server.request("/practice/sessions", {
+      method: "POST",
+      userId: aliceId,
+      body,
+    });
+    assert.equal(first.status, 201);
+    assert.equal(retry.status, 201);
+    assert.equal(retry.body.id, first.body.id);
+    assert.equal(retry.body.clientRequestId, clientRequestId);
+
+    const otherUser = await server.request("/practice/sessions", {
+      method: "POST",
+      userId: bobId,
+      body,
+    });
+    assert.equal(otherUser.status, 201);
+    assert.notEqual(otherUser.body.id, first.body.id);
+
+    const aliceRows = await db
+      .select()
+      .from(practiceSessionsTable)
+      .where(
+        and(
+          eq(practiceSessionsTable.userId, aliceId),
+          eq(practiceSessionsTable.clientRequestId, clientRequestId),
+        ),
+      );
+    assert.equal(aliceRows.length, 1);
+  } finally {
+    await server.close();
+    await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, aliceId));
+    await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, bobId));
   }
 });

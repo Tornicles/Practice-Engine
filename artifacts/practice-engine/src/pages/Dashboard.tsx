@@ -31,6 +31,13 @@ export default function Dashboard() {
 
   const profile = overview?.profile;
   const activity = overview?.recentActivity ?? [];
+  const onboardingData = profile?.onboardingData;
+  const focusGoal = onboardingData?.goals?.primaryGoal || profile?.goal || profile?.developmentFocus || "Improve your coaching technique.";
+  const firstBuildTitle = onboardingData?.build?.firstBuild?.title;
+  const firstBuildType = onboardingData?.build?.firstBuild?.type;
+  const focusDetail = firstBuildTitle ? `Your first ambition: Build a ${firstBuildType || "framework"} about "${firstBuildTitle}".` : "One focused practice can improve the skill you use with real clients today.";
+  const planSummary = onboardingData?.thirtyDayPlan?.customization || "Complete daily practice to build your expertise.";
+
   const stats = [
     { label: "Practice sessions", value: overview?.practiceSessionCount ?? 0, icon: Activity },
     { label: "Experiences captured", value: overview?.experienceCount ?? 0, icon: BookOpen },
@@ -55,12 +62,34 @@ export default function Dashboard() {
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
           <div>
             <div className="engine-kicker mb-2 text-primary">TODAY’S FOCUS</div>
-            <h2 className="text-lg font-semibold">Improve your questioning under resistance.</h2>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">One focused practice can improve the skill you use with real clients today.</p>
+            <h2 className="text-lg font-semibold">{focusGoal}</h2>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{focusDetail}</p>
+            {onboardingData?.thirtyDayPlan?.customization && (
+              <p className="mt-2 max-w-2xl text-xs text-muted-foreground/80 border-l-2 border-primary/30 pl-3 italic">{planSummary}</p>
+            )}
           </div>
           <Link href="/practice" className="inline-flex h-9 shrink-0 items-center justify-center border border-primary bg-primary px-4 text-xs font-semibold uppercase tracking-[.08em] text-primary-foreground hover:bg-primary/90" data-testid="link-dashboard-start-practice">Start practice</Link>
         </div>
       </section>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Link href="/today" className="engine-card block p-4 hover:border-primary/50 transition-colors" data-testid="link-nav-today">
+          <div className="engine-kicker mb-1">Execution</div>
+          <div className="font-semibold text-sm">Today</div>
+        </Link>
+        <Link href="/practice" className="engine-card block p-4 hover:border-primary/50 transition-colors" data-testid="link-nav-practice">
+          <div className="engine-kicker mb-1">Development</div>
+          <div className="font-semibold text-sm">Practice Simulator</div>
+        </Link>
+        <Link href="/knowledge" className="engine-card block p-4 hover:border-primary/50 transition-colors" data-testid="link-nav-vault">
+          <div className="engine-kicker mb-1">Expertise</div>
+          <div className="font-semibold text-sm">Experience Vault</div>
+        </Link>
+        <Link href="/passport" className="engine-card block p-4 hover:border-primary/50 transition-colors" data-testid="link-nav-passport">
+          <div className="engine-kicker mb-1">Identity</div>
+          <div className="font-semibold text-sm">Coach Passport</div>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon }, index) => (

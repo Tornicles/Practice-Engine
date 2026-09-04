@@ -1,0 +1,1356 @@
+Practice Engine — Detailed Architecture
+Engines 5–8
+
+These four engines form the commercialization and authority layer of Practice Engine.
+
+They take the output of Engines 1–4:
+
+practice → client delivery → experience → expertise
+
+and turn it into:
+
+methodology → authority → audience → revenue.
+
+The dependency structure is:
+
+ENGINE 4
+Experience → Expertise
+        │
+        ↓
+ENGINE 5
+Methodology & IP
+        │
+        ├───────────────┐
+        ↓               ↓
+ENGINE 6           ENGINE 7
+Brand &            Content &
+Authority          Audience
+        │               │
+        └───────┬───────┘
+                ↓
+             ENGINE 8
+        Offers & Commercial
+ENGINE 5 — METHODOLOGY & IP SYSTEM
+5.1 Purpose
+
+Engine 5 converts validated expertise into a coherent, proprietary methodology that can be used repeatedly across coaching, content, courses, products, and commercial offers.
+
+The fundamental transformation is:
+
+Experience
+   ↓
+Lesson
+   ↓
+Pattern
+   ↓
+Principle
+   ↓
+Method
+   ↓
+Framework
+   ↓
+Methodology
+   ↓
+IP Asset
+
+This engine answers:
+
+What does this coach uniquely know, how do they work, why does it work, and what reusable intellectual property has been developed from evidence?
+
+5.2 What Engine 5 is responsible for
+
+It manages:
+
+Principles
+Methods
+Frameworks
+Models
+Processes
+Diagnostic systems
+Coaching protocols
+Exercises
+Tools
+Assessments
+Playbooks
+Methodology versions
+IP assets
+Validation
+Testing
+Evidence lineage
+Relationships between methodology components
+5.3 Methodology hierarchy
+
+The system should distinguish different levels of intellectual property.
+
+METHODOLOGY
+     │
+     ├── Philosophy
+     │
+     ├── Principles
+     │
+     ├── Models
+     │
+     ├── Frameworks
+     │
+     ├── Methods
+     │
+     ├── Processes
+     │
+     ├── Protocols
+     │
+     ├── Tools
+     │
+     └── Exercises
+
+These should not be treated as interchangeable.
+
+Example
+Principle
+"Diagnosis should precede prescription."
+
+        ↓
+
+Method
+"Diagnostic Conversation Method"
+
+        ↓
+
+Framework
+"5-Stage Diagnostic Conversation"
+
+        ↓
+
+Protocol
+"Question → Listen → Clarify → Test → Confirm"
+
+        ↓
+
+Exercise
+"10-minute diagnostic questioning drill"
+5.4 Core data objects
+Methodology
+Methodology
+- id
+- coachId
+- name
+- description
+- purpose
+- audience
+- philosophy
+- status
+- version
+- createdAt
+- updatedAt
+Principle
+Principle
+- id
+- statement
+- explanation
+- context
+- source
+- evidenceCount
+- validationStatus
+- confidence
+Method
+Method
+- id
+- methodologyId
+- name
+- purpose
+- whenToUse
+- whenNotToUse
+- steps
+- expectedOutcome
+- evidence
+Framework
+Framework
+- id
+- methodologyId
+- name
+- problem
+- components
+- sequence
+- application
+- evidence
+- validationStatus
+IP Asset
+IPAsset
+- id
+- type
+- title
+- description
+- owner
+- methodologyId
+- status
+- version
+- sourceLineage
+- validationStatus
+5.5 IP lifecycle
+
+Every major IP asset should have a lifecycle.
+
+Idea
+ ↓
+Candidate
+ ↓
+Draft
+ ↓
+Test
+ ↓
+Evidence
+ ↓
+Validated
+ ↓
+Published
+ ↓
+Improved
+ ↓
+Versioned
+ ↓
+Retired
+
+This prevents the system from treating every AI-generated framework as established intellectual property.
+
+5.6 Evidence lineage
+
+Every methodology component should be traceable.
+
+For example:
+
+Framework
+   ↓
+Principle
+   ↓
+Pattern
+   ↓
+Lessons
+   ↓
+Experiences
+   ↓
+Client Sessions
+   ↓
+Client Outcomes
+
+The system should allow:
+
+“Show me why this principle exists.”
+
+and:
+
+“Show me everything this framework is based on.”
+
+5.7 Methodology testing
+
+A methodology component should be testable.
+
+Test object
+Methodology Test
+- methodologyId
+- componentId
+- context
+- hypothesis
+- testDate
+- application
+- result
+- evidence
+- conclusion
+Testing loop
+Method
+ ↓
+Apply
+ ↓
+Observe
+ ↓
+Measure
+ ↓
+Compare expected vs actual
+ ↓
+Evaluate
+ ↓
+Refine
+5.8 Version control
+
+Methodology should evolve without destroying history.
+
+Framework v1
+ ↓
+Testing
+ ↓
+Framework v2
+ ↓
+Testing
+ ↓
+Framework v3
+
+Each version needs:
+
+Changes
+Reason for change
+Supporting evidence
+Previous version
+New version
+Validation status
+5.9 Contradiction and limitation system
+
+The methodology engine should actively look for exceptions.
+
+Example:
+
+Principle:
+"Direct challenge improves accountability."
+
+Evidence:
+Works in high-accountability environments.
+
+Contradictory evidence:
+Creates resistance in low-trust environments.
+
+Result:
+Principle requires contextual condition.
+
+The system should therefore support:
+
+Supporting evidence
+Contradicting evidence
+Conditions
+Exceptions
+Limitations
+Boundary conditions
+
+This makes methodology substantially more credible.
+
+5.10 Reusability engine
+
+Once something is validated, the system should identify where it can be reused.
+
+Validated Framework
+      │
+      ├── Coaching
+      ├── Content
+      ├── Course
+      ├── Workshop
+      ├── Assessment
+      ├── Book
+      ├── Product
+      └── Commercial Offer
+
+This becomes the bridge into Engines 6–8 and later Engine 9.
+
+5.11 AI architecture
+
+AI can:
+
+Extract principles
+Propose frameworks
+Compare methodology components
+Find duplication
+Identify contradictions
+Suggest tests
+Structure frameworks
+Generate documentation
+Identify evidence gaps
+Recommend improvements
+Convert methodology into reusable assets
+
+AI should not independently establish an unsupported claim as validated expertise.
+
+5.12 Engine 5 outputs
+Validated Expertise
+       ↓
+Methodology
+       ↓
+Principles
+Methods
+Frameworks
+Protocols
+Tools
+Exercises
+       ↓
+Reusable IP
+
+These outputs feed Engines 6, 7, 8, and eventually 9.
+
+ENGINE 6 — BRAND & AUTHORITY SYSTEM
+6.1 Purpose
+
+Engine 6 converts expertise and methodology into a recognizable professional identity and authority position.
+
+It answers:
+
+Why should someone recognize this coach as credible, distinctive, and worth listening to?
+
+6.2 Architecture
+Experience
+     ↓
+Expertise
+     ↓
+Methodology
+     ↓
+Positioning
+     ↓
+Point of View
+     ↓
+Messaging
+     ↓
+Proof
+     ↓
+Authority
+     ↓
+Reputation
+6.3 Core objects
+Brand Profile
+Brand
+- coachId
+- name
+- positioning
+- mission
+- vision
+- values
+- philosophy
+- personality
+- audience
+- niche
+Positioning
+Positioning
+- audience
+- problem
+- category
+- promise
+- differentiator
+- methodology
+- proof
+
+A positioning statement should connect:
+
+Who
++
+Problem
++
+Approach
++
+Outcome
++
+Difference
+Point of View
+
+The coach's distinctive perspective.
+
+POV
+- claim
+- supporting principles
+- experience
+- evidence
+- implications
+6.4 Brand knowledge graph
+
+The brand should inherit information from the methodology engine.
+
+Methodology
+     ↓
+Unique Approach
+     ↓
+Differentiator
+     ↓
+Positioning
+     ↓
+Messaging
+
+This prevents the brand from becoming generic AI-generated marketing language.
+
+6.5 Proof architecture
+
+Authority requires proof.
+
+The system should manage:
+
+Client outcomes
+Case studies
+Testimonials
+Credentials
+Certifications
+Experience
+Published work
+Frameworks
+Speaking
+Teaching
+Results
+Demonstrations
+Proof object
+Proof
+- type
+- claim
+- source
+- evidence
+- date
+- verificationStatus
+- permissionStatus
+6.6 Claim-to-proof relationship
+
+Every significant authority claim should ideally connect to evidence.
+
+Claim
+ ↓
+Proof
+ ↓
+Source
+ ↓
+Evidence
+
+Example:
+
+Claim:
+"Helps founders improve decision-making."
+
+Proof:
+12 documented client engagements
+
+Evidence:
+Client outcomes + feedback
+
+The system should identify unsupported claims.
+
+6.7 Authority development
+
+Authority should be treated as something built over time.
+
+Possible authority signals:
+
+Expertise
++
+Results
++
+Consistency
++
+Teaching
++
+Published IP
++
+Audience trust
++
+External recognition
+
+The system should track these as evidence rather than using a simplistic popularity score.
+
+6.8 Brand asset system
+
+Manage:
+
+Bio
+Short bio
+Long bio
+Profile descriptions
+About page
+Speaker profile
+Media profile
+Brand story
+Founder story
+Positioning statements
+Messaging pillars
+Taglines
+Key claims
+Methodology descriptions
+6.9 Messaging architecture
+Brand
+ ↓
+Core Message
+ ↓
+Messaging Pillars
+ ↓
+Audience Problems
+ ↓
+Proof
+ ↓
+Content Themes
+ ↓
+Offers
+Messaging pillars
+
+Each pillar should connect to:
+
+Principle
+Expertise
+Problem
+Proof
+Content
+Offer
+6.10 Authority gaps
+
+The system should identify missing proof.
+
+Example:
+
+Positioning:
+Executive decision coach
+
+Evidence:
+Strong experience
+
+Missing:
+Documented client outcomes
+
+Recommendation:
+Capture 3 measurable case studies.
+
+This makes Brand & Authority operational rather than merely cosmetic.
+
+6.11 AI architecture
+
+AI can:
+
+Develop messaging
+Organize positioning
+Extract differentiators
+Create bios
+Structure case studies
+Identify unsupported claims
+Recommend proof gaps
+Adapt messaging to audiences
+Maintain consistency
+
+AI should not invent:
+
+credentials
+clients
+outcomes
+testimonials
+experience
+authority
+6.12 Engine 6 outputs
+Positioning
+Messaging
+Brand Identity
+Point of View
+Proof Library
+Case Studies
+Authority Assets
+Authority Gaps
+
+These feed Engine 7 and Engine 8.
+
+ENGINE 7 — CONTENT & AUDIENCE SYSTEM
+7.1 Purpose
+
+Engine 7 converts expertise, methodology, brand, and real-world learning into content and audience relationships.
+
+It is not simply a social media scheduler.
+
+Its deeper function is:
+
+Turn expertise into communication, measure audience response, and feed audience intelligence back into the practice.
+
+7.2 Core architecture
+Expertise
+    ↓
+Methodology
+    ↓
+Content Idea
+    ↓
+Content
+    ↓
+Distribution
+    ↓
+Audience Response
+    ↓
+Performance
+    ↓
+Audience Intelligence
+    ↓
+New Insights
+    ↓
+Expertise / Offers
+7.3 Core objects
+Content Idea
+ContentIdea
+- topic
+- audience
+- problem
+- source
+- angle
+- contentType
+- priority
+Content Asset
+Content
+- title
+- format
+- topic
+- message
+- source
+- methodology
+- audience
+- status
+- publication
+Content Series
+
+A group of related content.
+
+Series
+ ↓
+Episode 1
+Episode 2
+Episode 3
+...
+Audience
+
+The system should maintain audience segments.
+
+Audience Segment
+- name
+- characteristics
+- problems
+- goals
+- interests
+- objections
+- behavior
+7.4 Content lineage
+
+This is critical.
+
+Every strong content asset should be traceable to an underlying knowledge source.
+
+Post
+ ↓
+Messaging Pillar
+ ↓
+Methodology
+ ↓
+Principle
+ ↓
+Experience
+
+This produces authentic content rather than generic AI content.
+
+7.5 Content generation pipeline
+Source
+ ↓
+Idea
+ ↓
+Angle
+ ↓
+Brief
+ ↓
+Draft
+ ↓
+Review
+ ↓
+Approval
+ ↓
+Publish
+ ↓
+Measure
+7.6 Content source types
+
+The system should be able to generate content from:
+
+Experience
+Client lessons
+Methodology
+Principles
+Case studies
+Questions
+Audience feedback
+Current objectives
+Brand POV
+Product
+Offer
+Research
+7.7 Content formats
+
+Architecture should support:
+
+Short posts
+Long posts
+Articles
+Videos
+Short-form videos
+Podcasts
+Newsletters
+Threads
+Carousels
+Case studies
+Educational pieces
+Interviews
+Webinars
+Courses
+Guides
+7.8 Distribution
+
+A content asset can have multiple distribution targets.
+
+One Core Idea
+      │
+      ├── LinkedIn
+      ├── X
+      ├── Instagram
+      ├── YouTube
+      ├── Newsletter
+      └── Podcast
+
+The system should separate:
+
+content concept from platform-specific adaptation.
+
+7.9 Audience response architecture
+
+Track:
+
+Views
+Reach
+Engagement
+Comments
+Shares
+Saves
+Clicks
+Leads
+Replies
+Questions
+Sentiment where appropriate
+Conversion
+
+But metrics should be tied to objectives.
+
+For example:
+
+Goal = Authority
+
+Important:
+Qualified engagement
++
+Relevant conversations
++
+Proof of expertise
+
+Not merely:
+Views
+7.10 Audience intelligence
+
+The system should analyze audience behavior to identify:
+
+recurring questions
+recurring problems
+objections
+high-interest topics
+weak topics
+content gaps
+emerging needs
+potential offers
+
+Example:
+
+50 audience questions
+        ↓
+Recurring problem
+        ↓
+New research / experience
+        ↓
+New methodology component
+        ↓
+New content
+        ↓
+Potential offer
+7.11 Content experimentation
+
+Content should be treated as experimentation.
+
+Hypothesis
+ ↓
+Content Variant
+ ↓
+Publish
+ ↓
+Measure
+ ↓
+Compare
+ ↓
+Learn
+
+Possible variables:
+
+Topic
+Hook
+Format
+Length
+CTA
+Audience
+Position
+Story vs framework
+7.12 Content-to-commercial connection
+
+Content should be able to lead into:
+
+Content
+ ↓
+Interest
+ ↓
+Engagement
+ ↓
+Lead
+ ↓
+Offer
+
+But not every content asset needs a sales CTA.
+
+The system should distinguish:
+
+Authority content
+Educational content
+Relationship content
+Demand-generation content
+Conversion content
+Proof content
+7.13 AI architecture
+
+AI can:
+
+Generate ideas
+Transform experiences into content
+Adapt content to platforms
+Generate drafts
+Repurpose content
+Identify audience patterns
+Analyze responses
+Suggest experiments
+Recommend topics
+Maintain brand/methodology consistency
+
+AI should preserve the source lineage of generated content.
+
+7.14 Engine 7 outputs
+Content ideas
+Content assets
+Content series
+Published content
+Audience intelligence
+Content performance
+Topic intelligence
+Leads
+Feedback
+New problem signals
+
+These feed Engines 6 and 8 and can also feed Engine 4.
+
+ENGINE 8 — OFFER & COMMERCIAL SYSTEM
+8.1 Purpose
+
+Engine 8 turns expertise, methodology, authority, audience, and client problems into commercially viable offers.
+
+The fundamental flow:
+
+Problem
+ ↓
+Audience
+ ↓
+Expertise
+ ↓
+Methodology
+ ↓
+Offer
+ ↓
+Prospect
+ ↓
+Conversation
+ ↓
+Sale
+ ↓
+Delivery
+ ↓
+Outcome
+ ↓
+Proof
+8.2 Core principle
+
+An offer should not be created in isolation.
+
+It should connect:
+
+Real Problem
++
+Target Audience
++
+Validated Expertise
++
+Methodology
++
+Desired Outcome
++
+Proof
+=
+Offer
+8.3 Core objects
+Offer
+Offer
+- id
+- coachId
+- name
+- type
+- audience
+- problem
+- promise
+- outcome
+- methodology
+- deliveryModel
+- duration
+- price
+- status
+Offer Component
+Offer
+ ↓
+Components
+├── Sessions
+├── Assessments
+├── Exercises
+├── Resources
+├── Support
+└── Outcomes
+Prospect
+Prospect
+- profile
+- source
+- problem
+- interest
+- stage
+- qualification
+- lastContact
+Opportunity
+
+Represents a genuine commercial opportunity.
+
+Opportunity
+- prospect
+- offer
+- value
+- stage
+- probability
+- expectedClose
+- nextAction
+8.4 Offer lifecycle
+Problem Identified
+ ↓
+Offer Hypothesis
+ ↓
+Draft
+ ↓
+Test
+ ↓
+Sell
+ ↓
+Deliver
+ ↓
+Measure Outcomes
+ ↓
+Improve
+ ↓
+Scale / Retire
+
+This is important.
+
+An offer should be validated through actual market behavior.
+
+8.5 Offer types
+
+The architecture should support:
+
+Services
+1:1 coaching
+Consulting
+Advisory
+Retainers
+Programs
+Group coaching
+Cohorts
+Workshops
+Bootcamps
+Education
+Courses
+Certification
+Training
+Products
+Assessments
+Toolkits
+Templates
+Digital products
+IP commercialization
+Licensing
+Certification
+Methodology licensing
+Facilitator programs
+8.6 Customer problem architecture
+
+Before creating an offer, the system should capture:
+
+Problem
+ ↓
+Current State
+ ↓
+Desired State
+ ↓
+Gap
+ ↓
+Root Cause
+ ↓
+Intervention
+ ↓
+Outcome
+
+This can connect directly to the client delivery engine.
+
+8.7 Offer-to-methodology connection
+
+Every methodology-based offer should identify what methodology it uses.
+
+Offer
+ ↓
+Methodology
+ ↓
+Framework
+ ↓
+Methods
+ ↓
+Sessions / Exercises
+
+This creates consistency between:
+
+what the coach sells and what the coach actually does.
+
+8.8 Sales pipeline
+Lead
+ ↓
+Qualified
+ ↓
+Conversation
+ ↓
+Discovery
+ ↓
+Offer Presented
+ ↓
+Decision
+ ↓
+Won / Lost
+
+Each stage should have:
+
+timestamp
+owner
+next action
+reason
+evidence
+status
+8.9 Sales intelligence
+
+Track:
+
+Leads
+Lead sources
+Qualified leads
+Conversations
+Proposals
+Wins
+Losses
+Revenue
+Conversion rates
+Sales cycle
+Offer performance
+Customer acquisition source
+8.10 Lost opportunity analysis
+
+This should be built into the system.
+
+When an opportunity is lost:
+
+Lost
+ ↓
+Reason
+ ↓
+Pattern
+ ↓
+Investigation
+ ↓
+Offer adjustment
+
+Possible reasons:
+
+Wrong audience
+Wrong problem
+Weak positioning
+Insufficient proof
+Price
+Timing
+Offer complexity
+Poor sales process
+Wrong channel
+
+This will later connect directly to Engine 11.
+
+8.11 Commercial feedback loop
+
+The commercial engine should continuously feed information back into the practice.
+
+Market
+ ↓
+Problems
+ ↓
+Offers
+ ↓
+Sales
+ ↓
+Clients
+ ↓
+Outcomes
+ ↓
+Experience
+ ↓
+Expertise
+ ↓
+Methodology
+ ↓
+Better Offer
+
+This is a critical flywheel.
+
+8.12 Offer validation
+
+An offer can have states:
+
+Idea
+Draft
+Testing
+Validated
+Scaling
+Needs Revision
+Paused
+Retired
+
+Validation can consider:
+
+Demand
+Sales
+Delivery quality
+Client outcomes
+Profitability
+Retention
+Referrals
+Satisfaction
+8.13 Economics architecture
+
+The engine should eventually track:
+
+Revenue
+Revenue
+= Customers × Average Revenue
+Offer economics
+Price
+Delivery cost
+Acquisition cost
+Gross margin
+Revenue per client
+Lifetime value
+Refunds
+Retention
+
+The commercial engine should therefore not only answer:
+
+“Did we sell?”
+
+but:
+
+“Is this commercially healthy?”
+
+8.14 AI architecture
+
+AI can:
+
+Identify offer opportunities
+Analyze customer problems
+Structure offers
+Generate offer drafts
+Recommend positioning
+Prepare discovery questions
+Analyze sales patterns
+Identify objections
+Analyze lost opportunities
+Recommend offer experiments
+Connect offers to methodology
+
+AI should not fabricate:
+
+customer results
+testimonials
+revenue
+demand
+credentials
+market validation
+8.15 Engine 8 outputs
+Offers
+Prospects
+Opportunities
+Sales Pipeline
+Commercial Results
+Customer Problems
+Market Intelligence
+Offer Validation
+Revenue Data
+THE COMPLETE 5–8 CONNECTION
+
+These four engines should form one commercialization flywheel.
+
+                 ENGINE 5
+          METHODOLOGY & IP
+                  │
+        ┌─────────┴─────────┐
+        ↓                   ↓
+   ENGINE 6             ENGINE 7
+ BRAND & AUTHORITY    CONTENT & AUDIENCE
+        │                   │
+        └─────────┬─────────┘
+                  ↓
+             ENGINE 8
+        OFFERS & COMMERCIAL
+                  │
+                  ↓
+              CLIENTS
+                  │
+                  ↓
+           REAL OUTCOMES
+                  │
+                  ↓
+            EXPERIENCE
+                  │
+                  ↓
+             ENGINE 4
+                  │
+                  └────────→ ENGINE 5
+THE CROSS-ENGINE DATA FLOW
+
+The most important relationships are:
+
+From	Produces	Feeds
+Engine 4	Expertise	Engine 5
+Engine 5	Methodology/IP	Engines 6, 7, 8
+Engine 6	Positioning/Proof	Engines 7, 8
+Engine 7	Audience intelligence	Engines 4, 6, 8
+Engine 8	Client/market intelligence	Engines 3, 4, 5
+
+So the system becomes:
+
+EXPERIENCE
+    ↓
+EXPERTISE
+    ↓
+METHODOLOGY
+    ↓
+AUTHORITY
+    ↓
+CONTENT
+    ↓
+AUDIENCE
+    ↓
+OFFER
+    ↓
+CLIENT
+    ↓
+OUTCOME
+    ↓
+EXPERIENCE
+
+That is the actual Practice Engine flywheel.
+
+The critical architectural point is that Engines 5–8 should not become content-management, CRM, branding, or sales tools bolted onto the side of Practice Engine. Their purpose is to commercialize the coach's validated expertise, while every commercial result feeds new evidence back into the development and expertise engines.

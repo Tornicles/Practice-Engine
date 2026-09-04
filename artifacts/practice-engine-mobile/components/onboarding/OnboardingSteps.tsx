@@ -4,13 +4,14 @@ import { Button, Field, Card, State, ScreenTitle } from '@/components/UI';
 import { useColors } from '@/hooks/useColors';
 import { MultiSelect, SingleSelect, RatingScale, QuestionStepper, AILoadingState } from './OnboardingUI';
 import { StepProps } from './types';
-import { 
-  useExtractExperienceKnowledge, 
-  useSimulateClientTurn, 
-  useCreateExperience, 
+import { buildExperienceDecisionUpdate } from './state';
+import {
+  useExtractExperienceKnowledge,
+  useSimulateClientTurn,
+  useCreateExperience,
   useCreatePracticeSession,
-  ExperienceExtractionResult, 
-  SimulationTurnResult 
+  ExperienceExtractionResult,
+  SimulationTurnResult
 } from '@workspace/api-client-react';
 
 export function Step1Welcome({ onNext, isSaving }: StepProps) {
@@ -27,8 +28,8 @@ export function Step1Welcome({ onNext, isSaving }: StepProps) {
 }
 
 const GOAL_OPTIONS = [
-  'Become a better coach', 'Improve my coaching delivery', 'Practice difficult situations', 
-  'Build my coaching brand', 'Develop my own methodology', 'Turn my experience into IP', 
+  'Become a better coach', 'Improve my coaching delivery', 'Practice difficult situations',
+  'Build my coaching brand', 'Develop my own methodology', 'Turn my experience into IP',
   'Create courses', 'Create content', 'Build coaching products', 'Grow my coaching business'
 ];
 
@@ -38,13 +39,13 @@ export function Step2Goals({ profile, onNext, isSaving }: StepProps) {
     <View style={{ gap: 24 }}>
       <ScreenTitle title="What do you want to accomplish?" detail="Select all that apply." />
       <MultiSelect options={GOAL_OPTIONS} selected={selected} onChange={setSelected} />
-      <Button 
-        label="Continue" 
-        onPress={() => onNext({ 
-          onboardingData: { ...profile.onboardingData, goals: { ...profile.onboardingData?.goals, outcomes: selected } }, 
-          onboardingStep: 3 
-        })} 
-        disabled={selected.length === 0 || isSaving} 
+      <Button
+        label="Continue"
+        onPress={() => onNext({
+          onboardingData: { ...profile.onboardingData, goals: { ...profile.onboardingData?.goals, outcomes: selected } },
+          onboardingStep: 3
+        })}
+        disabled={selected.length === 0 || isSaving}
       />
     </View>
   );
@@ -96,7 +97,7 @@ export function Step3Profile({ profile, onNext, isSaving }: StepProps) {
         if (exp === '3–5 years') years = 4;
         if (exp === '5–10 years') years = 7;
         if (exp === '10+ years') years = 10;
-        
+
         onNext({
           name, niche, experienceLevel: exp, audience,
           onboardingData: {
@@ -163,17 +164,17 @@ export function Step5Skills({ profile, onNext, isSaving }: StepProps) {
   const [ratings, setRatings] = useState<Record<string, number>>(profile.onboardingData?.skillRatings as Record<string, number> || {});
   const [scenarioChoice, setScenarioChoice] = useState<string>(profile.onboardingData?.miniScenario?.choice || '');
   const [practiceResponse, setPracticeResponse] = useState<string>('');
-  
+
   const simulate = useSimulateClientTurn();
   const createPractice = useCreatePracticeSession();
-  
-  const handleSaveAssessment = (practiceScore?: number, practiceFeedback?: string) => {
+
+  const handleSaveAssessment = (practiceSessionId?: number, practiceFeedback?: string) => {
     onNext({
       onboardingData: {
         ...profile.onboardingData,
         skillRatings: ratings as any,
         miniScenario: { choice: scenarioChoice, score: scenarioChoice === "It sounds like you're feeling really frustrated right now." ? 100 : 50 },
-        practice: practiceScore !== undefined ? { score: practiceScore, result: practiceFeedback } : { skipped: true }
+        practice: practiceSessionId !== undefined ? { sessionId: practiceSessionId, result: practiceFeedback } : { skipped: true }
       },
       onboardingStep: 6
     });
@@ -225,7 +226,7 @@ export function Step5Skills({ profile, onNext, isSaving }: StepProps) {
         <Text style={{ fontFamily: 'Inter_400Regular', color: c.foreground, fontSize: 16 }}>"I don't have time to do the homework we agreed on."</Text>
       </Card>
       <Field value={practiceResponse} onChangeText={setPracticeResponse} placeholder="Type your response..." multiline />
-      
+
       <View style={{ gap: 12 }}>
         <Button label={simulate.isPending || createPractice.isPending ? "Evaluating..." : "Complete Assessment"} disabled={isSaving || simulate.isPending || createPractice.isPending} onPress={() => {
           if (practiceResponse.trim()) {
@@ -241,13 +242,14 @@ export function Step5Skills({ profile, onNext, isSaving }: StepProps) {
               onSuccess: (simResult) => {
                 createPractice.mutate({
                   data: {
+                    clientRequestId: `${profile.id}-onboarding-assessment`,
                     scenario: "I don't have time to do the homework we agreed on.",
                     category: "accountability",
                     score: simResult.score,
                     feedback: simResult.observation
                   }
                 }, {
-                  onSuccess: () => handleSaveAssessment(simResult.score, simResult.observation),
+                  onSuccess: (savedSession) => handleSaveAssessment(savedSession.id, simResult.observation),
                 });
               }
             });
@@ -287,9 +289,9 @@ export function Step6Development({ profile, onNext, isSaving }: StepProps) {
       <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: c.mutedForeground, marginTop: 16 }}>How much time can you realistically dedicate each day?</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
         {DEV_TIMES.map(opt => (
-          <Pressable 
-            key={opt.value} 
-            onPress={() => setTime(opt.value)} 
+          <Pressable
+            key={opt.value}
+            onPress={() => setTime(opt.value)}
             style={[{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 24, borderWidth: 1 }, { backgroundColor: time === opt.value ? c.primary : c.card, borderColor: time === opt.value ? c.primary : c.border }]}
           >
             <Text style={{ color: time === opt.value ? c.primaryForeground : c.foreground, fontSize: 14, fontFamily: 'Inter_500Medium' }}>{opt.label}</Text>
@@ -298,7 +300,7 @@ export function Step6Development({ profile, onNext, isSaving }: StepProps) {
       </View>
 
       <Button label="Continue" disabled={modes.length === 0 || !time || isSaving} onPress={() => onNext({
-        onboardingData: { ...profile.onboardingData, development: { modes, dailyTimeCommitment: time as any } },
+        onboardingData: { ...profile.onboardingData, development: { ...profile.onboardingData?.development, modes, dailyTimeCommitment: time as any } },
         onboardingStep: 7
       })} />
     </View>
@@ -315,47 +317,38 @@ const Q7 = [
 ];
 
 export function Step7Brand({ profile, onNext, isSaving }: StepProps) {
-  const [phase, setPhase] = useState<'questions' | 'analyzing' | 'review'>('questions');
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [phase, setPhase] = useState<'questions' | 'review'>('questions');
+  const [answers, setAnswers] = useState<string[]>(() => {
+    const d = profile.onboardingData?.brand?.discovery;
+    return d ? [d.q1, d.q2, d.q3, d.q4, d.q5, d.q6].map(String) : [];
+  });
   const c = useColors();
 
   if (phase === 'questions') {
-    return <QuestionStepper questions={Q7} onComplete={(ans) => { setAnswers(ans); setPhase('analyzing'); }} isSaving={isSaving} />;
-  }
-
-  if (phase === 'analyzing') {
-    return <AILoadingState message="Drafting your Brand Core..." onComplete={() => setPhase('review')} />;
+    return <QuestionStepper questions={Q7} initialAnswers={answers.length === Q7.length ? answers : undefined} onComplete={(ans) => { setAnswers(ans); setPhase('review'); }} isSaving={isSaving} />;
   }
 
   return (
     <View style={{ gap: 24 }}>
-      <ScreenTitle title="Your Brand Core" detail="Based on your answers, here is a starting point for your brand." />
+      <ScreenTitle title="Draft Brand Core" detail="Based on your answers, here is a draft starting point for your brand." />
       <Card>
         <Text style={{ fontFamily: 'Inter_400Regular', color: c.foreground, fontSize: 16, lineHeight: 24 }}>
           I help <Text style={{ fontFamily: 'Inter_600SemiBold' }}>{answers[1] || 'professionals'}</Text> who are struggling with <Text style={{ fontFamily: 'Inter_600SemiBold' }}>{answers[2] || 'key challenges'}</Text>. What makes my approach different is <Text style={{ fontFamily: 'Inter_600SemiBold' }}>{answers[3] || 'my unique method'}</Text>. I believe that <Text style={{ fontFamily: 'Inter_600SemiBold' }}>{answers[4] || 'everyone has potential'}</Text>, and my background in <Text style={{ fontFamily: 'Inter_600SemiBold' }}>{answers[5] || 'my industry'}</Text> gives me the perspective to guide them there.
         </Text>
       </Card>
       <View style={{ gap: 12, marginTop: 12 }}>
-        <Button label="Accept Brand Core" disabled={isSaving} onPress={() => onNext({ 
-          onboardingStep: 8, 
-          onboardingData: { 
-            ...profile.onboardingData, 
-            brand: { 
-              discovery: { q1: answers[0], q2: answers[1], q3: answers[2], q4: answers[3], q5: answers[4], q6: answers[5] },
-              reviewState: 'accepted' 
-            } 
-          } 
+        <Button label="Accept Brand Core" disabled={isSaving} onPress={() => onNext({
+          onboardingStep: 8,
+          onboardingData: {
+            ...profile.onboardingData,
+            brand: {
+              ...profile.onboardingData?.brand,
+              discovery: { ...profile.onboardingData?.brand?.discovery, q1: answers[0], q2: answers[1], q3: answers[2], q4: answers[3], q5: answers[4], q6: answers[5] },
+              reviewState: 'accepted'
+            }
+          }
         })} />
-        <Button label="Edit" secondary disabled={isSaving} onPress={() => onNext({ 
-          onboardingStep: 8, 
-          onboardingData: { 
-            ...profile.onboardingData, 
-            brand: { 
-              discovery: { q1: answers[0], q2: answers[1], q3: answers[2], q4: answers[3], q5: answers[4], q6: answers[5] },
-              reviewState: 'editing' 
-            } 
-          } 
-        })} />
+        <Button label="Edit Answers" secondary disabled={isSaving} onPress={() => setPhase('questions')} />
       </View>
     </View>
   );
@@ -371,37 +364,61 @@ const Q8 = [
 ];
 
 export function Step8Methodology({ profile, onNext, isSaving }: StepProps) {
-  const [phase, setPhase] = useState<'questions' | 'analyzing' | 'review'>('questions');
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [phase, setPhase] = useState<'questions' | 'review'>('questions');
+  const [answers, setAnswers] = useState<string[]>(() => {
+    const d = profile.onboardingData?.methodology?.discovery;
+    return d ? [d.q1, d.q2, d.q3, d.q4, d.q5, d.q6].map(String) : [];
+  });
   const c = useColors();
 
   if (phase === 'questions') {
-    return <QuestionStepper questions={Q8} onComplete={(ans) => { setAnswers(ans); setPhase('analyzing'); }} isSaving={isSaving} />;
+    return <QuestionStepper questions={Q8} initialAnswers={answers.length === Q8.length ? answers : undefined} onComplete={(ans) => {
+      setAnswers(ans);
+      setPhase('review');
+    }} isSaving={isSaving} />;
   }
 
-  if (phase === 'analyzing') {
-    return <AILoadingState message="Discovering patterns in your methodology..." onComplete={() => setPhase('review')} />;
-  }
+  const draftCandidates = [
+    { title: "Core Approach", description: answers[0] || "Begin with initial diagnosis" },
+    { title: "Guiding Principle", description: answers[3] || "Use question-led exploration" },
+    { title: "Proven Method", description: answers[4] || "Focus on pragmatic action" }
+  ];
 
   return (
     <View style={{ gap: 24 }}>
-      <ScreenTitle title="Methodology Candidates" detail="We found 3 potential principles in your experience." />
-      <Card>
-        <Text style={{ fontFamily: 'Inter_600SemiBold', color: c.foreground }}>1. Initial Diagnosis</Text>
-        <Text style={{ fontFamily: 'Inter_400Regular', color: c.mutedForeground, marginTop: 4 }}>Always diagnose the root problem before suggesting solutions.</Text>
-      </Card>
-      <Card>
-        <Text style={{ fontFamily: 'Inter_600SemiBold', color: c.foreground }}>2. Question-led Exploration</Text>
-        <Text style={{ fontFamily: 'Inter_400Regular', color: c.mutedForeground, marginTop: 4 }}>Use repeated foundational questions to guide the client's self-discovery.</Text>
-      </Card>
-      <Card>
-        <Text style={{ fontFamily: 'Inter_600SemiBold', color: c.foreground }}>3. Pragmatic Action</Text>
-        <Text style={{ fontFamily: 'Inter_400Regular', color: c.mutedForeground, marginTop: 4 }}>Focus heavily on approaches that have proven practical success.</Text>
-      </Card>
+      <ScreenTitle title="Draft Methodology Candidates" detail="We mapped these potential principles from your answers." />
+      {draftCandidates.map((cand, i) => (
+        <Card key={i}>
+          <Text style={{ fontFamily: 'Inter_600SemiBold', color: c.foreground }}>{i + 1}. {cand.title}</Text>
+          <Text style={{ fontFamily: 'Inter_400Regular', color: c.mutedForeground, marginTop: 4 }}>{cand.description}</Text>
+        </Card>
+      ))}
       <View style={{ gap: 12, marginTop: 12 }}>
-        <Button label="Keep Principles" disabled={isSaving} onPress={() => onNext({ onboardingStep: 9, onboardingData: { ...profile.onboardingData, methodology: { reviewState: 'keep' } } })} />
-        <Button label="Edit Candidates" secondary disabled={isSaving} onPress={() => onNext({ onboardingStep: 9, onboardingData: { ...profile.onboardingData, methodology: { reviewState: 'edit' } } })} />
-        <Button label="Discard" secondary disabled={isSaving} onPress={() => onNext({ onboardingStep: 9, onboardingData: { ...profile.onboardingData, methodology: { reviewState: 'discard' } } })} />
+        <Button label="Keep Principles" disabled={isSaving} onPress={() => onNext({
+          onboardingStep: 9,
+          onboardingData: {
+            ...profile.onboardingData,
+            methodology: {
+              ...profile.onboardingData?.methodology,
+              discovery: { q1: answers[0], q2: answers[1], q3: answers[2], q4: answers[3], q5: answers[4], q6: answers[5] },
+              candidates: draftCandidates,
+              reviewState: 'keep'
+            }
+          }
+        })} />
+        <Button label="Edit Answers" secondary disabled={isSaving} onPress={() => setPhase('questions')} />
+        <Button label="Discard" secondary disabled={isSaving} onPress={() => onNext({
+          onboardingStep: 9,
+          onboardingData: {
+            ...profile.onboardingData,
+            methodology: {
+              ...profile.onboardingData?.methodology,
+              discovery: { q1: answers[0], q2: answers[1], q3: answers[2], q4: answers[3], q5: answers[4], q6: answers[5] },
+              candidates: [],
+              reviewState: 'discard'
+            }
+          }
+        })} />
       </View>
     </View>
   );
@@ -417,7 +434,7 @@ export function Step9Build({ profile, onNext, isSaving }: StepProps) {
   return (
     <View style={{ gap: 24 }}>
       <ScreenTitle title="What Do You Want to Build?" detail="Determine your IP and product ambitions." />
-      
+
       <View style={{ gap: 12 }}>
         <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: c.mutedForeground }}>Select all that apply:</Text>
         <MultiSelect options={BUILD_OPTIONS} selected={ambitions} onChange={setAmbitions} />
@@ -431,7 +448,7 @@ export function Step9Build({ profile, onNext, isSaving }: StepProps) {
       )}
 
       <Button label="Continue" disabled={!first || isSaving} onPress={() => onNext({
-        onboardingData: { ...profile.onboardingData, build: { ambitions, firstBuild: { type: first } } },
+        onboardingData: { ...profile.onboardingData, build: { ...profile.onboardingData?.build, ambitions, firstBuild: { ...profile.onboardingData?.build?.firstBuild, type: first } } },
         onboardingStep: 10
       })} />
     </View>
@@ -439,26 +456,26 @@ export function Step9Build({ profile, onNext, isSaving }: StepProps) {
 }
 
 const Q10 = [
-  "Tell us about one coaching experience that changed the way you think about coaching.",
-  "What was happening?",
-  "What did you initially think?",
-  "What did you discover?",
+  "What happened?",
+  "Who was involved?",
   "What did you do?",
-  "What happened afterward?",
-  "What did this experience teach you?",
-  "What could another coach learn from this?"
+  "What were you thinking?",
+  "What worked?",
+  "What didn't work?",
+  "What did you learn?",
+  "What will you do differently?"
 ];
 
 export function Step10ExperienceCapture({ profile, onNext, isSaving }: StepProps) {
   const initial = [
-    profile.onboardingData?.experienceDiscovery?.cap_q1 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q2 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q3 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q4 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q5 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q6 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q7 as string || '',
-    profile.onboardingData?.experienceDiscovery?.cap_q8 as string || ''
+    profile.onboardingData?.firstExperience?.whatHappened || '',
+    profile.onboardingData?.firstExperience?.whoWasInvolved || '',
+    profile.onboardingData?.firstExperience?.whatDidYouDo || '',
+    profile.onboardingData?.firstExperience?.whatWereYouThinking || '',
+    profile.onboardingData?.firstExperience?.whatWorked || '',
+    profile.onboardingData?.firstExperience?.whatDidNotWork || '',
+    profile.onboardingData?.firstExperience?.whatDidYouLearn || '',
+    profile.onboardingData?.firstExperience?.whatWillYouDoDifferently || ''
   ];
 
   return (
@@ -468,10 +485,16 @@ export function Step10ExperienceCapture({ profile, onNext, isSaving }: StepProps
       onComplete={(ans) => onNext({
         onboardingData: {
           ...profile.onboardingData,
-          experienceDiscovery: {
-            ...profile.onboardingData?.experienceDiscovery,
-            cap_q1: ans[0], cap_q2: ans[1], cap_q3: ans[2], cap_q4: ans[3],
-            cap_q5: ans[4], cap_q6: ans[5], cap_q7: ans[6], cap_q8: ans[7]
+          firstExperience: {
+            ...profile.onboardingData?.firstExperience,
+            whatHappened: ans[0],
+            whoWasInvolved: ans[1],
+            whatDidYouDo: ans[2],
+            whatWereYouThinking: ans[3],
+            whatWorked: ans[4],
+            whatDidNotWork: ans[5],
+            whatDidYouLearn: ans[6],
+            whatWillYouDoDifferently: ans[7]
           }
         },
         onboardingStep: 11
@@ -486,16 +509,18 @@ export function Step11Analysis({ profile, onNext, isSaving }: StepProps) {
   const createExp = useCreateExperience();
   const c = useColors();
   const [result, setResult] = useState<ExperienceExtractionResult | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const hasExtracted = useRef(false);
+  const clientRequestId = useRef(`${profile.id}-onboarding-first-experience`);
 
   useEffect(() => {
     if (hasExtracted.current || result) return;
     hasExtracted.current = true;
 
-    const data = profile.onboardingData?.experienceDiscovery || {};
-    const title = String(data.cap_q1 || 'Coaching Experience');
-    const situation = String(data.cap_q2 || 'Situation');
-    const reflection = [data.cap_q3, data.cap_q4, data.cap_q5, data.cap_q6, data.cap_q7, data.cap_q8].filter(Boolean).join(' ');
+    const data = profile.onboardingData?.firstExperience || {};
+    const title = "First Coaching Experience";
+    const situation = String(data.whatHappened || 'Situation');
+    const reflection = [data.whatDidYouDo, data.whatWereYouThinking, data.whatWorked, data.whatDidNotWork, data.whatDidYouLearn, data.whatWillYouDoDifferently].filter(Boolean).join(' ');
 
     extract.mutate({
       data: {
@@ -512,6 +537,18 @@ export function Step11Analysis({ profile, onNext, isSaving }: StepProps) {
   if (extract.error) return <State error={extract.error} retry={() => { hasExtracted.current = false; extract.reset(); }} />;
 
   if (result) {
+    if (isEditing) {
+      return (
+        <View style={{ gap: 24 }}>
+          <ScreenTitle title="Edit Analysis" detail="Refine the extracted lessons." />
+          <Field label="Lesson" value={result.lesson} onChangeText={t => setResult({...result, lesson: t})} placeholder="Your lesson..." multiline />
+          <Field label="Principle" value={result.principle} onChangeText={t => setResult({...result, principle: t})} placeholder="Your principle..." multiline />
+          <Field label="Framework Candidate" value={result.frameworkCandidate} onChangeText={t => setResult({...result, frameworkCandidate: t})} placeholder="Your framework..." multiline />
+          <Button label="Done Editing" onPress={() => setIsEditing(false)} />
+        </View>
+      );
+    }
+
     return (
       <View style={{ gap: 24 }}>
         <ScreenTitle title="Experience Analysis" detail="Here is what we extracted from your experience." />
@@ -536,21 +573,48 @@ export function Step11Analysis({ profile, onNext, isSaving }: StepProps) {
           <Button label={createExp.isPending ? "Saving..." : "Accept"} disabled={isSaving || createExp.isPending} onPress={() => {
             createExp.mutate({
               data: {
-                clientRequestId: Date.now().toString(),
+                clientRequestId: clientRequestId.current,
                 title: result.title,
-                situation: profile.onboardingData?.experienceDiscovery?.cap_q2 as string || 'Situation',
+                situation: profile.onboardingData?.firstExperience?.whatHappened || 'Situation',
                 learning: result.lesson,
                 principle: result.principle
               }
             }, {
-              onSuccess: () => onNext({ onboardingStep: 12, onboardingData: { ...profile.onboardingData, experienceAnalysis: { reviewState: 'accepted' } } }),
-              onError: () => onNext({ onboardingStep: 12, onboardingData: { ...profile.onboardingData, experienceAnalysis: { reviewState: 'accepted' } } })
+              onSuccess: (savedExp) => onNext({
+                onboardingStep: 12,
+                 onboardingData: buildExperienceDecisionUpdate(
+                   profile.onboardingData,
+                   result,
+                   savedExp.id,
+                   'accepted',
+                 ),
+              })
             });
           }} />
-          <Button label="Edit" secondary disabled={isSaving || createExp.isPending} onPress={() => onNext({ onboardingStep: 12, onboardingData: { ...profile.onboardingData, experienceAnalysis: { reviewState: 'editing' } } })} />
-          <Button label="Reject" secondary disabled={isSaving || createExp.isPending} onPress={() => onNext({ onboardingStep: 12 })} />
+          <Button label="Edit" secondary disabled={isSaving || createExp.isPending} onPress={() => setIsEditing(true)} />
+           <Button label={createExp.isPending ? "Saving..." : "Reject"} secondary disabled={isSaving || createExp.isPending} onPress={() => {
+             createExp.mutate({
+               data: {
+                 clientRequestId: clientRequestId.current,
+                 title: result.title,
+                 situation: profile.onboardingData?.firstExperience?.whatHappened || 'Situation',
+                 learning: result.lesson,
+                 principle: result.principle,
+               },
+             }, {
+               onSuccess: (savedExp) => onNext({
+                 onboardingStep: 12,
+                 onboardingData: buildExperienceDecisionUpdate(
+                   profile.onboardingData,
+                   result,
+                   savedExp.id,
+                   'rejected',
+                 ),
+               }),
+             });
+           }} />
         </View>
-        {createExp.error && <Text style={{ color: c.destructive, textAlign: 'center' }}>Could not save record, but you can continue.</Text>}
+        {createExp.error && <State error={createExp.error} />}
       </View>
     );
   }
@@ -580,19 +644,16 @@ export function Step12FirstChallenge({ profile, onNext, isSaving }: StepProps) {
         <Button label={createPractice.isPending ? "Saving..." : "Continue"} disabled={isSaving || createPractice.isPending} onPress={() => {
           createPractice.mutate({
             data: {
+              clientRequestId: `${profile.id}-onboarding-challenge-session`,
               scenario: "Client is resisting questioning.",
               category: result.skill || "handling_resistance",
               score: result.score,
               feedback: result.observation
             }
           }, {
-            onSuccess: () => onNext({ 
-              onboardingStep: 13, 
-              onboardingData: { ...profile.onboardingData, firstChallenge: { score: result.score, result: result.observation, completed: true } } 
-            }),
-            onError: () => onNext({ 
-              onboardingStep: 13, 
-              onboardingData: { ...profile.onboardingData, firstChallenge: { score: result.score, result: result.observation, completed: true } } 
+            onSuccess: (savedSession) => onNext({
+              onboardingStep: 13,
+              onboardingData: { ...profile.onboardingData, firstChallenge: { ...profile.onboardingData?.firstChallenge, sessionId: savedSession.id, score: result.score, result: result.observation, completed: true } }
             })
           });
         }} />
@@ -646,13 +707,28 @@ export function Step13Plan({ profile, onNext, isSaving }: StepProps) {
         <Text style={{ color: c.mutedForeground, fontFamily: 'Inter_400Regular' }}>• Capture 2 experiences/week</Text>
       </Card>
       <View style={{ gap: 12, marginTop: 12 }}>
-        <Button label="Accept Plan" disabled={isSaving} onPress={() => onNext({ 
+        <Button label="Accept Plan" disabled={isSaving} onPress={() => onNext({
           onboardingStep: 14,
-          onboardingData: { ...profile.onboardingData, thirtyDayPlan: { accepted: true } } 
+          onboardingData: {
+            ...profile.onboardingData,
+            thirtyDayPlan: {
+              ...profile.onboardingData?.thirtyDayPlan,
+              accepted: true,
+              sections: {
+                ...profile.onboardingData?.thirtyDayPlan?.sections,
+                foundation: ["Questioning practice", "Resistance handling", "Reframing"],
+                practice: ["3 simulations/week"],
+                reflection: ["Capture 2 experiences/week"]
+              }
+            }
+          }
         })} />
-        <Button label="Customize" secondary disabled={isSaving} onPress={() => onNext({ 
+        <Button label="Customize" secondary disabled={isSaving} onPress={() => onNext({
           onboardingStep: 14,
-          onboardingData: { ...profile.onboardingData, thirtyDayPlan: { accepted: false } } 
+          onboardingData: {
+            ...profile.onboardingData,
+            thirtyDayPlan: { ...profile.onboardingData?.thirtyDayPlan, accepted: false }
+          }
         })} />
       </View>
     </View>
@@ -675,10 +751,17 @@ export function Step14Passport({ profile, onNext, isSaving }: StepProps) {
       <Card>
         <Text style={{ fontFamily: 'Inter_600SemiBold', color: c.foreground, marginBottom: 8 }}>Development</Text>
         <Text style={{ color: c.mutedForeground, marginBottom: 4, fontFamily: 'Inter_400Regular' }}>Goals: <Text style={{ color: c.foreground }}>{profile.onboardingData?.goals?.outcomes?.join(', ')}</Text></Text>
-        <Text style={{ color: c.mutedForeground, marginBottom: 4, fontFamily: 'Inter_400Regular' }}>Time Commitment: <Text style={{ color: c.foreground }}>{profile.onboardingData?.development?.minutesPerWeek || profile.onboardingData?.development?.schedule}</Text></Text>
+        <Text style={{ color: c.mutedForeground, marginBottom: 4, fontFamily: 'Inter_400Regular' }}>Time Commitment: <Text style={{ color: c.foreground }}>{profile.onboardingData?.development?.dailyTimeCommitment ? `${profile.onboardingData.development.dailyTimeCommitment} minutes` : profile.onboardingData?.development?.schedule}</Text></Text>
       </Card>
 
-      <Button label="Enter Practice Engine" disabled={isSaving} onPress={() => onNext({ onboardingStep: 15, onboardingCompleted: true })} />
+      <Button label="Enter Practice Engine" disabled={isSaving} onPress={() => onNext({
+        onboardingStep: 15,
+        onboardingCompleted: true,
+        onboardingData: {
+          ...profile.onboardingData,
+          passport: { ...profile.onboardingData?.passport, reviewed: true }
+        }
+      })} />
     </View>
   );
 }
