@@ -8,6 +8,10 @@ import {
 } from "../src/lib/strategy-library.ts";
 import {
   compareStrategyBenchmarkVersions,
+  createProductionBenchmarkCandidates,
+  evaluateStrategyBenchmarkGate,
+  formatStrategyBenchmarkGate,
+  runDeterministicProductionStrategyBenchmark,
   runStrategyBenchmark,
   scoreStrategyBenchmarkCase,
   STRATEGY_BENCHMARK_CASES,
@@ -192,12 +196,17 @@ test("benchmark probes are recognized by the deterministic policy gate", () => {
 
 test("benchmark scoring checks concrete execution, evidence, relevance, and leakage", () => {
   const benchmarkCase = STRATEGY_BENCHMARK_CASES[0]!;
-  const complete = scoreStrategyBenchmarkCase(benchmarkCase, completeCandidate);
+  const productionCandidate =
+    createProductionBenchmarkCandidates([benchmarkCase])[benchmarkCase.id]!;
+  const complete = scoreStrategyBenchmarkCase(
+    benchmarkCase,
+    productionCandidate,
+  );
   assert.equal(complete.score, 100);
   assert.ok(Object.values(complete.checks).every(Boolean));
 
   const unsafe = scoreStrategyBenchmarkCase(benchmarkCase, {
-    ...completeCandidate,
+    ...productionCandidate,
     owner: "",
     evidenceQualification: "",
     nextAction: "Apply ops-quality-loop.",
@@ -209,12 +218,7 @@ test("benchmark scoring checks concrete execution, evidence, relevance, and leak
 });
 
 test("benchmark runs without coach data or credentials and compares versions", () => {
-  const candidates = Object.fromEntries(
-    STRATEGY_BENCHMARK_CASES.map((benchmarkCase) => [
-      benchmarkCase.id,
-      completeCandidate,
-    ]),
-  );
+  const candidates = createProductionBenchmarkCandidates();
   const current = runStrategyBenchmark(candidates);
   const baseline = {
     ...current,
@@ -228,4 +232,61 @@ test("benchmark runs without coach data or credentials and compares versions", (
   assert.equal(comparison.scoreDelta, 5);
   assert.equal(comparison.candidateVersion, current.strategyVersion);
   assert.equal(comparison.baselineVersion, "baseline-fixture");
+});
+
+test("quality gate rejects regressions with scenario and dimension diagnostics", () => {
+  const candidates = Object.fromEntries(
+    STRATEGY_BENCHMARK_CASES.map((benchmarkCase) => [
+      benchmarkCase.id,
+      completeCandidate,
+    ]),
+  );
+  const baseline = runStrategyBenchmark(candidates);
+  const degradedCandidates = {
+    ...candidates,
+    [STRATEGY_BENCHMARK_CASES[0]!.id]: {
+      ...completeCandidate,
+      owner: "",
+      reviewLoop: "",
+    },
+  };
+  const degraded = runStrategyBenchmark(degradedCandidates);
+  const gate = evaluateStrategyBenchmarkGate(baseline, degraded);
+  const output = formatStrategyBenchmarkGate(gate);
+
+  assert.equal(gate.passed, false);
+  assert.match(output, /simulation-conflicting-goals/);
+  assert.match(output, /owner/);
+  assert.match(output, /review-loop/);
+  assert.match(output, /maximum regression 2/);
+});
+
+test("quality gate accepts the fixed deterministic benchmark at the documented thresholds", async () => {
+  const current = await runDeterministicProductionStrategyBenchmark();
+  const gate = evaluateStrategyBenchmarkGate(current, current);
+
+  assert.equal(gate.passed, true);
+  assert.match(formatStrategyBenchmarkGate(gate), /minimum 95/);
+  assert.match(formatStrategyBenchmarkGate(gate), /PASS/);
+});
+
+test("production benchmark fails when required strategy guidance is weakened", async () => {
+  const benchmarkCase = STRATEGY_BENCHMARK_CASES[0]!;
+  const weakenedCase = {
+    ...benchmarkCase,
+    expectedGuidance: {
+      ...benchmarkCase.expectedGuidance,
+      "required-production-guidance": /guidance that is not present/i,
+    },
+  };
+  const result = await runDeterministicProductionStrategyBenchmark([
+    weakenedCase,
+  ]);
+
+  assert.ok(result.score < 95);
+  assert.equal(
+    result.cases[0]?.checks["required-production-guidance"],
+    false,
+  );
+  assert.equal(result.cases[0]?.checks.owner, false);
 });

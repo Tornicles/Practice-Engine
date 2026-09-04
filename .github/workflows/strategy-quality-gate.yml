@@ -1,0 +1,35 @@
+name: Strategy quality gate
+
+on:
+  pull_request:
+    paths:
+      - "artifacts/api-server/src/lib/strategy-library.ts"
+      - "artifacts/api-server/src/lib/strategy-benchmark.ts"
+      - "artifacts/api-server/src/lib/strategy-governance.ts"
+      - "artifacts/api-server/src/lib/structured-intelligence-pipeline.ts"
+      - "artifacts/api-server/src/lib/practice-intelligence.ts"
+      - "artifacts/api-server/src/lib/intelligence-completion.ts"
+      - "artifacts/api-server/benchmark-baselines/**"
+      - "artifacts/api-server/src/scripts/strategy-benchmark-gate.ts"
+      - "artifacts/api-server/test/strategy-library.test.ts"
+      - "artifacts/api-server/package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/strategy-quality-gate.yml"
+
+jobs:
+  strategy-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Enforce strategy benchmark thresholds
+        run: |
+          pnpm run strategy:quality-gate
+          pnpm --filter @workspace/api-server run test
