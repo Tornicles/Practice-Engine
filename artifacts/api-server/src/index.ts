@@ -1,4 +1,5 @@
 import app from "./app";
+import { scheduleIntelligenceOperationCompaction } from "./lib/intelligence-operations";
 import { logger } from "./lib/logger";
 
 const rawPort = process.env["PORT"];
@@ -22,4 +23,10 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+  scheduleIntelligenceOperationCompaction((error) => {
+    logger.error(
+      { err: error },
+      "Intelligence operation compaction failed",
+    );
+  });
 });

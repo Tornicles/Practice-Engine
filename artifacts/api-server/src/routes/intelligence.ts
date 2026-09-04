@@ -25,7 +25,11 @@ import {
   IntelligenceSafetyError,
   type IntelligenceTrace,
 } from "../lib/practice-intelligence";
-import { recordIntelligenceOperation } from "../lib/intelligence-operations";
+import {
+  compactIntelligenceOperations,
+  INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS,
+  recordIntelligenceOperation,
+} from "../lib/intelligence-operations";
 import {
   buildIntelligenceAlerts,
   classifyIntelligenceFailure,
@@ -459,28 +463,76 @@ router.get(
       ? Math.min(720, Math.max(1, Math.floor(requestedHours)))
       : 24;
     const bucket = hours <= 72 ? "hour" : "day";
+    await compactIntelligenceOperations();
 
     const [result, latestResult] = await Promise.all([
       db.execute(sql`
+        with raw_rows as (
+          select
+            date_trunc(
+              ${bucket},
+              operation.created_at at time zone 'UTC'
+            ) at time zone 'UTC' as bucket,
+            operation.engine,
+            operation.strategy_version,
+            family.value as strategy_family,
+            operation.outcome,
+            operation.failure_class,
+            count(*)::integer as operation_count,
+            sum(operation.latency_ms)::bigint as latency_total_ms,
+            percentile_cont(0.95) within group (
+              order by operation.latency_ms
+            )::integer as p95_latency_ms
+          from intelligence_operations operation
+          cross join lateral jsonb_array_elements_text(
+            case
+              when jsonb_array_length(operation.strategy_families) = 0
+                then '["unselected"]'::jsonb
+              else operation.strategy_families
+            end
+          ) family(value)
+          where operation.created_at >= now() - (${hours} * interval '1 hour')
+          group by 1, 2, 3, 4, 5, 6
+        ),
+        report_rows as (
+          select * from raw_rows
+
+          union all
+
+          select
+            rollup.day::timestamp at time zone 'UTC' as bucket,
+            rollup.engine,
+            rollup.strategy_version,
+            rollup.strategy_family,
+            rollup.outcome,
+            nullif(rollup.failure_class, 'none') as failure_class,
+            rollup.operation_count,
+            rollup.latency_total_ms,
+            rollup.p95_latency_ms
+          from intelligence_operation_daily_rollups rollup
+          where ${bucket} = 'day'
+            and rollup.day > (
+              (now() at time zone 'UTC') - (${hours} * interval '1 hour')
+            )::date
+            and rollup.day < date_trunc(
+              'day',
+              (now() at time zone 'UTC')
+                - (${INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS} * interval '1 day')
+            )::date
+        )
         select
-          date_trunc(${bucket}, operation.created_at) as bucket,
-          operation.engine,
-          operation.strategy_version as "strategyVersion",
-          family.value as "strategyFamily",
-          operation.outcome,
-          operation.failure_class as "failureClass",
-          count(*)::integer as count,
-          round(avg(operation.latency_ms))::integer as "averageLatencyMs",
-          percentile_cont(0.95) within group (order by operation.latency_ms)::integer as "p95LatencyMs"
-        from intelligence_operations operation
-        cross join lateral jsonb_array_elements_text(
-          case
-            when jsonb_array_length(operation.strategy_families) = 0
-              then '["unselected"]'::jsonb
-            else operation.strategy_families
-          end
-        ) family(value)
-        where operation.created_at >= now() - (${hours} * interval '1 hour')
+          bucket,
+          engine,
+          strategy_version as "strategyVersion",
+          strategy_family as "strategyFamily",
+          outcome,
+          failure_class as "failureClass",
+          sum(operation_count)::integer as count,
+          round(
+            sum(latency_total_ms)::numeric / sum(operation_count)
+          )::integer as "averageLatencyMs",
+          max(p95_latency_ms)::integer as "p95LatencyMs"
+        from report_rows
         group by 1, 2, 3, 4, 5, 6
         order by 1 asc, 2 asc, 3 asc, 4 asc, 5 asc, 6 asc
       `),

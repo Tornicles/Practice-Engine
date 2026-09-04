@@ -19,6 +19,100 @@ const ALERT_CODES = [
   "policy-block-spike",
 ] as const;
 
+/**
+ * Raw operation telemetry is retained for seven UTC days. Complete older days
+ * are reduced to neutral daily dimensions before their raw rows are deleted.
+ */
+export const INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS = 7;
+const INTELLIGENCE_OPERATION_COMPACTION_INTERVAL_MS = 6 * 60 * 60 * 1_000;
+
+export async function compactIntelligenceOperations(): Promise<void> {
+  await db.transaction(async (tx) => {
+    const lock = await tx.execute(sql`
+      select pg_try_advisory_xact_lock(824771109) as acquired
+    `);
+    if (lock.rows[0]?.acquired !== true) return;
+
+    await tx.execute(sql`
+      insert into intelligence_operation_daily_rollups (
+        day,
+        engine,
+        strategy_version,
+        strategy_family,
+        outcome,
+        failure_class,
+        operation_count,
+        latency_total_ms,
+        average_latency_ms,
+        p95_latency_ms
+      )
+      select
+        (operation.created_at at time zone 'UTC')::date,
+        operation.engine,
+        operation.strategy_version,
+        family.value,
+        operation.outcome,
+        coalesce(operation.failure_class, 'none'),
+        count(*)::integer,
+        sum(operation.latency_ms)::bigint,
+        round(avg(operation.latency_ms))::integer,
+        percentile_cont(0.95) within group (
+          order by operation.latency_ms
+        )::integer
+      from intelligence_operations operation
+      cross join lateral jsonb_array_elements_text(
+        case
+          when jsonb_array_length(operation.strategy_families) = 0
+            then '["unselected"]'::jsonb
+          else operation.strategy_families
+        end
+      ) family(value)
+      where operation.created_at < date_trunc(
+        'day',
+        (now() at time zone 'UTC')
+          - (${INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS} * interval '1 day')
+      ) at time zone 'UTC'
+      group by 1, 2, 3, 4, 5, 6
+      on conflict (
+        day,
+        engine,
+        strategy_version,
+        strategy_family,
+        outcome,
+        failure_class
+      ) do update set
+        operation_count = excluded.operation_count,
+        latency_total_ms = excluded.latency_total_ms,
+        average_latency_ms = excluded.average_latency_ms,
+        p95_latency_ms = excluded.p95_latency_ms
+    `);
+
+    await tx.execute(sql`
+      delete from intelligence_operations
+      where created_at < date_trunc(
+        'day',
+        (now() at time zone 'UTC')
+          - (${INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS} * interval '1 day')
+      ) at time zone 'UTC'
+    `);
+  });
+}
+
+export function scheduleIntelligenceOperationCompaction(
+  onError: (error: unknown) => void,
+): NodeJS.Timeout {
+  const run = () => {
+    void compactIntelligenceOperations().catch(onError);
+  };
+  run();
+  const timer = setInterval(
+    run,
+    INTELLIGENCE_OPERATION_COMPACTION_INTERVAL_MS,
+  );
+  timer.unref();
+  return timer;
+}
+
 async function sendAlertNotification(
   notification: IntelligenceAlertNotification,
 ): Promise<boolean> {

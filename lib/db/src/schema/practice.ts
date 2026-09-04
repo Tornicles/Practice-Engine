@@ -1,5 +1,7 @@
 import {
+  bigint,
   boolean,
+  date,
   index,
   integer,
   jsonb,
@@ -117,6 +119,35 @@ export const intelligenceOperationsTable = pgTable(
   ],
 );
 
+export const intelligenceOperationDailyRollupsTable = pgTable(
+  "intelligence_operation_daily_rollups",
+  {
+    day: date("day", { mode: "string" }).notNull(),
+    engine: text("engine").notNull(),
+    strategyVersion: text("strategy_version").notNull(),
+    strategyFamily: text("strategy_family").notNull(),
+    outcome: text("outcome").notNull(),
+    failureClass: text("failure_class").notNull().default("none"),
+    operationCount: integer("operation_count").notNull(),
+    latencyTotalMs: bigint("latency_total_ms", { mode: "number" }).notNull(),
+    averageLatencyMs: integer("average_latency_ms").notNull(),
+    p95LatencyMs: integer("p95_latency_ms").notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [
+        table.day,
+        table.engine,
+        table.strategyVersion,
+        table.strategyFamily,
+        table.outcome,
+        table.failureClass,
+      ],
+    }),
+    index("intelligence_operation_daily_rollups_day_idx").on(table.day),
+  ],
+);
+
 export const intelligenceAlertStatesTable = pgTable(
   "intelligence_alert_states",
   {
@@ -204,3 +235,5 @@ export type KnowledgeAsset = typeof knowledgeAssetsTable.$inferSelect;
 export type InsertPromptRun = z.infer<typeof insertPromptRunSchema>;
 export type PromptRun = typeof promptRunsTable.$inferSelect;
 export type IntelligenceOperation = typeof intelligenceOperationsTable.$inferSelect;
+export type IntelligenceOperationDailyRollup =
+  typeof intelligenceOperationDailyRollupsTable.$inferSelect;
