@@ -38,6 +38,7 @@ Public brand details:
 - `artifacts/api-server/src/lib/practice-intelligence.ts` — shared AI client, prompt governance, and strategy routing
 - `lib/api-spec/openapi.yaml` — API contract and generated-client source of truth
 - `lib/db/src/schema/practice.ts` — coach profile, experience, practice-session, IP asset, and prompt-run data
+- `os/` — 7-dashboard TanStack Start coach OS (Home, Development, Clients, Content, Messages, Help, Settings). Independent of the Replit web app. Engines are backend compute, not left-menu items.
 
 ## Authentication deployment
 
@@ -74,7 +75,7 @@ Public brand details:
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Coach-facing left menu is 7 working dashboards (Home, Development, Clients, Content, Messages, Help, Settings). Internal engines stay off the navigation.
 
 ## Gotchas
 
