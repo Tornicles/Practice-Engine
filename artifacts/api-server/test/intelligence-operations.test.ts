@@ -260,7 +260,7 @@ test("database claims deduplicate concurrent alerts and lease interrupted delive
   }
 });
 
-test("failed alert delivery releases its claim and retries once on later telemetry", async () => {
+test("timed-out alert delivery releases its claim and retries once on later telemetry", async () => {
   const originalFetch = globalThis.fetch;
   const originalWebhookUrl = process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
   const testId = randomUUID();
@@ -302,7 +302,7 @@ test("failed alert delivery releases its claim and retries once on later telemet
   globalThis.fetch = async (_input, init) => {
     attempts += 1;
     if (attempts === 1) {
-      return new Response(null, { status: 503 });
+      throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
     }
     notifications.push(JSON.parse(String(init?.body)));
     return new Response(null, { status: 204 });
@@ -321,7 +321,10 @@ test("failed alert delivery releases its claim and retries once on later telemet
       })),
     );
 
-    await assert.rejects(record(), /Operational alert channel returned HTTP 503/);
+    await assert.rejects(record(), {
+      name: "TimeoutError",
+      message: "The operation was aborted due to timeout",
+    });
 
     let [state] = await db
       .select()
