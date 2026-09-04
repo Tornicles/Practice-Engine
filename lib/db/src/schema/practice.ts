@@ -1,5 +1,6 @@
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -90,6 +91,31 @@ export const promptRunsTable = pgTable("prompt_runs", {
     .defaultNow(),
 });
 
+export const intelligenceOperationsTable = pgTable(
+  "intelligence_operations",
+  {
+    id: serial("id").primaryKey(),
+    engine: text("engine").notNull(),
+    strategyVersion: text("strategy_version").notNull().default("unselected"),
+    strategyFamilies: jsonb("strategy_families").$type<string[]>().notNull().default([]),
+    outcome: text("outcome").notNull(),
+    failureClass: text("failure_class"),
+    latencyMs: integer("latency_ms").notNull(),
+    chainStages: jsonb("chain_stages").$type<string[]>().notNull().default([]),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("intelligence_operations_created_at_idx").on(table.createdAt),
+    index("intelligence_operations_dimensions_idx").on(
+      table.engine,
+      table.strategyVersion,
+      table.outcome,
+    ),
+  ],
+);
+
 export const intelligenceRateLimitsTable = pgTable("intelligence_rate_limits", {
   userId: text("user_id").primaryKey(),
   requestCount: integer("request_count").notNull().default(1),
@@ -141,3 +167,4 @@ export type InsertKnowledgeAsset = z.infer<typeof insertKnowledgeAssetSchema>;
 export type KnowledgeAsset = typeof knowledgeAssetsTable.$inferSelect;
 export type InsertPromptRun = z.infer<typeof insertPromptRunSchema>;
 export type PromptRun = typeof promptRunsTable.$inferSelect;
+export type IntelligenceOperation = typeof intelligenceOperationsTable.$inferSelect;

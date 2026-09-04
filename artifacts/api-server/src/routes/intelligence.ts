@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import {
   db,
   coachProfilesTable,
@@ -25,11 +25,22 @@ import {
   IntelligenceSafetyError,
   type IntelligenceTrace,
 } from "../lib/practice-intelligence";
+import { recordIntelligenceOperation } from "../lib/intelligence-operations";
+import {
+  buildIntelligenceAlerts,
+  classifyIntelligenceFailure,
+  launchOperationalWrites,
+} from "../lib/intelligence-operation-policy";
+import { logger } from "../lib/logger";
 import {
   selectStrategies,
   type StrategySelection,
 } from "../lib/strategy-library";
-import { authenticatedUserId, requireAuth } from "../middlewares/requireAuth";
+import {
+  authenticatedUserId,
+  requireAuth,
+  requireOperator,
+} from "../middlewares/requireAuth";
 import { intelligenceRateLimit } from "../middlewares/intelligenceRateLimit";
 
 const router: IRouter = Router();
@@ -45,61 +56,116 @@ async function getProfile(userId: string) {
   return profile;
 }
 
-async function recordPromptRun(
+function recordPromptRun(
   engine: string,
   strategy: string,
   inputSummary: string,
   outputSummary: string,
   userId: string,
   trace: IntelligenceTrace,
+  startedAt: number,
 ) {
-  await db.insert(promptRunsTable).values({
-    userId,
-    engine,
-    strategy,
-    strategyVersion: trace.strategyVersion,
-    strategyIds: trace.strategyIds,
-    strategyFamilies: trace.strategyFamilies,
-    sourceClasses: trace.sourceClasses,
-    chainStages: trace.chainStages,
-    safetyOutcome: trace.safetyOutcome,
-    inputSummary: inputSummary.slice(0, 800),
-    outputSummary: outputSummary.slice(0, 800),
-  });
+  launchOperationalWrites(
+    [
+      {
+        name: "prompt audit",
+        run: () =>
+          db.insert(promptRunsTable).values({
+            userId,
+            engine,
+            strategy,
+            strategyVersion: trace.strategyVersion,
+            strategyIds: trace.strategyIds,
+            strategyFamilies: trace.strategyFamilies,
+            sourceClasses: trace.sourceClasses,
+            chainStages: trace.chainStages,
+            safetyOutcome: trace.safetyOutcome,
+            inputSummary: inputSummary.slice(0, 800),
+            outputSummary: outputSummary.slice(0, 800),
+          }),
+      },
+      {
+        name: "operations telemetry",
+        run: () =>
+          recordIntelligenceOperation({
+            engine,
+            outcome: "success",
+            startedAt,
+            trace,
+          }),
+      },
+    ],
+    (name, error) =>
+      logger.error({ err: error, engine, persistence: name }, "Intelligence persistence failed"),
+  );
 }
 
-async function recordFailedPromptRun(
+function recordFailedPromptRun(
   engine: string,
   userId: string,
   selection: StrategySelection | undefined,
   error: unknown,
+  startedAt: number,
 ) {
-  if (!selection) return;
-  try {
-    const trace: IntelligenceTrace =
-      error instanceof IntelligenceSafetyError
-        ? error.trace
-        : {
-            strategyVersion: selection.version,
-            strategyIds: selection.strategyIds,
-            strategyFamilies: selection.families,
-            sourceClasses: selection.sourceClasses,
-            chainStages: ["execute", "review"],
-            safetyOutcome: "generation-error",
-          };
-    await recordPromptRun(
-      engine,
-      selection.families.join(", "),
-      "Authenticated coach request",
-      error instanceof IntelligenceSafetyError
-        ? "Output blocked by source-safety review"
-        : "Generation did not complete",
-      userId,
-      trace,
-    );
-  } catch {
-    // Audit persistence must never replace the user-facing generation error.
-  }
+  const classified = classifyIntelligenceFailure(error);
+  const trace: IntelligenceTrace | undefined = selection
+    ? error instanceof IntelligenceSafetyError
+      ? error.trace
+      : {
+          strategyVersion: selection.version,
+          strategyIds: selection.strategyIds,
+          strategyFamilies: selection.families,
+          sourceClasses: selection.sourceClasses,
+          chainStages: ["execute", "review"],
+          safetyOutcome: "generation-error",
+        }
+    : undefined;
+
+  launchOperationalWrites(
+    [
+      {
+        name: "operations telemetry",
+        run: () =>
+          recordIntelligenceOperation({
+            engine,
+            outcome: classified.outcome,
+            failureClass: classified.failureClass,
+            startedAt,
+            selection,
+            trace: error instanceof IntelligenceSafetyError ? error.trace : undefined,
+          }),
+      },
+      ...(selection && trace
+        ? [
+            {
+              name: "prompt audit",
+              run: () =>
+                db.insert(promptRunsTable).values({
+                  userId,
+                  engine,
+                  strategy: selection.families.join(", "),
+                  strategyVersion: trace.strategyVersion,
+                  strategyIds: trace.strategyIds,
+                  strategyFamilies: trace.strategyFamilies,
+                  sourceClasses: trace.sourceClasses,
+                  chainStages: trace.chainStages,
+                  safetyOutcome: trace.safetyOutcome,
+                  inputSummary: "Authenticated coach request",
+                  outputSummary:
+                    error instanceof IntelligenceSafetyError
+                      ? "Output blocked by source-safety review"
+                      : "Generation did not complete",
+                }),
+            },
+          ]
+        : []),
+    ],
+    (name, persistenceError) =>
+      logger.error(
+        { err: persistenceError, engine, persistence: name },
+        "Intelligence failure persistence failed",
+      ),
+  );
 }
 
 router.get("/practice/assets", async (req, res): Promise<void> => {
@@ -113,6 +179,7 @@ router.get("/practice/assets", async (req, res): Promise<void> => {
 });
 
 router.post("/practice/ai/simulate", async (req, res): Promise<void> => {
+  const startedAt = Date.now();
   const userId = authenticatedUserId(req);
   const parsed = SimulateClientTurnBody.safeParse(req.body);
   if (!parsed.success) {
@@ -158,16 +225,18 @@ Return JSON only with clientReply, observation, skill, score, sessionComplete.`,
       "Reviewed simulation response accepted",
       userId,
       generated.trace,
+      startedAt,
     );
     res.json(output);
   } catch (error) {
-    await recordFailedPromptRun("Practice Simulator", userId, selection, error);
+    await recordFailedPromptRun("Practice Simulator", userId, selection, error, startedAt);
     req.log.error({ err: error }, "Client simulation failed");
     res.status(502).json({ error: "The client simulator could not respond. Please try again." });
   }
 });
 
 router.post("/practice/ai/extract", async (req, res): Promise<void> => {
+  const startedAt = Date.now();
   const userId = authenticatedUserId(req);
   const parsed = ExtractExperienceKnowledgeBody.safeParse(req.body);
   if (!parsed.success) {
@@ -209,16 +278,18 @@ Return JSON only with title, lesson, principle, insight, frameworkCandidate, evi
       "Reviewed structured reflection accepted",
       userId,
       generated.trace,
+      startedAt,
     );
     res.json(output);
   } catch (error) {
-    await recordFailedPromptRun("Experience & Knowledge", userId, selection, error);
+    await recordFailedPromptRun("Experience & Knowledge", userId, selection, error, startedAt);
     req.log.error({ err: error }, "Experience extraction failed");
     res.status(502).json({ error: "The experience could not be analyzed. Please try again." });
   }
 });
 
 router.post("/practice/ai/generate", async (req, res): Promise<void> => {
+  const startedAt = Date.now();
   const userId = authenticatedUserId(req);
   const parsed = GenerateKnowledgeAssetBody.safeParse(req.body);
   if (!parsed.success) {
@@ -296,16 +367,18 @@ Return JSON only with title and content. Content should be polished markdown.`,
       "Reviewed evidence-linked asset accepted",
       userId,
       generated.trace,
+      startedAt,
     );
     res.status(201).json(output);
   } catch (error) {
-    await recordFailedPromptRun("Experience to IP", userId, selection, error);
+    await recordFailedPromptRun("Experience to IP", userId, selection, error, startedAt);
     req.log.error({ err: error }, "Asset generation failed");
     res.status(502).json({ error: "The asset could not be generated. Please try again." });
   }
 });
 
 router.post("/practice/ai/next-action", async (req, res): Promise<void> => {
+  const startedAt = Date.now();
   const userId = authenticatedUserId(req);
   const parsed = RecommendNextActionBody.safeParse(req.body);
   if (!parsed.success) {
@@ -367,13 +440,92 @@ reason, engine, duration, successCriteria (2-4 measurable strings).`,
       "Reviewed next action accepted",
       userId,
       generated.trace,
+      startedAt,
     );
     res.json(output);
   } catch (error) {
-    await recordFailedPromptRun("Growth Orchestration", userId, selection, error);
+    await recordFailedPromptRun("Growth Orchestration", userId, selection, error, startedAt);
     req.log.error({ err: error }, "Next-action recommendation failed");
     res.status(502).json({ error: "A next action could not be selected. Please try again." });
   }
 });
+
+router.get(
+  "/practice/operations/intelligence",
+  requireOperator,
+  async (req, res): Promise<void> => {
+    const requestedHours = Number(req.query.hours ?? 24);
+    const hours = Number.isFinite(requestedHours)
+      ? Math.min(720, Math.max(1, Math.floor(requestedHours)))
+      : 24;
+    const bucket = hours <= 72 ? "hour" : "day";
+
+    const [result, latestResult] = await Promise.all([
+      db.execute(sql`
+        select
+          date_trunc(${bucket}, operation.created_at) as bucket,
+          operation.engine,
+          operation.strategy_version as "strategyVersion",
+          family.value as "strategyFamily",
+          operation.outcome,
+          operation.failure_class as "failureClass",
+          count(*)::integer as count,
+          round(avg(operation.latency_ms))::integer as "averageLatencyMs",
+          percentile_cont(0.95) within group (order by operation.latency_ms)::integer as "p95LatencyMs"
+        from intelligence_operations operation
+        cross join lateral jsonb_array_elements_text(
+          case
+            when jsonb_array_length(operation.strategy_families) = 0
+              then '["unselected"]'::jsonb
+            else operation.strategy_families
+          end
+        ) family(value)
+        where operation.created_at >= now() - (${hours} * interval '1 hour')
+        group by 1, 2, 3, 4, 5, 6
+        order by 1 asc, 2 asc, 3 asc, 4 asc, 5 asc, 6 asc
+      `),
+      db.execute(sql`
+        select outcome, count(*)::integer as count
+        from intelligence_operations
+        where created_at >= now() - (
+          ${bucket === "hour" ? 1 : 24} * interval '1 hour'
+        )
+        group by outcome
+      `),
+    ]);
+
+    const rows = result.rows as Array<{
+      bucket: Date | string;
+      engine: string;
+      strategyVersion: string;
+      strategyFamily: string;
+      outcome: string;
+      failureClass: string | null;
+      count: number;
+      averageLatencyMs: number;
+      p95LatencyMs: number;
+    }>;
+    const totals = (latestResult.rows as Array<{
+      outcome: string;
+      count: number;
+    }>).reduce(
+      (acc, row) => {
+        acc.total += row.count;
+        acc[row.outcome] = (acc[row.outcome] ?? 0) + row.count;
+        return acc;
+      },
+      { total: 0 } as Record<string, number>,
+    );
+    const alerts = buildIntelligenceAlerts(totals);
+
+    res.json({
+      windowHours: hours,
+      bucket,
+      generatedAt: new Date().toISOString(),
+      trends: rows,
+      alerts,
+    });
+  },
+);
 
 export default router;

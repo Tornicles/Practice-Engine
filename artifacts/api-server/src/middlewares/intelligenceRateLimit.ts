@@ -2,6 +2,11 @@ import type { RequestHandler } from "express";
 import { db, intelligenceRateLimitsTable } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { authenticatedUserId } from "./requireAuth";
+import {
+  engineFromAiPath,
+  recordIntelligenceOperation,
+} from "../lib/intelligence-operations";
+import { launchOperationalWrites } from "../lib/intelligence-operation-policy";
 
 export const intelligenceRateLimit: RequestHandler = async (req, res, next) => {
   try {
@@ -38,6 +43,22 @@ export const intelligenceRateLimit: RequestHandler = async (req, res, next) => {
         ),
       );
       res.setHeader("Retry-After", String(retryAfterSeconds));
+      launchOperationalWrites(
+        [
+          {
+            name: "rate-limit telemetry",
+            run: () =>
+              recordIntelligenceOperation({
+                engine: engineFromAiPath(req.path),
+                outcome: "rate-limit",
+                failureClass: "application-rate-limit",
+                startedAt: Date.now(),
+              }),
+          },
+        ],
+        (_name, error) =>
+          req.log.error({ err: error }, "Rate-limit telemetry persistence failed"),
+      );
       res.status(429).json({
         error:
           "The intelligence engine is receiving too many requests. Please try again shortly.",
