@@ -40,6 +40,12 @@ A connected coach-development workspace that turns learning, simulation, real de
 - AI-generated methodology and market assets remain drafts until their validation gaps are resolved.
 - Build the core loop first: develop → practice → reflect → capture → structure → prove. Expand downstream engines on that foundation.
 
+## Visual direction
+
+- Use `attached_assets/practice_engine_complete_1788517743907.html` as the visual source of truth.
+- The interface is a compact dark coaching operating system: charcoal surfaces, fine borders, amber/gold signals, grouped fixed navigation, sticky utility bar, dense cards, KPI rows, timelines, and restrained radii.
+- Preserve information density and the Experience → Expertise → IP hierarchy. Avoid glossy gradients, oversized empty hero areas, excessive pills, and generic light SaaS styling.
+
 ## Product
 
 - Guided onboarding and persistent Coach Passport
