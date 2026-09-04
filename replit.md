@@ -6,6 +6,7 @@ A connected coach-development workspace that turns learning, simulation, real de
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm --filter @workspace/practice-engine run dev` — run the Practice Engine web app
+- `pnpm --filter @workspace/practice-engine-mobile run dev` — run the iOS/Android Expo app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -26,6 +27,7 @@ A connected coach-development workspace that turns learning, simulation, real de
 ## Where things live
 
 - `artifacts/practice-engine/` — React frontend
+- `artifacts/practice-engine-mobile/` — primary mobile experience for iOS and Android
 - `artifacts/api-server/src/routes/practice.ts` — Practice Engine API routes
 - `artifacts/api-server/src/routes/intelligence.ts` — grounded AI simulation, extraction, asset generation, and orchestration
 - `artifacts/api-server/src/lib/practice-intelligence.ts` — shared AI client, prompt governance, and strategy routing
@@ -40,6 +42,7 @@ A connected coach-development workspace that turns learning, simulation, real de
 ## Architecture decisions
 
 - Treat the product as one coach-development flywheel with connected engines, not a bundle of unrelated AI tools.
+- Treat mobile as the primary product experience; keep the web app as a connected companion using the same accounts, API, and coach-owned data.
 - The Coach Passport is the shared context layer; experiences and practice history feed every later engine.
 - Preserve evidence lineage: methodology, content, courses, and products should trace back to lived experience and validation.
 - Treat broad prompt libraries as hidden strategy inputs, never as expertise or proof. Select and adapt strategies from live context instead of exposing raw prompt lists.

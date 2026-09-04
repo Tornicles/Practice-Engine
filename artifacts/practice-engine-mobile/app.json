@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Practice Engine Mobile",
+    "slug": "practice-engine-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "practice-engine-mobile",
+    "userInterfaceStyle": "dark",
+    "splash": { "backgroundColor": "#0f1215" },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.practiceengine.mobile"
+    },
+    "android": { "package": "com.practiceengine.mobile" },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "@clerk/expo",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

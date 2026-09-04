@@ -1,0 +1,14 @@
+import React from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { Redirect, Tabs } from 'expo-router';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { Feather } from '@expo/vector-icons';
+import { SymbolView } from 'expo-symbols';
+import { BlurView } from 'expo-blur';
+import { isLiquidGlassAvailable } from 'expo-glass-effect';
+import { useAuth } from '@clerk/expo';
+import { getGetPracticeProfileQueryKey, setAuthTokenGetter, useGetPracticeProfile } from '@workspace/api-client-react';
+import { useColors } from '@/hooks/useColors';
+function Native(){return <NativeTabs><NativeTabs.Trigger name="index"><NativeTabs.Trigger.Icon sf={{default:'sun.max',selected:'sun.max.fill'}}/><NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label></NativeTabs.Trigger><NativeTabs.Trigger name="practice"><NativeTabs.Trigger.Icon sf={{default:'bubble.left',selected:'bubble.left.fill'}}/><NativeTabs.Trigger.Label>Practice</NativeTabs.Trigger.Label></NativeTabs.Trigger><NativeTabs.Trigger name="capture"><NativeTabs.Trigger.Icon sf={{default:'plus.circle',selected:'plus.circle.fill'}}/><NativeTabs.Trigger.Label>Capture</NativeTabs.Trigger.Label></NativeTabs.Trigger><NativeTabs.Trigger name="library"><NativeTabs.Trigger.Icon sf={{default:'books.vertical',selected:'books.vertical.fill'}}/><NativeTabs.Trigger.Label>Library</NativeTabs.Trigger.Label></NativeTabs.Trigger></NativeTabs>}
+function Classic(){const c=useColors();const ios=Platform.OS==='ios';return <Tabs screenOptions={{headerShown:false,tabBarActiveTintColor:c.primary,tabBarInactiveTintColor:c.mutedForeground,tabBarStyle:{backgroundColor:ios?'transparent':c.background,borderTopColor:c.border,borderTopWidth:Platform.OS==='web'?1:0,elevation:0,...(Platform.OS==='web'?{height:84}: {})},tabBarBackground:()=>ios?<BlurView intensity={85} tint="dark" style={StyleSheet.absoluteFill}/>:<View style={[StyleSheet.absoluteFill,{backgroundColor:c.background}]}/>}}>{[['index','Today','sun'],['practice','Practice','message-circle'],['capture','Capture','plus-circle'],['library','Library','book-open']].map(([name,title,icon])=><Tabs.Screen key={name} name={name} options={{title,tabBarIcon:({color})=>ios?<SymbolView name={name==='index'?'sun.max':name==='practice'?'bubble.left':name==='capture'?'plus.circle':'books.vertical'} tintColor={color} size={23}/>:<Feather name={icon as keyof typeof Feather.glyphMap} color={color} size={21}/>}}/>)}</Tabs>}
+export default function TabLayout(){const {isSignedIn,getToken}=useAuth();setAuthTokenGetter(()=>getToken());const profile=useGetPracticeProfile({query:{queryKey:getGetPracticeProfileQueryKey(),enabled:!!isSignedIn}});if(!isSignedIn)return <Redirect href="/(auth)/sign-in"/>;if(profile.data&&!profile.data.onboardingCompleted)return <Redirect href="/onboarding"/>;return isLiquidGlassAvailable()?<Native/>:<Classic/>;}
