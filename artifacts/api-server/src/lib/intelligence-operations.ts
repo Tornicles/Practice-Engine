@@ -12,7 +12,7 @@ import {
   type IntelligenceAlert,
   type IntelligenceAlertNotification,
   type IntelligenceOutcome,
-} from "./intelligence-operation-policy";
+} from "./intelligence-operation-policy.ts";
 
 const ALERT_CODES = [
   "sustained-upstream-failures",

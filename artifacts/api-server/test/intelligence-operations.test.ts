@@ -1,11 +1,19 @@
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import test from "node:test";
+import {
+  db,
+  intelligenceAlertStatesTable,
+  intelligenceOperationsTable,
+} from "@workspace/db";
+import { and, eq } from "drizzle-orm";
 import {
   buildIntelligenceAlerts,
   buildIntelligenceAlertNotification,
   classifyIntelligenceFailure,
   launchOperationalWrites,
 } from "../src/lib/intelligence-operation-policy.ts";
+import { recordIntelligenceOperation } from "../src/lib/intelligence-operations.ts";
 
 test("persistence failures remain best-effort after successful generation", async () => {
   const attempted: string[] = [];
@@ -127,4 +135,122 @@ test("recovery notifications use the same metadata allowlist", () => {
     },
   );
   assert.equal(notification.event, "recovered");
+});
+
+test("database claims deduplicate concurrent alerts and lease interrupted deliveries", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalWebhookUrl = process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
+  const testId = randomUUID();
+  const engine = `claim-test-${testId}`;
+  const strategyVersion = `version-${testId}`;
+  const strategyFamily = `family-${testId}`;
+  const notifications: Array<{ event: string; engine: string }> = [];
+  const dimensions = and(
+    eq(intelligenceAlertStatesTable.engine, engine),
+    eq(intelligenceAlertStatesTable.strategyVersion, strategyVersion),
+    eq(intelligenceAlertStatesTable.strategyFamily, strategyFamily),
+  );
+  const operationDimensions = and(
+    eq(intelligenceOperationsTable.engine, engine),
+    eq(intelligenceOperationsTable.strategyVersion, strategyVersion),
+  );
+  const record = (outcome: "success" | "upstream-error") =>
+    recordIntelligenceOperation({
+      engine,
+      outcome,
+      startedAt: Date.now(),
+      selection: {
+        version: strategyVersion,
+        engine: "simulation",
+        cards: [],
+        strategyIds: [],
+        families: [strategyFamily],
+        sourceClasses: [],
+        promptContext: "",
+      },
+    });
+
+  process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = "https://alerts.test/webhook";
+  globalThis.fetch = async (_input, init) => {
+    notifications.push(JSON.parse(String(init?.body)));
+    return new Response(null, { status: 204 });
+  };
+
+  try {
+    await record("upstream-error");
+    await record("upstream-error");
+    await Promise.all([record("upstream-error"), record("upstream-error")]);
+
+    assert.deepEqual(
+      notifications.map((notification) => notification.event),
+      ["triggered"],
+      "concurrent threshold-crossing writes must claim one notification",
+    );
+
+    await record("upstream-error");
+    assert.equal(
+      notifications.length,
+      1,
+      "an unchanged active state must not notify again",
+    );
+
+    await Promise.all(Array.from({ length: 6 }, () => record("success")));
+    assert.deepEqual(
+      notifications.map((notification) => notification.event),
+      ["triggered", "recovered"],
+      "returning below the threshold must produce one recovery",
+    );
+
+    notifications.length = 0;
+    await db.delete(intelligenceOperationsTable).where(operationDimensions);
+    await db.delete(intelligenceAlertStatesTable).where(dimensions);
+    await db.insert(intelligenceOperationsTable).values(
+      Array.from({ length: 3 }, () => ({
+        engine,
+        strategyVersion,
+        strategyFamilies: [strategyFamily],
+        outcome: "upstream-error",
+        failureClass: "upstream",
+        latencyMs: 1,
+        chainStages: [],
+      })),
+    );
+    await db.insert(intelligenceAlertStatesTable).values({
+      alertCode: "sustained-upstream-failures",
+      engine,
+      strategyVersion,
+      strategyFamily,
+      active: true,
+      notifiedActive: false,
+      notificationActive: true,
+      notificationClaimedAt: new Date(),
+    });
+
+    await record("upstream-error");
+    assert.equal(
+      notifications.length,
+      0,
+      "a delivery claim must remain exclusive while its lease is fresh",
+    );
+
+    await db
+      .update(intelligenceAlertStatesTable)
+      .set({ notificationClaimedAt: new Date(Date.now() - 6 * 60_000) })
+      .where(dimensions);
+    await record("upstream-error");
+    assert.deepEqual(
+      notifications.map((notification) => notification.event),
+      ["triggered"],
+      "an interrupted delivery must become retryable after its lease expires",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalWebhookUrl === undefined) {
+      delete process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
+    } else {
+      process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = originalWebhookUrl;
+    }
+    await db.delete(intelligenceOperationsTable).where(operationDimensions);
+    await db.delete(intelligenceAlertStatesTable).where(dimensions);
+  }
 });
