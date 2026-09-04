@@ -35,7 +35,7 @@ import Proof from "@/pages/Proof";
 import Delivery from "@/pages/Delivery";
 import Settings from "@/pages/Settings";
 import Onboarding from "@/pages/Onboarding";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -149,7 +149,7 @@ function ClerkQueryClientCacheInvalidator() {
 }
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { data: profile, isLoading } = useGetPracticeProfile();
+  const { data: profile, isLoading, isError, refetch } = useGetPracticeProfile();
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
@@ -162,13 +162,74 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-3 bg-background px-6 text-center" role="status" aria-live="polite">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
+        <p className="text-sm text-muted-foreground" data-testid="status-profile-loading">Loading your workspace…</p>
       </div>
     );
   }
 
+  if (isError) {
+    return (
+      <main className="flex min-h-[100dvh] items-center justify-center bg-background px-6">
+        <section className="engine-card w-full max-w-md p-7 text-center" role="alert" aria-labelledby="profile-error-title">
+          <AlertCircle className="mx-auto mb-4 h-7 w-7 text-destructive" aria-hidden="true" />
+          <h1 id="profile-error-title" className="text-xl font-semibold">We couldn’t load your workspace</h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Check your connection and try again. Your account remains signed in.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-5 inline-flex h-10 items-center justify-center gap-2 border border-primary/60 px-4 text-xs font-semibold uppercase tracking-[.1em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            data-testid="button-retry-profile"
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> Try again
+          </button>
+        </section>
+      </main>
+    );
+  }
+
   return <Shell>{children}</Shell>;
+}
+
+const publicMetadata: Record<string, { title: string; description: string }> = {
+  "/": {
+    title: "Startup Man | Turn Experience Into IP",
+    description: "Startup Man helps coaches and advisors turn lived experience into stronger skills, repeatable methodology, and evidence-backed intellectual property.",
+  },
+  "/about": { title: "About Startup Man | Dallas, Texas", description: "Learn about Startup Man, a Dallas-based platform for coaches and advisors developing their practice and intellectual property." },
+  "/how-it-works": { title: "How Startup Man Works", description: "See how Startup Man helps coaches capture experience, develop repeatable methodology, and build evidence-backed intellectual property." },
+  "/services": { title: "Startup Man Services", description: "Explore Startup Man services for coaches and advisors who want to turn practical experience into usable intellectual property." },
+  "/resources": { title: "Startup Man Resources", description: "Browse Startup Man resources for building a stronger coaching practice, methodology, and body of work." },
+  "/contact": { title: "Contact Startup Man | Dallas, Texas", description: "Contact Startup Man at info@startupmans.com. Startup Man is based in Dallas, Texas, USA." },
+  "/privacy": { title: "Privacy Policy | Startup Man", description: "Read the Startup Man privacy policy and find contact details for privacy questions." },
+  "/terms": { title: "Terms of Service | Startup Man", description: "Read the Startup Man terms of service for use of the Startup Man platform." },
+};
+
+function PageMetadata() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    const metadata = publicMetadata[location];
+    const noIndex = !metadata;
+    const title = metadata?.title ?? "Startup Man Workspace";
+    const description = metadata?.description ?? "Private Startup Man workspace.";
+    const canonical = `https://startupmans.com${basePath}${location === "/" ? "/" : location}`.replace(/([^:]\/)\/+/g, "$1");
+
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[name="robots"]')?.setAttribute("content", noIndex ? "noindex, nofollow" : "index, follow");
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonical);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", description);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonical);
+  }, [location]);
+
+  return null;
 }
 
 function HomeRedirect() {
@@ -282,6 +343,7 @@ function ClerkProviderWithRoutes() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <ClerkQueryClientCacheInvalidator />
+          <PageMetadata />
           <Router />
           <Toaster />
         </ThemeProvider>

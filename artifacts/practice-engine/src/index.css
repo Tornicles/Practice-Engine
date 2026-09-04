@@ -121,6 +121,11 @@
     min-width: 320px;
     letter-spacing: -0.01em;
   }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
 }
 
 /* Startup Man visual system: dense, quiet, instrument-panel dark. */
@@ -154,6 +159,8 @@ h1, h2, h3, h4 { font-family: var(--app-font-sans); letter-spacing: -0.035em; }
 }
 .engine-content { width: min(1480px, 100%); margin: 0 auto; padding: 28px 34px 64px; }
 .engine-logo-mark { color: hsl(var(--primary)); border: 1px solid hsl(var(--primary) / .55); }
+.skip-link { position: fixed; top: .75rem; left: .75rem; z-index: 100; transform: translateY(-200%); background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); padding: .6rem .8rem; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.skip-link:focus { transform: translateY(0); }
 .engine-nav-group { margin-top: 22px; }
 .engine-nav-label { color: hsl(var(--muted-foreground) / .65); letter-spacing: .16em; font-size: 10px; }
 .engine-nav-link { border-left: 2px solid transparent; color: hsl(var(--muted-foreground)); }
@@ -191,6 +198,7 @@ input:focus, textarea:focus, select:focus { border-color: hsl(var(--primary) / .
   .engine-sidebar .engine-nav-group { margin-top: 12px; }
   .engine-content { padding: 20px 14px 44px; }
   .engine-topbar { padding-left: 14px; padding-right: 14px; }
+  .engine-topbar [data-testid="link-capture-experience"] { padding-left: .65rem; padding-right: .65rem; font-size: 10px; }
 }
 @media (max-width: 480px) {
   .engine-topbar .engine-topbar-score { display: none; }

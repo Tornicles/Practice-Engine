@@ -3,16 +3,26 @@
     "name": "Startup Man",
     "slug": "practice-engine-mobile",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "practice-engine-mobile",
     "userInterfaceStyle": "dark",
-    "splash": { "backgroundColor": "#0f1215" },
+    "splash": {
+      "backgroundColor": "#0f1215",
+      "resizeMode": "contain",
+      "image": "./assets/images/icon-generated.png"
+    },
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.practiceengine.mobile"
     },
-    "android": { "package": "com.practiceengine.mobile" },
+    "android": {
+      "package": "com.practiceengine.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon-generated.png",
+        "backgroundColor": "#0f1215"
+      }
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },

@@ -6,9 +6,11 @@ import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollV
 import { Button, Card, Field, ScreenTitle } from '@/components/UI';
 import { useColors } from '@/hooks/useColors';
 import { useOfflineCapture } from '@/lib/OfflineCaptureContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Capture() {
   const c = useColors();
+  const insets = useSafeAreaInsets();
   const { draft, loaded, syncState, queuedCount, isEnqueueing, storageError, updateDraft, queueDraft, retry } = useOfflineCapture();
   const extract = useExtractExperienceKnowledge({
     mutation: {
@@ -28,7 +30,7 @@ export default function Capture() {
         ? { icon: 'clock' as const, text: `${queuedCount} note${queuedCount === 1 ? '' : 's'} waiting to sync.`, color: c.accentForeground }
         : null;
 
-  return <KeyboardAwareScrollViewCompat style={{ flex: 1, backgroundColor: c.background }} contentContainerStyle={[styles.content, { paddingTop: Platform.OS === 'web' ? 87 : 28 }]} bottomOffset={36}>
+  return <KeyboardAwareScrollViewCompat style={{ flex: 1, backgroundColor: c.background }} contentContainerStyle={[styles.content, { paddingTop: Platform.OS === 'web' ? 87 : insets.top + 20 }]} bottomOffset={36}>
     <ScreenTitle kicker="Capture" title="Make today teach you" detail="Your draft is saved privately on this device while you type." />
     {status ? <View style={[styles.status, { borderColor: c.border, backgroundColor: c.card }]}>
       <Feather name={status.icon} size={17} color={status.color} />
@@ -46,7 +48,7 @@ export default function Capture() {
       <Field label="Principle" value={draft.principle} onChangeText={(principle) => updateDraft({ principle })} placeholder="A reusable practice principle" multiline editable={fieldsEditable} />
       <Button testID="save-experience" label={isEnqueueing ? 'Saving safely' : 'Save to library'} onPress={() => void queueDraft()} disabled={!loaded || isEnqueueing || !draft.title || !draft.lesson || !draft.principle} />
     </Card> : null}
-    {extract.error ? <Text style={{ color: c.destructive }}>Knowledge extraction failed. Please try again.</Text> : null}
+    {extract.error ? <Text accessibilityRole="alert" style={{ color: c.destructive }}>Knowledge extraction failed. Please try again.</Text> : null}
   </KeyboardAwareScrollViewCompat>;
 }
 

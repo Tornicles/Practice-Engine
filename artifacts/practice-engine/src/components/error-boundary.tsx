@@ -46,6 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <Button
             variant="outline"
             onClick={() => this.setState({ hasError: false, error: null })}
+            data-testid="button-retry-error-boundary"
           >
             Try again
           </Button>

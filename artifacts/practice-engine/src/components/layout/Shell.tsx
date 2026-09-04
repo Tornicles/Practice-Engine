@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import {
   Activity,
@@ -71,6 +71,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { data: profile } = useGetPracticeProfile();
   const { signOut } = useClerk();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   if (location === "/onboarding") {
     return <main className="flex min-h-[100dvh] flex-1 flex-col">{children}</main>;
@@ -83,16 +85,23 @@ export function Shell({ children }: { children: ReactNode }) {
     .slice(0, 2)
     .toUpperCase();
 
-  const handleSignOut = () => {
-    signOut({ redirectUrl: import.meta.env.BASE_URL.replace(/\/$/, "") || "/" });
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    setSignOutError(null);
+    try {
+      await signOut({ redirectUrl: import.meta.env.BASE_URL.replace(/\/$/, "") || "/" });
+    } catch {
+      setSignOutError("Unable to sign out. Please try again.");
+      setIsSigningOut(false);
+    }
   };
 
   return (
     <div className="engine-shell flex overflow-hidden">
       <aside className="engine-sidebar fixed inset-y-0 left-0 z-20 flex flex-col">
         <div className="flex h-[62px] shrink-0 items-center border-b border-sidebar-border px-4">
-          <Link href="/dashboard" className="group flex min-w-0 items-center gap-2.5" data-testid="link-shell-logo">
-            <span className="engine-logo-mark grid h-7 w-7 shrink-0 place-items-center rounded-sm text-xs font-bold">P</span>
+          <Link href="/dashboard" className="group flex min-w-0 items-center gap-2.5" data-testid="link-shell-logo" aria-label="Startup Man dashboard">
+            <span className="engine-logo-mark grid h-7 w-7 shrink-0 place-items-center rounded-sm text-xs font-bold" aria-hidden="true">S</span>
             <span className="engine-logo-copy truncate text-[13px] font-semibold uppercase tracking-[.16em] text-foreground">
               Startup <span className="text-primary">Man</span>
             </span>
@@ -113,6 +122,8 @@ export function Shell({ children }: { children: ReactNode }) {
                       href={item.href}
                       data-active={active}
                       data-testid={`link-nav-${item.name.toLowerCase().replaceAll(" ", "-")}`}
+                      aria-label={item.name}
+                      aria-current={active ? "page" : undefined}
                       className={cn(
                         "engine-nav-link flex items-center gap-2.5 px-2.5 py-2 text-[12px] transition-colors",
                         active && "font-medium",
@@ -133,18 +144,26 @@ export function Shell({ children }: { children: ReactNode }) {
             href="/settings"
             data-active={location === "/settings"}
             data-testid="link-nav-settings"
+            aria-label="Settings"
+            aria-current={location === "/settings" ? "page" : undefined}
             className="engine-nav-link flex items-center gap-2.5 px-2.5 py-2 text-[12px] transition-colors"
           >
             <Settings className="h-[15px] w-[15px] shrink-0" strokeWidth={1.7} />
             <span className="engine-nav-text">Settings</span>
           </Link>
           <button
+            type="button"
             onClick={handleSignOut}
-            className="engine-nav-link flex items-center gap-2.5 px-2.5 py-2 text-[12px] transition-colors w-full text-left"
+            disabled={isSigningOut}
+            aria-label={isSigningOut ? "Signing out" : "Sign out"}
+            aria-describedby={signOutError ? "sign-out-error" : undefined}
+            className="engine-nav-link flex w-full items-center gap-2.5 px-2.5 py-2 text-left text-[12px] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            data-testid="button-sign-out"
           >
             <LogOut className="h-[15px] w-[15px] shrink-0" strokeWidth={1.7} />
-            <span className="engine-nav-text">Sign out</span>
+            <span className="engine-nav-text">{isSigningOut ? "Signing out…" : "Sign out"}</span>
           </button>
+          {signOutError && <p id="sign-out-error" role="alert" className="px-2.5 pt-1 text-[10px] leading-snug text-destructive" data-testid="status-sign-out-error">{signOutError}</p>}
 
           <div className="mt-3 flex items-center gap-2 border-t border-sidebar-border px-2.5 pt-3">
             <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary" data-testid="avatar-coach">

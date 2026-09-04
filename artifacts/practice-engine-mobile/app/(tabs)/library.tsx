@@ -6,6 +6,7 @@ import { Button, Card, ScreenTitle, State } from '@/components/UI';
 import { useColors } from '@/hooks/useColors';
 import { useOfflineCapture } from '@/lib/OfflineCaptureContext';
 import { usePracticeReminder, WEEKDAYS } from '@/lib/PracticeReminderContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function ReminderSettings() {
   const c = useColors();
@@ -87,6 +88,7 @@ function ReminderSettings() {
 
 export default function Library() {
   const c = useColors();
+  const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<'experiences' | 'assets'>('experiences');
   const experiences = useListExperiences();
   const assets = useListKnowledgeAssets();
@@ -100,7 +102,7 @@ export default function Library() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: c.background }} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={active.isRefetching} onRefresh={active.refetch} tintColor={c.primary} />}>
+    <ScrollView style={{ flex: 1, backgroundColor: c.background }} contentContainerStyle={[styles.content, { paddingTop: Platform.OS === 'web' ? 87 : insets.top + 20 }]} refreshControl={<RefreshControl refreshing={active.isRefetching} onRefresh={active.refetch} tintColor={c.primary} />}>
       <ScreenTitle kicker="Library" title="Your evidence base" detail="Experiences, principles, and assets that remain traceable to real work." />
       <View style={styles.tabs}>
         <Button testID="filter-experiences" label="Experiences" onPress={() => setFilter('experiences')} secondary={filter !== 'experiences'} />

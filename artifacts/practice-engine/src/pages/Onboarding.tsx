@@ -20,7 +20,7 @@ export default function Onboarding() {
   const { signOut } = useClerk();
   const queryClient = useQueryClient();
 
-  const { data: profile, isLoading: isLoadingProfile, error: profileError } = useGetPracticeProfile();
+  const { data: profile, isLoading: isLoadingProfile, error: profileError, refetch: refetchProfile } = useGetPracticeProfile();
   const updateProfile = useUpdatePracticeProfile();
 
   const [step, setStep] = useState(1);
@@ -109,8 +109,8 @@ export default function Onboarding() {
             <CardTitle>Unable to load profile</CardTitle>
             <CardDescription>We could not load your Startup Man profile.</CardDescription>
           </CardHeader>
-          <CardFooter className="flex justify-center">
-            <Button onClick={() => window.location.reload()} variant="outline">Retry</Button>
+            <CardFooter className="flex justify-center">
+              <Button onClick={() => refetchProfile()} variant="outline" data-testid="button-retry-onboarding-profile">Retry</Button>
           </CardFooter>
         </Card>
       </div>
@@ -121,14 +121,16 @@ export default function Onboarding() {
     <div className="min-h-[100dvh] bg-noisy flex flex-col">
       <header className="flex h-[72px] items-center justify-between px-6 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary">P</span>
+          <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary" aria-hidden="true">S</span>
           <span className="text-[13px] font-semibold uppercase tracking-[.16em] text-foreground hidden sm:inline-block">
             Startup <span className="text-primary">Man</span>
           </span>
         </div>
         <button
+          type="button"
           onClick={handleSignOut}
           className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-[.08em] flex items-center gap-2"
+          data-testid="button-sign-out-onboarding"
         >
           <LogOut className="h-3 w-3" /> Sign Out
         </button>

@@ -14,31 +14,31 @@ export default function Privacy() {
         <h1 className="mb-12 text-3xl sm:text-5xl font-semibold tracking-tight">Privacy Policy</h1>
 
         <div className="prose prose-invert max-w-none text-muted-foreground font-light text-sm sm:text-base space-y-6">
-          <p>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <p>Startup Man is based in Dallas, Texas, USA. This policy describes how information is handled when you use startupmans.com and the Startup Man platform.</p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">1. Information We Collect</h2>
           <p>
-            Startup Man collects information you provide directly to us when you create an account, build your profile, log coaching experiences, or communicate with us. This includes your name, email address, niche, and any proprietary coaching notes or IP you submit to the platform.
+            We receive information you provide when you create an account, complete your profile, add experiences or materials to your workspace, or contact us. This can include account details and the content you choose to add to the platform.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">2. How We Use Your Information</h2>
           <p>
-            We use the information we collect to operate, maintain, and improve our platform. Specifically, your coaching logs are processed by our AI engines to extract principles and generate frameworks exclusive to your account. We do not use your proprietary session data to train models for other users.
+            We use information to provide and maintain the platform, respond to requests, and support the features you choose to use. Please do not enter information you are not authorized to share.
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">3. Data Security and IP Ownership</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">3. Your workspace content</h2>
           <p>
-            The intellectual property (frameworks, principles, content) generated on Startup Man using your logged experiences belongs to you. We employ rigorous security measures to protect your data from unauthorized access. Your client notes should be anonymized by you before entry to comply with your own confidentiality agreements.
+            You are responsible for the content you add to your workspace, including ensuring that it does not violate confidentiality obligations or applicable law. Consider anonymizing client information before entering it.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">4. Sharing of Information</h2>
           <p>
-            We do not sell your personal information or your generated IP. We may share information with third-party service providers (such as hosting partners or AI processing APIs) strictly for the purpose of operating the Startup Man platform, under strict confidentiality agreements.
+            We may use service providers that help us operate the platform. We do not sell personal information as part of operating Startup Man.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">5. Contact Us</h2>
           <p>
-            For questions regarding this privacy policy or your data, please contact us at <a href="mailto:info@startupmans.com" className="text-primary hover:underline">info@startupmans.com</a>.
+            For questions regarding this policy or your data, contact <a href="mailto:info@startupmans.com" className="text-primary hover:underline">info@startupmans.com</a> or visit <a href="https://startupmans.com" className="text-primary hover:underline">startupmans.com</a>.
           </p>
         </div>
       </motion.div>

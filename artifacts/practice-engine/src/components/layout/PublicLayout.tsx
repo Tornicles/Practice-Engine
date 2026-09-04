@@ -34,8 +34,17 @@ export function PublicLayout({ children }: PublicLayoutProps) {
     window.scrollTo(0, 0);
   }, [location]);
 
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
   return (
     <div className="min-h-[100dvh] bg-background text-foreground flex flex-col font-sans selection:bg-primary/20 bg-noisy">
+      <a href="#public-main" className="skip-link" data-testid="link-skip-to-content">Skip to content</a>
       <header
         className={`fixed top-0 z-50 w-full transition-all duration-300 border-b ${
           scrolled
@@ -44,8 +53,8 @@ export function PublicLayout({ children }: PublicLayoutProps) {
         }`}
       >
         <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3 z-50 relative group" data-testid="link-home">
-            <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+          <Link href="/" className="flex items-center gap-3 z-50 relative group" data-testid="link-home" aria-label="Startup Man home">
+            <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors" aria-hidden="true">
               S
             </span>
             <span className="text-[13px] font-semibold uppercase tracking-[.16em]">
@@ -54,7 +63,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-8" aria-label="Primary navigation">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -62,6 +71,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
                 className={`text-[11px] font-medium uppercase tracking-[.1em] transition-colors hover:text-primary ${
                   location === link.href ? "text-primary" : "text-muted-foreground"
                 }`}
+                aria-current={location === link.href ? "page" : undefined}
                 data-testid={`link-nav-${link.label.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 {link.label}
@@ -99,11 +109,15 @@ export function PublicLayout({ children }: PublicLayoutProps) {
 
           {/* Mobile Menu Toggle */}
           <button
+            type="button"
             className="md:hidden z-50 relative p-2 text-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation"
             data-testid="button-mobile-menu"
           >
-            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isMobileMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>
         </div>
       </header>
@@ -119,7 +133,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
             className="fixed inset-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/50 pt-24 px-6 pb-8 flex flex-col md:hidden"
             data-testid="mobile-menu-container"
           >
-            <nav className="flex flex-col gap-6 items-center text-center mt-10">
+            <nav id="mobile-navigation" className="flex flex-col gap-6 items-center text-center mt-10" aria-label="Mobile navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -127,6 +141,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
                   className={`text-lg font-medium uppercase tracking-[.15em] transition-colors hover:text-primary ${
                     location === link.href ? "text-primary" : "text-foreground"
                   }`}
+                  aria-current={location === link.href ? "page" : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
@@ -163,7 +178,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 w-full pt-[72px]">
+      <main id="public-main" className="flex-1 w-full pt-[72px]" tabIndex={-1}>
         {children}
       </main>
 
@@ -171,8 +186,8 @@ export function PublicLayout({ children }: PublicLayoutProps) {
         <div className="container mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8 mb-16">
             <div className="md:col-span-2">
-              <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
-                <span className="engine-logo-mark grid h-6 w-6 place-items-center rounded-sm text-[10px] font-bold border border-primary/50 text-primary">
+              <Link href="/" className="inline-flex items-center gap-3 mb-6 group" aria-label="Startup Man home">
+                <span className="engine-logo-mark grid h-6 w-6 place-items-center rounded-sm text-[10px] font-bold border border-primary/50 text-primary" aria-hidden="true">
                   S
                 </span>
                 <span className="text-xs font-semibold uppercase tracking-[.16em]">

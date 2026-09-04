@@ -14,7 +14,7 @@ export default function Terms() {
         <h1 className="mb-12 text-3xl sm:text-5xl font-semibold tracking-tight">Terms of Service</h1>
 
         <div className="prose prose-invert max-w-none text-muted-foreground font-light text-sm sm:text-base space-y-6">
-          <p>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <p>These terms apply to your use of startupmans.com and the Startup Man platform, operated from Dallas, Texas, USA.</p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">1. Acceptance of Terms</h2>
           <p>
@@ -23,7 +23,7 @@ export default function Terms() {
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">2. Intellectual Property Rights</h2>
           <p>
-            You retain all ownership rights to the raw inputs, session logs, and generated intellectual property (frameworks, principles, content) produced within your account. Startup Man claims no ownership over the methodologies you develop using our tools.
+            You are responsible for ensuring that you have the rights to submit the content you add to the Service. The Service and its underlying software, design, and branding remain the property of Startup Man or its licensors.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">3. User Responsibilities</h2>
@@ -33,7 +33,7 @@ export default function Terms() {
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">4. Platform Capabilities and AI Limitations</h2>
           <p>
-            Startup Man utilizes artificial intelligence to assist in pattern recognition and asset generation. The Service is provided "as is" and we do not guarantee the accuracy, completeness, or usefulness of AI-generated outputs. You must independently verify and validate all generated frameworks before bringing them to market.
+            Some features may assist with organizing or developing your material. You are responsible for reviewing outputs and deciding whether they are appropriate for your work and audience.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">5. Governing Law</h2>
@@ -43,7 +43,7 @@ export default function Terms() {
 
           <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">6. Contact</h2>
           <p>
-            Questions about the Terms of Service should be sent to <a href="mailto:info@startupmans.com" className="text-primary hover:underline">info@startupmans.com</a>.
+            Questions about these terms can be sent to <a href="mailto:info@startupmans.com" className="text-primary hover:underline">info@startupmans.com</a>. You can also visit <a href="https://startupmans.com" className="text-primary hover:underline">startupmans.com</a>.
           </p>
         </div>
       </motion.div>

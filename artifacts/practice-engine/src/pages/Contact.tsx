@@ -23,7 +23,7 @@ export default function Contact() {
             Contact the <span className="text-primary italic font-serif">Studio.</span>
           </h1>
           <p className="text-xl text-muted-foreground/90 font-light leading-relaxed mb-12">
-            We operate a quiet, focused studio in Dallas. For partnerships, product questions, press inquiries, or direct support, please reach out via email.
+            Startup Man is based in Dallas, Texas, USA. For product questions, partnership inquiries, or support, contact our team by email.
           </p>
 
           <div className="space-y-8">
@@ -33,7 +33,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-widest text-foreground mb-1">Email</h3>
-                <a href="mailto:info@startupmans.com" className="text-lg font-mono text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:info@startupmans.com" className="text-lg font-mono text-muted-foreground hover:text-primary transition-colors" data-testid="link-contact-email">
                   info@startupmans.com
                 </a>
               </div>
@@ -48,6 +48,17 @@ export default function Contact() {
                 <div className="text-lg font-mono text-muted-foreground">
                   Dallas, Texas, USA
                 </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-card border border-border text-primary">
+                <span className="text-sm font-bold" aria-hidden="true">↗</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-foreground mb-1">Website</h3>
+                <a href="https://startupmans.com" className="text-lg font-mono text-muted-foreground hover:text-primary transition-colors" rel="noopener noreferrer" data-testid="link-contact-website">
+                  startupmans.com
+                </a>
               </div>
             </div>
           </div>
