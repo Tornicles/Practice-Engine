@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Practice Engine API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: practice
+    description: Coaching practice and workspace operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,109 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /practice/overview:
+    get:
+      operationId: getPracticeOverview
+      tags: [practice]
+      summary: Get the workspace overview
+      responses:
+        "200":
+          description: Workspace overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PracticeOverview"
+  /practice/profile:
+    get:
+      operationId: getPracticeProfile
+      tags: [practice]
+      summary: Get the coach profile
+      responses:
+        "200":
+          description: Coach profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoachProfile"
+    patch:
+      operationId: updatePracticeProfile
+      tags: [practice]
+      summary: Update the coach profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoachProfileUpdate"
+      responses:
+        "200":
+          description: Updated coach profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoachProfile"
+  /practice/experiences:
+    get:
+      operationId: listExperiences
+      tags: [practice]
+      summary: List captured coaching experiences
+      responses:
+        "200":
+          description: Captured experiences
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Experience"
+    post:
+      operationId: createExperience
+      tags: [practice]
+      summary: Capture a coaching experience
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExperienceInput"
+      responses:
+        "201":
+          description: Created experience
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Experience"
+  /practice/sessions:
+    get:
+      operationId: listPracticeSessions
+      tags: [practice]
+      summary: List practice sessions
+      responses:
+        "200":
+          description: Practice sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PracticeSession"
+    post:
+      operationId: createPracticeSession
+      tags: [practice]
+      summary: Save a practice session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PracticeSessionInput"
+      responses:
+        "201":
+          description: Created practice session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PracticeSession"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +138,242 @@ components:
           type: string
       required:
         - status
-
+    CoachProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        niche:
+          type: string
+        experienceLevel:
+          type: string
+        audience:
+          type: string
+        goal:
+          type: string
+        developmentFocus:
+          type: string
+        practiceScore:
+          type: integer
+        streak:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - niche
+        - experienceLevel
+        - audience
+        - goal
+        - developmentFocus
+        - practiceScore
+        - streak
+        - updatedAt
+    CoachProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        niche:
+          type: string
+        experienceLevel:
+          type: string
+        audience:
+          type: string
+        goal:
+          type: string
+        developmentFocus:
+          type: string
+      required:
+        - name
+    Experience:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        situation:
+          type: string
+        learning:
+          type: string
+        principle:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - situation
+        - learning
+        - principle
+        - status
+        - createdAt
+    ExperienceInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        situation:
+          type: string
+          minLength: 1
+        learning:
+          type: string
+          minLength: 1
+        principle:
+          type: string
+          minLength: 1
+      required:
+        - title
+        - situation
+        - learning
+        - principle
+    PracticeSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        scenario:
+          type: string
+        category:
+          type: string
+        score:
+          type: ["integer", "null"]
+        feedback:
+          type: ["string", "null"]
+        completedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - scenario
+        - category
+        - score
+        - feedback
+        - completedAt
+        - createdAt
+    PracticeSessionInput:
+      type: object
+      properties:
+        scenario:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        feedback:
+          type: string
+          minLength: 1
+      required:
+        - scenario
+        - category
+        - score
+        - feedback
+    SkillProgress:
+      type: object
+      properties:
+        name:
+          type: string
+        score:
+          type: integer
+        trend:
+          type: string
+      required:
+        - name
+        - score
+        - trend
+    PracticeJob:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+      required:
+        - id
+        - kind
+        - title
+        - description
+        - duration
+    RecentActivity:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        kind:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - detail
+        - kind
+        - createdAt
+    PracticeOverview:
+      type: object
+      properties:
+        profile:
+          $ref: "#/components/schemas/CoachProfile"
+        experienceCount:
+          type: integer
+        lessonCount:
+          type: integer
+        principleCount:
+          type: integer
+        frameworkCount:
+          type: integer
+        ipAssetCount:
+          type: integer
+        practiceSessionCount:
+          type: integer
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillProgress"
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/PracticeJob"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecentActivity"
+      required:
+        - profile
+        - experienceCount
+        - lessonCount
+        - principleCount
+        - frameworkCount
+        - ipAssetCount
+        - practiceSessionCount
+        - skills
+        - jobs
+        - recentActivity

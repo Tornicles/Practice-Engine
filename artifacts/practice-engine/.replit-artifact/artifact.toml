@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Practice Engine"
+description = "A focused coaching workspace that turns practice, reflection, and real client experience into stronger skills, repeatable methodology, and evidence-backed intellectual property."
+version = "1.0.0"
+id = "artifacts/practice-engine"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25537
+
+[services.development]
+run = "pnpm --filter @workspace/practice-engine run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/practice-engine", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/practice-engine/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25537"
+BASE_PATH = "/"
