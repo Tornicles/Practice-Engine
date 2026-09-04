@@ -2,7 +2,7 @@ import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Brand() {
   return (
-    <AssetWorkspace 
+    <AssetWorkspace
       title="Brand Lab"
       description="Develop your unique positioning, messaging, and authority derived from actual client work."
       allowedTypes={["brand"]}

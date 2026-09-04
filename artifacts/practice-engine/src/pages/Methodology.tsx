@@ -2,7 +2,7 @@ import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Methodology() {
   return (
-    <AssetWorkspace 
+    <AssetWorkspace
       title="Methodology Builder"
       description="Turn your extracted principles into scalable frameworks and structural IP."
       allowedTypes={["framework"]}

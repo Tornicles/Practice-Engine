@@ -17,17 +17,17 @@ export default function Knowledge() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
   const { data: experiences, isLoading } = useListExperiences()
-  
+
   const createExp = useCreateExperience()
   const extractKnowledge = useExtractExperienceKnowledge()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [step, setStep] = useState<"input" | "extracted">("input")
-  
+
   // Step 1 input
   const [rawSituation, setRawSituation] = useState("")
   const [rawReflection, setRawReflection] = useState("")
-  
+
   // Step 2 result/edit
   const [formData, setFormData] = useState({
     title: "",
@@ -116,26 +116,26 @@ export default function Knowledge() {
                 {step === "input" ? "Dump your unpolished thoughts. The AI will extract the underlying methodology." : "Review and refine the extracted structural knowledge before saving."}
               </DialogDescription>
             </DialogHeader>
-            
+
             {step === "input" ? (
               <form onSubmit={handleExtract} className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label>What happened? (Situation)</Label>
-                  <Textarea 
+                  <Textarea
                     required
                     className="min-h-[120px]"
-                    placeholder="Client had 3 urgent problems, kept jumping between them..." 
-                    value={rawSituation} 
+                    placeholder="Client had 3 urgent problems, kept jumping between them..."
+                    value={rawSituation}
                     onChange={e => setRawSituation(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>What did you learn or observe? (Reflection)</Label>
-                  <Textarea 
+                  <Textarea
                     required
                     className="min-h-[120px]"
-                    placeholder="I noticed the problem wasn't time management, it was lack of clarity..." 
-                    value={rawReflection} 
+                    placeholder="I noticed the problem wasn't time management, it was lack of clarity..."
+                    value={rawReflection}
                     onChange={e => setRawReflection(e.target.value)}
                   />
                 </div>
@@ -164,10 +164,10 @@ export default function Knowledge() {
                 </div>
                 <div className="space-y-2 bg-primary/5 border border-primary/20 p-4 rounded-lg">
                   <Label className="text-primary flex items-center gap-2"><Sparkles className="h-4 w-4" /> Core Principle</Label>
-                  <Input 
+                  <Input
                     required
                     className="bg-background border-primary/30 mt-2 font-medium"
-                    value={formData.principle} 
+                    value={formData.principle}
                     onChange={e => setFormData(p => ({...p, principle: e.target.value}))}
                   />
                 </div>

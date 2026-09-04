@@ -42,13 +42,13 @@ export default function Practice() {
 
   const [activeScenario, setActiveScenario] = useState<typeof SCENARIOS[0] | null>(null)
   const [sessionState, setSessionState] = useState<"brief" | "simulating" | "feedback">("brief")
-  
+
   const [history, setHistory] = useState<ConversationMessage[]>([])
   const [coachInput, setCoachInput] = useState("")
   const [latestObservation, setLatestObservation] = useState("")
   const [latestSkill, setLatestSkill] = useState("")
   const [currentScore, setCurrentScore] = useState(0)
-  
+
   const [reflection, setReflection] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -92,7 +92,7 @@ export default function Practice() {
         setLatestObservation(res.observation);
         setLatestSkill(res.skill);
         setCurrentScore(res.score);
-        
+
         if (res.sessionComplete) {
           toast({
             title: "Session Completed",
@@ -187,7 +187,7 @@ export default function Practice() {
                     </Button>
                   </div>
                 </CardHeader>
-                <CardContent 
+                <CardContent
                   className="flex-1 overflow-y-auto p-6 space-y-6 bg-card"
                   ref={scrollRef}
                 >
@@ -205,8 +205,8 @@ export default function Practice() {
                         </div>
                       )}
                       <div className={`p-4 rounded-xl max-w-[80%] ${
-                        msg.role === 'coach' 
-                          ? 'bg-primary text-primary-foreground rounded-br-sm' 
+                        msg.role === 'coach'
+                          ? 'bg-primary text-primary-foreground rounded-br-sm'
                           : 'bg-muted rounded-bl-sm'
                       }`}>
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
@@ -231,11 +231,11 @@ export default function Practice() {
                   )}
                 </CardContent>
                 <div className="p-4 border-t border-border/50 bg-background">
-                  <form 
+                  <form
                     className="flex gap-2"
                     onSubmit={(e) => { e.preventDefault(); handleSendTurn(); }}
                   >
-                    <Textarea 
+                    <Textarea
                       value={coachInput}
                       onChange={(e) => setCoachInput(e.target.value)}
                       placeholder="What do you say to the client?"
@@ -247,8 +247,8 @@ export default function Practice() {
                         }
                       }}
                     />
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="h-auto px-6"
                       disabled={simulateTurn.isPending || !coachInput.trim()}
                     >
@@ -258,7 +258,7 @@ export default function Practice() {
                 </div>
               </Card>
             </div>
-            
+
              <div className="space-y-6">
                <Card className="engine-card border-border">
                 <CardHeader className="bg-primary/5 border-b border-border/50 py-4">
@@ -310,7 +310,7 @@ export default function Practice() {
                   <p className="text-sm font-medium">{latestSkill || "Active Listening & Redirect"}</p>
                 </div>
               </div>
-              
+
               <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                   <Bot className="h-4 w-4" /> AI Supervisor Notes
@@ -319,11 +319,11 @@ export default function Practice() {
                   {latestObservation || "You handled the resistance well, but ensure you give the client enough silence to solve their own problem before jumping in with frameworks."}
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Your Reflection</label>
-                <Textarea 
-                  placeholder="What did you learn? What principle can you extract from this?" 
+                <Textarea
+                  placeholder="What did you learn? What principle can you extract from this?"
                   className="min-h-[120px]"
                   value={reflection}
                   onChange={(e) => setReflection(e.target.value)}
@@ -380,7 +380,7 @@ export default function Practice() {
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <History className="h-5 w-5 text-muted-foreground" /> Recent History
           </h2>
-          
+
            <Card className="engine-card">
             <CardContent className="p-0">
               {sessionsLoading ? (

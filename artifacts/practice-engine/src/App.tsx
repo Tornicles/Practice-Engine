@@ -11,7 +11,15 @@ import NotFound from "@/pages/not-found";
 import { useGetPracticeProfile } from "@workspace/api-client-react";
 
 import { Shell } from "@/components/layout/Shell";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import Home from "@/pages/Home";
+import About from "@/pages/About";
+import HowItWorks from "@/pages/HowItWorks";
+import Services from "@/pages/Services";
+import Resources from "@/pages/Resources";
+import Contact from "@/pages/Contact";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
 import Dashboard from "@/pages/Dashboard";
 import Today from "@/pages/Today";
 import Practice from "@/pages/Practice";
@@ -170,7 +178,9 @@ function HomeRedirect() {
         <Redirect to="/dashboard" />
       </Show>
       <Show when="signed-out">
-        <Home />
+        <PublicLayout>
+          <Home />
+        </PublicLayout>
       </Show>
     </>
   );
@@ -186,9 +196,30 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={HomeRedirect} />
+        <Route path="/about">
+          <PublicLayout><About /></PublicLayout>
+        </Route>
+        <Route path="/how-it-works">
+          <PublicLayout><HowItWorks /></PublicLayout>
+        </Route>
+        <Route path="/services">
+          <PublicLayout><Services /></PublicLayout>
+        </Route>
+        <Route path="/resources">
+          <PublicLayout><Resources /></PublicLayout>
+        </Route>
+        <Route path="/contact">
+          <PublicLayout><Contact /></PublicLayout>
+        </Route>
+        <Route path="/privacy">
+          <PublicLayout><Privacy /></PublicLayout>
+        </Route>
+        <Route path="/terms">
+          <PublicLayout><Terms /></PublicLayout>
+        </Route>
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
-        
+
         <Route path="/:rest*">
           <Show when="signed-in">
             <AuthGuard>

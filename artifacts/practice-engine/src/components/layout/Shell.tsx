@@ -145,7 +145,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <LogOut className="h-[15px] w-[15px] shrink-0" strokeWidth={1.7} />
             <span className="engine-nav-text">Sign out</span>
           </button>
-          
+
           <div className="mt-3 flex items-center gap-2 border-t border-sidebar-border px-2.5 pt-3">
             <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary" data-testid="avatar-coach">
               {initials}

@@ -13,7 +13,7 @@ export default function GenericPage({ title, description, icon: Icon, actions = 
         <h1 className="font-serif text-3xl font-medium">{title}</h1>
         <p className="text-muted-foreground text-lg">{description}</p>
       </div>
-      
+
       {actions && (
         <div className="pt-8 w-full max-w-sm">
           <Card className="bg-primary/5 border-primary/20">

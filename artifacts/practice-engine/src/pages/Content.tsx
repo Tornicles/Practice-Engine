@@ -2,7 +2,7 @@ import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Content() {
   return (
-    <AssetWorkspace 
+    <AssetWorkspace
       title="Content Engine"
       description="Transform lived coaching experiences into engaging articles, posts, and narratives."
       allowedTypes={["content"]}

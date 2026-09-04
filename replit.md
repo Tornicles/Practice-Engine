@@ -2,6 +2,11 @@
 
 A connected coach-development workspace that turns learning, simulation, real delivery, reflection, and evidence into stronger coaching ability, distinctive methodology, and reusable intellectual property.
 
+Public brand details:
+- Website: `https://startupmans.com`
+- Office: Dallas, Texas, USA
+- Contact: `info@startupmans.com`
+
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)

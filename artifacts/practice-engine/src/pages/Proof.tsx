@@ -2,7 +2,7 @@ import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Proof() {
   return (
-    <AssetWorkspace 
+    <AssetWorkspace
       title="Proof Bank"
       description="Convert client outcomes and interactions into validated case studies and testimonials."
       allowedTypes={["case-study"]}

@@ -70,7 +70,7 @@ export default function Settings() {
                 <Input value={formData.niche} onChange={e => setFormData(p => ({...p, niche: e.target.value}))} />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label>Target Audience</Label>
               <Input value={formData.audience} onChange={e => setFormData(p => ({...p, audience: e.target.value}))} />

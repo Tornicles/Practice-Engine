@@ -2,7 +2,7 @@ import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Products() {
   return (
-    <AssetWorkspace 
+    <AssetWorkspace
       title="Product & Offers"
       description="Package your expertise into scalable products and irresistible coaching offers."
       allowedTypes={["offer"]}

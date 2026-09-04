@@ -38,8 +38,8 @@ export function NextActionWidget() {
           <form onSubmit={handleRecommend} className="space-y-4">
             <div className="space-y-2">
               <Label>Current Objective</Label>
-              <Input 
-                placeholder="e.g. Prepare for an onboarding call, build a new framework..." 
+              <Input
+                placeholder="e.g. Prepare for an onboarding call, build a new framework..."
                 value={objective}
                 onChange={e => setObjective(e.target.value)}
                 required
@@ -78,7 +78,7 @@ export function NextActionWidget() {
               </div>
               <h3 className="font-medium text-lg mb-1">{recommend.data.action}</h3>
               <p className="text-sm text-muted-foreground mb-4">{recommend.data.reason}</p>
-              
+
               <div className="space-y-2">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Success Criteria</h4>
                 <ul className="space-y-1">

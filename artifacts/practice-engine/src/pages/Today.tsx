@@ -23,7 +23,7 @@ export default function Today() {
             <h2 className="text-lg font-semibold mb-4">Your Focus</h2>
             <NextActionWidget />
           </div>
-          
+
           <div>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Clock className="h-5 w-5 text-muted-foreground" /> Pending Tasks

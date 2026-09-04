@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearch } from "wouter";
-import { 
-  useListKnowledgeAssets, 
-  useListExperiences, 
+import {
+  useListKnowledgeAssets,
+  useListExperiences,
   useGenerateKnowledgeAsset,
   getListKnowledgeAssetsQueryKey
 } from "@workspace/api-client-react";
@@ -29,14 +29,14 @@ interface AssetWorkspaceProps {
 export function AssetWorkspace({ title, description, allowedTypes, emptyMessage }: AssetWorkspaceProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   const { data: allAssets, isLoading: loadingAssets } = useListKnowledgeAssets();
   const { data: experiences, isLoading: loadingExperiences } = useListExperiences();
   const generateAsset = useGenerateKnowledgeAsset();
   const searchString = useSearch();
-  
+
   const assets = allAssets?.filter(a => allowedTypes.includes(a.type as any)) || [];
-  
+
   const [sourceId, setSourceId] = useState<string>("");
   const [assetType, setAssetType] = useState<string>(allowedTypes[0]);
   const [objective, setObjective] = useState("");
@@ -52,7 +52,7 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!sourceId || !objective) return;
-    
+
     generateAsset.mutate({
       data: {
         sourceExperienceId: parseInt(sourceId, 10),
@@ -104,7 +104,7 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
                      <div className="mt-3 flex items-start gap-2 border border-border/50 bg-secondary/30 p-3">
                       <GitMerge className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                       <p className="text-xs text-muted-foreground italic leading-relaxed">
-                        <span className="font-semibold text-foreground not-italic">Lineage: </span> 
+                        <span className="font-semibold text-foreground not-italic">Lineage: </span>
                         {asset.promptStrategy}
                       </p>
                     </div>
@@ -145,7 +145,7 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 {allowedTypes.length > 1 && (
                   <div className="space-y-2">
                     <Label>Asset Type</Label>
@@ -163,10 +163,10 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
                     </Select>
                   </div>
                 )}
-                
+
                 <div className="space-y-2">
                   <Label>Objective</Label>
-                  <Textarea 
+                  <Textarea
                     placeholder="e.g. Create a practical 3-step exercise for clients struggling with this exact issue."
                     className="min-h-[100px] resize-none"
                     value={objective}
@@ -174,7 +174,7 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
                     required
                   />
                 </div>
-                
+
                 <Button type="submit" disabled={generateAsset.isPending || !sourceId || !objective} className="w-full">
                   {generateAsset.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                   Generate Asset

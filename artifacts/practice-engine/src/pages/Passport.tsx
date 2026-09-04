@@ -43,7 +43,7 @@ export default function Passport() {
                <h2 className="text-2xl font-semibold">{profile?.name}</h2>
                 <p className="text-primary font-medium tracking-wide mt-1">{profile?.niche} Coach</p>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                   <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Level</div>
@@ -70,10 +70,10 @@ export default function Passport() {
        <div className="space-y-4">
          <div><div className="engine-kicker mb-2">TRACEABLE PRACTICE</div><h3 className="text-xl font-semibold">Experience <span className="text-primary">→</span> Expertise <span className="text-primary">→</span> IP</h3></div>
          <p className="text-sm text-muted-foreground">This system proves your authority by mapping every asset back to a real client interaction.</p>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
            <div className="hidden md:block absolute top-1/2 left-[16%] right-[16%] h-px bg-border -translate-y-1/2 z-0" />
-          
+
            <Card className="engine-card relative z-10">
             <CardHeader className="text-center pb-2">
                <div className="mx-auto flex h-10 w-10 items-center justify-center border border-border bg-secondary mb-4">

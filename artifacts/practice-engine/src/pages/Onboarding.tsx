@@ -19,13 +19,13 @@ export default function Onboarding() {
   const { user } = useUser();
   const { signOut } = useClerk();
   const queryClient = useQueryClient();
-  
+
   const { data: profile, isLoading: isLoadingProfile, error: profileError } = useGetPracticeProfile();
   const updateProfile = useUpdatePracticeProfile();
-  
+
   const [step, setStep] = useState(1);
   const [isInitializing, setIsInitializing] = useState(true);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     niche: "",
@@ -49,16 +49,16 @@ export default function Onboarding() {
         developmentFocus: profile.developmentFocus || "",
         workingPreferences: profile.workingPreferences || "",
       });
-      
+
       if (profile.onboardingCompleted) {
         setLocation('/dashboard');
         return;
       }
-      
+
       if (profile.onboardingStep > 1 && profile.onboardingStep <= 4) {
         setStep(profile.onboardingStep);
       }
-      
+
       setIsInitializing(false);
     }
   }, [profile, isInitializing, user, setLocation]);
@@ -74,7 +74,7 @@ export default function Onboarding() {
         }
       });
       queryClient.setQueryData(getGetPracticeProfileQueryKey(), updatedProfile);
-      
+
       if (complete) {
         setLocation('/dashboard');
       } else {
@@ -126,7 +126,7 @@ export default function Onboarding() {
             Startup <span className="text-primary">Man</span>
           </span>
         </div>
-        <button 
+        <button
           onClick={handleSignOut}
           className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-[.08em] flex items-center gap-2"
         >
@@ -150,11 +150,11 @@ export default function Onboarding() {
 
           <div className="mb-8 flex justify-center gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`h-2 rounded-sm transition-all duration-300 ${
                   i === step ? "w-12 bg-primary" : i < step ? "w-6 bg-primary/40" : "w-6 bg-secondary"
-                }`} 
+                }`}
               />
             ))}
           </div>
@@ -177,9 +177,9 @@ export default function Onboarding() {
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
                     <Label htmlFor="name" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Your Name</Label>
-                    <Input 
-                      id="name" 
-                      placeholder="Your professional name" 
+                    <Input
+                      id="name"
+                      placeholder="Your professional name"
                       value={formData.name}
                       onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
                       className="h-12 bg-background/50 text-base"
@@ -187,9 +187,9 @@ export default function Onboarding() {
                   </div>
                   <div className="space-y-3">
                     <Label htmlFor="niche" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Your Domain / Niche</Label>
-                    <Input 
-                      id="niche" 
-                      placeholder="e.g., Executive Leadership, Creator Performance" 
+                    <Input
+                      id="niche"
+                      placeholder="e.g., Executive Leadership, Creator Performance"
                       value={formData.niche}
                       onChange={(e) => setFormData(p => ({ ...p, niche: e.target.value }))}
                       className="h-12 bg-background/50 text-base"
@@ -197,9 +197,9 @@ export default function Onboarding() {
                   </div>
                   <div className="space-y-3">
                     <Label htmlFor="audience" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Target Audience</Label>
-                    <Input 
-                      id="audience" 
-                      placeholder="e.g., Series B Founders, Agency Owners" 
+                    <Input
+                      id="audience"
+                      placeholder="e.g., Series B Founders, Agency Owners"
                       value={formData.audience}
                       onChange={(e) => setFormData(p => ({ ...p, audience: e.target.value }))}
                       className="h-12 bg-background/50 text-base"
@@ -207,8 +207,8 @@ export default function Onboarding() {
                   </div>
                 </CardContent>
                 <CardFooter className="pt-6 pb-8 border-t border-border/50 mt-4">
-                  <Button 
-                    className="w-full h-12 text-sm font-bold uppercase tracking-[.1em]" 
+                  <Button
+                    className="w-full h-12 text-sm font-bold uppercase tracking-[.1em]"
                     onClick={handleNext}
                     disabled={!formData.name || !formData.niche || updateProfile.isPending}
                   >
@@ -230,8 +230,8 @@ export default function Onboarding() {
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
                     <Label htmlFor="experienceLevel" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Experience Level</Label>
-                    <select 
-                      id="experienceLevel" 
+                    <select
+                      id="experienceLevel"
                       className="flex h-12 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors"
                       value={formData.experienceLevel}
                       onChange={(e) => setFormData(p => ({ ...p, experienceLevel: e.target.value }))}
@@ -245,9 +245,9 @@ export default function Onboarding() {
                   </div>
                   <div className="space-y-3">
                     <Label htmlFor="goal" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Primary Development Goal</Label>
-                    <Textarea 
-                      id="goal" 
-                      placeholder="e.g., I want to turn my 1:1 framework into a signature scalable course, or I need to build unshakeable confidence handling client resistance..." 
+                    <Textarea
+                      id="goal"
+                      placeholder="e.g., I want to turn my 1:1 framework into a signature scalable course, or I need to build unshakeable confidence handling client resistance..."
                       className="min-h-[120px] resize-none bg-background/50 text-base p-4"
                       value={formData.goal}
                       onChange={(e) => setFormData(p => ({ ...p, goal: e.target.value }))}
@@ -258,8 +258,8 @@ export default function Onboarding() {
                   <Button variant="outline" onClick={handleBack} className="h-12 w-1/3 bg-transparent hover:bg-secondary/50 border-border">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back
                   </Button>
-                  <Button 
-                    className="h-12 w-2/3 text-sm font-bold uppercase tracking-[.1em]" 
+                  <Button
+                    className="h-12 w-2/3 text-sm font-bold uppercase tracking-[.1em]"
                     onClick={handleNext}
                     disabled={updateProfile.isPending || !formData.experienceLevel || !formData.goal}
                   >
@@ -281,8 +281,8 @@ export default function Onboarding() {
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
                     <Label htmlFor="developmentFocus" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Core Competency Focus</Label>
-                    <select 
-                      id="developmentFocus" 
+                    <select
+                      id="developmentFocus"
                       className="flex h-12 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors"
                       value={formData.developmentFocus}
                       onChange={(e) => setFormData(p => ({ ...p, developmentFocus: e.target.value }))}
@@ -296,9 +296,9 @@ export default function Onboarding() {
                   </div>
                   <div className="space-y-3">
                     <Label htmlFor="workingPreferences" className="text-xs uppercase tracking-[.08em] text-muted-foreground">Operating Preferences</Label>
-                    <Textarea 
-                      id="workingPreferences" 
-                      placeholder="e.g., Keep generated content highly concise. I lean heavily on Socratic questioning. Do not use corporate jargon..." 
+                    <Textarea
+                      id="workingPreferences"
+                      placeholder="e.g., Keep generated content highly concise. I lean heavily on Socratic questioning. Do not use corporate jargon..."
                       className="min-h-[120px] resize-none bg-background/50 text-base p-4"
                       value={formData.workingPreferences}
                       onChange={(e) => setFormData(p => ({ ...p, workingPreferences: e.target.value }))}
@@ -309,8 +309,8 @@ export default function Onboarding() {
                   <Button variant="outline" onClick={handleBack} className="h-12 w-1/3 bg-transparent hover:bg-secondary/50 border-border">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back
                   </Button>
-                  <Button 
-                    className="h-12 w-2/3 text-sm font-bold uppercase tracking-[.1em]" 
+                  <Button
+                    className="h-12 w-2/3 text-sm font-bold uppercase tracking-[.1em]"
                     onClick={handleNext}
                     disabled={updateProfile.isPending || !formData.developmentFocus}
                   >
@@ -346,8 +346,8 @@ export default function Onboarding() {
                   <Button variant="outline" onClick={handleBack} className="h-12 w-1/4 bg-transparent hover:bg-secondary/50 border-border" disabled={updateProfile.isPending}>
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    className="h-12 w-3/4 text-sm font-bold uppercase tracking-[.1em] shadow-[0_0_15px_rgba(201,168,78,0.2)]" 
+                  <Button
+                    className="h-12 w-3/4 text-sm font-bold uppercase tracking-[.1em] shadow-[0_0_15px_rgba(201,168,78,0.2)]"
                     onClick={handleComplete}
                     disabled={updateProfile.isPending}
                   >
