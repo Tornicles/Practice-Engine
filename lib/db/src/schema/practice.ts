@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
@@ -76,9 +77,23 @@ export const promptRunsTable = pgTable("prompt_runs", {
   userId: text("user_id").notNull().default("legacy"),
   engine: text("engine").notNull(),
   strategy: text("strategy").notNull(),
+  strategyVersion: text("strategy_version").notNull().default("legacy"),
+  strategyIds: jsonb("strategy_ids").$type<string[]>().notNull().default([]),
+  strategyFamilies: jsonb("strategy_families").$type<string[]>().notNull().default([]),
+  sourceClasses: jsonb("source_classes").$type<string[]>().notNull().default([]),
+  chainStages: jsonb("chain_stages").$type<string[]>().notNull().default([]),
+  safetyOutcome: text("safety_outcome").notNull().default("not-reviewed"),
   inputSummary: text("input_summary").notNull(),
   outputSummary: text("output_summary").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const intelligenceRateLimitsTable = pgTable("intelligence_rate_limits", {
+  userId: text("user_id").primaryKey(),
+  requestCount: integer("request_count").notNull().default(1),
+  windowStartedAt: timestamp("window_started_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });

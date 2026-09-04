@@ -22,11 +22,19 @@ import {
 import {
   assetStrategies,
   generateStructured,
+  IntelligenceSafetyError,
+  type IntelligenceTrace,
 } from "../lib/practice-intelligence";
+import {
+  selectStrategies,
+  type StrategySelection,
+} from "../lib/strategy-library";
 import { authenticatedUserId, requireAuth } from "../middlewares/requireAuth";
+import { intelligenceRateLimit } from "../middlewares/intelligenceRateLimit";
 
 const router: IRouter = Router();
 router.use("/practice", requireAuth);
+router.use("/practice/ai", intelligenceRateLimit);
 
 async function getProfile(userId: string) {
   const [profile] = await db
@@ -43,14 +51,55 @@ async function recordPromptRun(
   inputSummary: string,
   outputSummary: string,
   userId: string,
+  trace: IntelligenceTrace,
 ) {
   await db.insert(promptRunsTable).values({
     userId,
     engine,
     strategy,
+    strategyVersion: trace.strategyVersion,
+    strategyIds: trace.strategyIds,
+    strategyFamilies: trace.strategyFamilies,
+    sourceClasses: trace.sourceClasses,
+    chainStages: trace.chainStages,
+    safetyOutcome: trace.safetyOutcome,
     inputSummary: inputSummary.slice(0, 800),
     outputSummary: outputSummary.slice(0, 800),
   });
+}
+
+async function recordFailedPromptRun(
+  engine: string,
+  userId: string,
+  selection: StrategySelection | undefined,
+  error: unknown,
+) {
+  if (!selection) return;
+  try {
+    const trace: IntelligenceTrace =
+      error instanceof IntelligenceSafetyError
+        ? error.trace
+        : {
+            strategyVersion: selection.version,
+            strategyIds: selection.strategyIds,
+            strategyFamilies: selection.families,
+            sourceClasses: selection.sourceClasses,
+            chainStages: ["execute", "review"],
+            safetyOutcome: "generation-error",
+          };
+    await recordPromptRun(
+      engine,
+      selection.families.join(", "),
+      "Authenticated coach request",
+      error instanceof IntelligenceSafetyError
+        ? "Output blocked by source-safety review"
+        : "Generation did not complete",
+      userId,
+      trace,
+    );
+  } catch {
+    // Audit persistence must never replace the user-facing generation error.
+  }
 }
 
 router.get("/practice/assets", async (req, res): Promise<void> => {
@@ -71,9 +120,14 @@ router.post("/practice/ai/simulate", async (req, res): Promise<void> => {
     return;
   }
 
+  let selection: StrategySelection | undefined;
   try {
     const profile = await getProfile(userId);
-    const result = await generateStructured<{
+    selection = selectStrategies({
+      engine: "simulation",
+      context: { profile, request: parsed.data },
+    });
+    const generated = await generateStructured<{
       clientReply: string;
       observation: string;
       skill: string;
@@ -88,7 +142,9 @@ boundaries, structure, and intervention judgment. A score is 0-100. Do not compl
 four coach turns unless the coach clearly ends the session.
 Return JSON only with clientReply, observation, skill, score, sessionComplete.`,
       JSON.stringify({ profile, ...parsed.data }),
+      selection,
     );
+    const result = generated.data;
 
     const output = SimulateClientTurnResponse.parse({
       ...result,
@@ -97,13 +153,15 @@ Return JSON only with clientReply, observation, skill, score, sessionComplete.`,
     });
     await recordPromptRun(
       "Practice Simulator",
-      `Adaptive ${parsed.data.difficulty} client simulation`,
-      `${parsed.data.scenario}: ${parsed.data.coachMessage}`,
-      `${output.skill} ${output.score}: ${output.observation}`,
+      selection.families.join(", "),
+      `Authenticated ${parsed.data.difficulty} simulation turn`,
+      "Reviewed simulation response accepted",
       userId,
+      generated.trace,
     );
     res.json(output);
   } catch (error) {
+    await recordFailedPromptRun("Practice Simulator", userId, selection, error);
     req.log.error({ err: error }, "Client simulation failed");
     res.status(502).json({ error: "The client simulator could not respond. Please try again." });
   }
@@ -117,9 +175,14 @@ router.post("/practice/ai/extract", async (req, res): Promise<void> => {
     return;
   }
 
+  let selection: StrategySelection | undefined;
   try {
     const profile = await getProfile(userId);
-    const result = await generateStructured<{
+    selection = selectStrategies({
+      engine: "experience-extraction",
+      context: { profile, experience: parsed.data },
+    });
+    const generated = await generateStructured<{
       title: string;
       lesson: string;
       principle: string;
@@ -134,18 +197,22 @@ qualified. The frameworkCandidate is a concise possible mechanism, not a validat
 The evidenceGap must state what needs testing or proof.
 Return JSON only with title, lesson, principle, insight, frameworkCandidate, evidenceGap.`,
       JSON.stringify({ profile, experience: parsed.data }),
+      selection,
     );
+    const result = generated.data;
 
     const output = ExtractExperienceKnowledgeResponse.parse(result);
     await recordPromptRun(
       "Experience & Knowledge",
-      "Experience-to-principle extraction",
-      parsed.data.situation,
-      `${output.principle} Evidence gap: ${output.evidenceGap}`,
+      selection.families.join(", "),
+      "Authenticated lived-experience reflection",
+      "Reviewed structured reflection accepted",
       userId,
+      generated.trace,
     );
     res.json(output);
   } catch (error) {
+    await recordFailedPromptRun("Experience & Knowledge", userId, selection, error);
     req.log.error({ err: error }, "Experience extraction failed");
     res.status(502).json({ error: "The experience could not be analyzed. Please try again." });
   }
@@ -169,11 +236,31 @@ router.post("/practice/ai/generate", async (req, res): Promise<void> => {
     return;
   }
 
+  let selection: StrategySelection | undefined;
   try {
     const profile = await getProfile(userId);
     const strategy =
       assetStrategies[parsed.data.assetType as keyof typeof assetStrategies];
-    const result = await generateStructured<{ title: string; content: string }>(
+    const preferredIds: Partial<Record<string, string[]>> = {
+      brand: ["mkt-evidence-led-positioning"],
+      content: ["mkt-content-repurposing"],
+      workshop: ["mkt-learning-product-design"],
+      course: ["mkt-learning-product-design"],
+      exercise: ["mkt-learning-product-design"],
+      offer: ["mkt-offer-packaging"],
+    };
+    selection = selectStrategies({
+      engine: "asset-generation",
+      context: {
+        profile,
+        sourceExperience: experience,
+        objective: parsed.data.objective,
+        assetType: parsed.data.assetType,
+      },
+      preferredIds: preferredIds[parsed.data.assetType],
+      limit: 5,
+    });
+    const generated = await generateStructured<{ title: string; content: string }>(
       `You are the Practice Engine's ${strategy} specialist.
 Create a useful ${parsed.data.assetType} grounded in the supplied source experience,
 lesson, and principle. Preserve the coach's voice and audience. Never invent testimonials,
@@ -185,7 +272,9 @@ Return JSON only with title and content. Content should be polished markdown.`,
         sourceExperience: experience,
         objective: parsed.data.objective,
       }),
+      selection,
     );
+    const result = generated.data;
 
     const [asset] = await db
       .insert(knowledgeAssetsTable)
@@ -202,13 +291,15 @@ Return JSON only with title and content. Content should be polished markdown.`,
     const output = GenerateKnowledgeAssetResponse.parse(asset);
     await recordPromptRun(
       "Experience to IP",
-      strategy,
-      `${experience.title}: ${parsed.data.objective}`,
-      output.title,
+      selection.families.join(", "),
+      `Authenticated ${parsed.data.assetType} generation`,
+      "Reviewed evidence-linked asset accepted",
       userId,
+      generated.trace,
     );
     res.status(201).json(output);
   } catch (error) {
+    await recordFailedPromptRun("Experience to IP", userId, selection, error);
     req.log.error({ err: error }, "Asset generation failed");
     res.status(502).json({ error: "The asset could not be generated. Please try again." });
   }
@@ -222,6 +313,7 @@ router.post("/practice/ai/next-action", async (req, res): Promise<void> => {
     return;
   }
 
+  let selection: StrategySelection | undefined;
   try {
     const [profile, experiences, sessions, assets] = await Promise.all([
       getProfile(userId),
@@ -230,7 +322,18 @@ router.post("/practice/ai/next-action", async (req, res): Promise<void> => {
       db.select().from(knowledgeAssetsTable).where(eq(knowledgeAssetsTable.userId, userId)).orderBy(desc(knowledgeAssetsTable.createdAt)).limit(5),
     ]);
 
-    const result = await generateStructured<{
+    selection = selectStrategies({
+      engine: "next-action",
+      context: {
+        profile,
+        recentExperiences: experiences,
+        recentSessions: sessions,
+        recentAssets: assets,
+        request: parsed.data,
+      },
+      limit: 5,
+    });
+    const generated = await generateStructured<{
       action: string;
       reason: string;
       engine: string;
@@ -243,7 +346,9 @@ Use the available time. Choose among Development, Simulator, Delivery, Knowledge
 Methodology, Brand, Content, Course, Product, or Proof. Return JSON only with action,
 reason, engine, duration, successCriteria (2-4 measurable strings).`,
       JSON.stringify({ profile, recentExperiences: experiences, recentSessions: sessions, recentAssets: assets, request: parsed.data }),
+      selection,
     );
+    const result = generated.data;
 
     const output = RecommendNextActionResponse.parse({
       ...result,
@@ -257,13 +362,15 @@ reason, engine, duration, successCriteria (2-4 measurable strings).`,
     });
     await recordPromptRun(
       "Growth Orchestration",
-      "Contextual next-best action",
-      parsed.data.currentObjective,
-      `${output.engine}: ${output.action}`,
+      selection.families.join(", "),
+      "Authenticated next-action request",
+      "Reviewed next action accepted",
       userId,
+      generated.trace,
     );
     res.json(output);
   } catch (error) {
+    await recordFailedPromptRun("Growth Orchestration", userId, selection, error);
     req.log.error({ err: error }, "Next-action recommendation failed");
     res.status(502).json({ error: "A next action could not be selected. Please try again." });
   }

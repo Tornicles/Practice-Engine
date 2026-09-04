@@ -43,6 +43,8 @@ A connected coach-development workspace that turns learning, simulation, real de
 - The Coach Passport is the shared context layer; experiences and practice history feed every later engine.
 - Preserve evidence lineage: methodology, content, courses, and products should trace back to lived experience and validation.
 - Treat broad prompt libraries as hidden strategy inputs, never as expertise or proof. Select and adapt strategies from live context instead of exposing raw prompt lists.
+- Organizational intelligence uses a curated, versioned neutral strategy layer only. Never load the management volumes at runtime or reproduce their source-specific doctrine, terminology, attribution, coercive practices, punitive personnel systems, recruitment methods, or high-impact employment decisions.
+- AI generation uses route-specific strategy selection followed by a separate evidence and source-safety review. Prompt-run audits store strategy metadata and generic summaries, not raw prompts or sensitive free-form coach content.
 - AI-generated methodology and market assets remain drafts until their validation gaps are resolved.
 - Build the core loop first: develop → practice → reflect → capture → structure → prove. Expand downstream engines on that foundation.
 
