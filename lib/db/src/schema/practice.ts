@@ -10,6 +10,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -34,18 +35,28 @@ export const coachProfilesTable = pgTable("coach_profiles", {
     .$onUpdate(() => new Date()),
 });
 
-export const experiencesTable = pgTable("experiences", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id").notNull().default("legacy"),
-  title: text("title").notNull(),
-  situation: text("situation").notNull(),
-  learning: text("learning").notNull(),
-  principle: text("principle").notNull(),
-  status: text("status").notNull().default("Principle extracted"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const experiencesTable = pgTable(
+  "experiences",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull().default("legacy"),
+    clientRequestId: text("client_request_id"),
+    title: text("title").notNull(),
+    situation: text("situation").notNull(),
+    learning: text("learning").notNull(),
+    principle: text("principle").notNull(),
+    status: text("status").notNull().default("Principle extracted"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("experiences_user_client_request_unique").on(
+      table.userId,
+      table.clientRequestId,
+    ),
+  ],
+);
 
 export const practiceSessionsTable = pgTable("practice_sessions", {
   id: serial("id").primaryKey(),

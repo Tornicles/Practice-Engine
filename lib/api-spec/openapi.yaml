@@ -321,6 +321,10 @@ components:
     ExperienceInput:
       type: object
       properties:
+        clientRequestId:
+          type: string
+          minLength: 1
+          maxLength: 128
         title:
           type: string
           minLength: 1
@@ -334,6 +338,7 @@ components:
           type: string
           minLength: 1
       required:
+        - clientRequestId
         - title
         - situation
         - learning

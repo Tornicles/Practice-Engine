@@ -139,6 +139,8 @@ export const ListExperiencesResponse = zod.array(ListExperiencesResponseItem)
 /**
  * @summary Capture a coaching experience
  */
+export const createExperienceBodyClientRequestIdMax = 128;
+
 
 
 
@@ -146,6 +148,7 @@ export const ListExperiencesResponse = zod.array(ListExperiencesResponseItem)
 
 
 export const CreateExperienceBody = zod.object({
+  "clientRequestId": zod.string().min(1).max(createExperienceBodyClientRequestIdMax),
   "title": zod.string().min(1),
   "situation": zod.string().min(1),
   "learning": zod.string().min(1),

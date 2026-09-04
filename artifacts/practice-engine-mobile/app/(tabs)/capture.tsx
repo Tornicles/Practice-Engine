@@ -1,3 +1,57 @@
-import React,{useState}from 'react';import {Platform,StyleSheet,Text,View}from 'react-native';import {useQueryClient}from '@tanstack/react-query';import {getListExperiencesQueryKey,useCreateExperience,useExtractExperienceKnowledge}from '@workspace/api-client-react';import {KeyboardAwareScrollViewCompat}from '@/components/KeyboardAwareScrollViewCompat';import {Button,Card,Field,ScreenTitle}from '@/components/UI';import {useColors}from '@/hooks/useColors';
-export default function Capture(){const c=useColors();const qc=useQueryClient();const[title,setTitle]=useState('');const[situation,setSituation]=useState('');const[reflection,setReflection]=useState('');const[lesson,setLesson]=useState('');const[principle,setPrinciple]=useState('');const[success,setSuccess]=useState(false);const extract=useExtractExperienceKnowledge({mutation:{onSuccess:x=>{setTitle(x.title);setLesson(x.lesson);setPrinciple(x.principle);}}});const save=useCreateExperience({mutation:{onSuccess:()=>{setSuccess(true);setTitle('');setSituation('');setReflection('');setLesson('');setPrinciple('');void qc.invalidateQueries({queryKey:getListExperiencesQueryKey()});}}});return <KeyboardAwareScrollViewCompat style={{flex:1,backgroundColor:c.background}} contentContainerStyle={[styles.content,{paddingTop:Platform.OS==='web'?87:28}]} bottomOffset={36}><ScreenTitle kicker="Capture" title="Make today teach you" detail="Record the real moment, then refine it into a reusable coaching principle."/><Card><Field label="Situation" value={situation} onChangeText={setSituation} placeholder="What happened with your client?" multiline/><Field label="Your reflection" value={reflection} onChangeText={setReflection} placeholder="What did you notice, try, or learn?" multiline/><Button testID="extract-knowledge" label={extract.isPending?'Extracting insight':'Extract knowledge'} onPress={()=>extract.mutate({data:{title,situation,coachReflection:reflection}})} disabled={!situation||extract.isPending}/></Card>{(lesson||principle)?<Card><Field label="Title" value={title} onChangeText={setTitle} placeholder="A concise title"/><Field label="Lesson" value={lesson} onChangeText={setLesson} placeholder="What the experience taught you" multiline/><Field label="Principle" value={principle} onChangeText={setPrinciple} placeholder="A reusable practice principle" multiline/><Button testID="save-experience" label={save.isPending?'Saving record':'Save to library'} onPress={()=>save.mutate({data:{title,situation,learning:lesson,principle}})} disabled={!title||!lesson||!principle||save.isPending}/></Card>:null}{success?<Text style={{color:c.primary,fontFamily:'Inter_600SemiBold'}}>Saved to your private library.</Text>:null}{extract.error?<Text style={{color:c.destructive}}>Knowledge extraction failed. Please try again.</Text>:null}</KeyboardAwareScrollViewCompat>}
-const styles=StyleSheet.create({content:{flexGrow:1,padding:18,paddingBottom:120,gap:14}});
+import React from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { useExtractExperienceKnowledge } from '@workspace/api-client-react';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
+import { Button, Card, Field, ScreenTitle } from '@/components/UI';
+import { useColors } from '@/hooks/useColors';
+import { useOfflineCapture } from '@/lib/OfflineCaptureContext';
+
+export default function Capture() {
+  const c = useColors();
+  const { draft, loaded, syncState, queuedCount, isEnqueueing, storageError, updateDraft, queueDraft, retry } = useOfflineCapture();
+  const extract = useExtractExperienceKnowledge({
+    mutation: {
+      onSuccess: (result) => updateDraft({
+        title: result.title,
+        lesson: result.lesson,
+        principle: result.principle,
+      }),
+    },
+  });
+  const fieldsEditable = loaded && !isEnqueueing;
+  const status = syncState === 'synced'
+    ? { icon: 'check-circle' as const, text: 'Synced to your private library.', color: c.primary }
+    : syncState === 'failed'
+      ? { icon: 'alert-circle' as const, text: storageError ? 'Secure device storage was unavailable. Your draft is still here.' : `${queuedCount} note${queuedCount === 1 ? '' : 's'} could not sync. Your copy is safe.`, color: c.destructive }
+      : queuedCount > 0
+        ? { icon: 'clock' as const, text: `${queuedCount} note${queuedCount === 1 ? '' : 's'} waiting to sync.`, color: c.accentForeground }
+        : null;
+
+  return <KeyboardAwareScrollViewCompat style={{ flex: 1, backgroundColor: c.background }} contentContainerStyle={[styles.content, { paddingTop: Platform.OS === 'web' ? 87 : 28 }]} bottomOffset={36}>
+    <ScreenTitle kicker="Capture" title="Make today teach you" detail="Your draft is saved privately on this device while you type." />
+    {status ? <View style={[styles.status, { borderColor: c.border, backgroundColor: c.card }]}>
+      <Feather name={status.icon} size={17} color={status.color} />
+      <Text style={[styles.statusText, { color: status.color }]}>{status.text}</Text>
+      {syncState === 'failed' ? <Button testID="retry-sync" label="Retry" secondary onPress={() => void retry()} /> : null}
+    </View> : null}
+    <Card>
+      <Field label="Situation" value={draft.situation} onChangeText={(situation) => updateDraft({ situation })} placeholder="What happened with your client?" multiline editable={fieldsEditable} />
+      <Field label="Your reflection" value={draft.reflection} onChangeText={(reflection) => updateDraft({ reflection })} placeholder="What did you notice, try, or learn?" multiline editable={fieldsEditable} />
+      <Button testID="extract-knowledge" label={extract.isPending ? 'Extracting insight' : 'Extract knowledge'} onPress={() => extract.mutate({ data: { title: draft.title, situation: draft.situation, coachReflection: draft.reflection } })} disabled={!loaded || !draft.situation || extract.isPending} />
+    </Card>
+    {(draft.lesson || draft.principle) ? <Card>
+      <Field label="Title" value={draft.title} onChangeText={(title) => updateDraft({ title })} placeholder="A concise title" editable={fieldsEditable} />
+      <Field label="Lesson" value={draft.lesson} onChangeText={(lesson) => updateDraft({ lesson })} placeholder="What the experience taught you" multiline editable={fieldsEditable} />
+      <Field label="Principle" value={draft.principle} onChangeText={(principle) => updateDraft({ principle })} placeholder="A reusable practice principle" multiline editable={fieldsEditable} />
+      <Button testID="save-experience" label={isEnqueueing ? 'Saving safely' : 'Save to library'} onPress={() => void queueDraft()} disabled={!loaded || isEnqueueing || !draft.title || !draft.lesson || !draft.principle} />
+    </Card> : null}
+    {extract.error ? <Text style={{ color: c.destructive }}>Knowledge extraction failed. Please try again.</Text> : null}
+  </KeyboardAwareScrollViewCompat>;
+}
+
+const styles = StyleSheet.create({
+  content: { flexGrow: 1, padding: 18, paddingBottom: 120, gap: 14 },
+  status: { borderWidth: 1, borderRadius: 6, padding: 12, gap: 10, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
+  statusText: { fontFamily: 'Inter_500Medium', fontSize: 13, flex: 1 },
+});

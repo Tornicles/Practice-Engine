@@ -7,6 +7,11 @@
  */
 
 export interface ExperienceInput {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  clientRequestId: string;
   /** @minLength 1 */
   title: string;
   /** @minLength 1 */

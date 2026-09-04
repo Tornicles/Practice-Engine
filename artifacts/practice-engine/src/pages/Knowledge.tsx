@@ -70,6 +70,7 @@ export default function Knowledge() {
 
     createExp.mutate({
       data: {
+        clientRequestId: `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
         title: formData.title,
         situation: formData.situation,
         learning: finalLearning,

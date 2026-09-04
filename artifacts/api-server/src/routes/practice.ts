@@ -106,6 +106,10 @@ router.post("/practice/experiences", async (req, res): Promise<void> => {
   const [experience] = await db
     .insert(experiencesTable)
     .values({ ...parsed.data, userId })
+    .onConflictDoUpdate({
+      target: [experiencesTable.userId, experiencesTable.clientRequestId],
+      set: { clientRequestId: parsed.data.clientRequestId },
+    })
     .returning();
   res.status(201).json(CreateExperienceResponse.parse(experience));
 });
