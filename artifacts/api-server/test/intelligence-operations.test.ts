@@ -143,13 +143,18 @@ test("recovery notifications use the same metadata allowlist", () => {
 });
 
 test("database claims deduplicate concurrent alerts and lease interrupted deliveries", async () => {
-  const originalFetch = globalThis.fetch;
-  const originalWebhookUrl = process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
   const testId = randomUUID();
   const engine = `claim-test-${testId}`;
   const strategyVersion = `version-${testId}`;
   const strategyFamily = `family-${testId}`;
   const notifications: Array<{ event: string; engine: string }> = [];
+  const alertDelivery = {
+    webhookUrl: "https://alerts.test/webhook",
+    httpSender: async (_input: string | URL | Request, init?: RequestInit) => {
+      notifications.push(JSON.parse(String(init?.body)));
+      return new Response(null, { status: 204 });
+    },
+  };
   const dimensions = and(
     eq(intelligenceAlertStatesTable.engine, engine),
     eq(intelligenceAlertStatesTable.strategyVersion, strategyVersion),
@@ -160,26 +165,23 @@ test("database claims deduplicate concurrent alerts and lease interrupted delive
     eq(intelligenceOperationsTable.strategyVersion, strategyVersion),
   );
   const record = (outcome: "success" | "upstream-error") =>
-    recordIntelligenceOperation({
-      engine,
-      outcome,
-      startedAt: Date.now(),
-      selection: {
-        version: strategyVersion,
-        engine: "simulation",
-        cards: [],
-        strategyIds: [],
-        families: [strategyFamily],
-        sourceClasses: [],
-        promptContext: "",
+    recordIntelligenceOperation(
+      {
+        engine,
+        outcome,
+        startedAt: Date.now(),
+        selection: {
+          version: strategyVersion,
+          engine: "simulation",
+          cards: [],
+          strategyIds: [],
+          families: [strategyFamily],
+          sourceClasses: [],
+          promptContext: "",
+        },
       },
-    });
-
-  process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = "https://alerts.test/webhook";
-  globalThis.fetch = async (_input, init) => {
-    notifications.push(JSON.parse(String(init?.body)));
-    return new Response(null, { status: 204 });
-  };
+      alertDelivery,
+    );
 
   try {
     await record("upstream-error");
@@ -249,20 +251,12 @@ test("database claims deduplicate concurrent alerts and lease interrupted delive
       "an interrupted delivery must become retryable after its lease expires",
     );
   } finally {
-    globalThis.fetch = originalFetch;
-    if (originalWebhookUrl === undefined) {
-      delete process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
-    } else {
-      process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = originalWebhookUrl;
-    }
     await db.delete(intelligenceOperationsTable).where(operationDimensions);
     await db.delete(intelligenceAlertStatesTable).where(dimensions);
   }
 });
 
 test("timed-out alert delivery releases its claim and retries once on later telemetry", async () => {
-  const originalFetch = globalThis.fetch;
-  const originalWebhookUrl = process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
   const testId = randomUUID();
   const engine = `failed-delivery-test-${testId}`;
   const strategyVersion = `version-${testId}`;
@@ -282,31 +276,38 @@ test("timed-out alert delivery releases its claim and retries once on later tele
   );
   const notifications: Array<{ event: string }> = [];
   let attempts = 0;
-  const record = () =>
-    recordIntelligenceOperation({
-      engine,
-      outcome: "upstream-error",
-      startedAt: Date.now(),
-      selection: {
-        version: strategyVersion,
-        engine: "simulation",
-        cards: [],
-        strategyIds: [],
-        families: [strategyFamily],
-        sourceClasses: [],
-        promptContext: "",
-      },
-    });
-
-  process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = "https://alerts.test/webhook";
-  globalThis.fetch = async (_input, init) => {
-    attempts += 1;
-    if (attempts === 1) {
-      throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
-    }
-    notifications.push(JSON.parse(String(init?.body)));
-    return new Response(null, { status: 204 });
+  const alertDelivery = {
+    webhookUrl: "https://alerts.test/webhook",
+    httpSender: async (_input: string | URL | Request, init?: RequestInit) => {
+      attempts += 1;
+      if (attempts === 1) {
+        throw new DOMException(
+          "The operation was aborted due to timeout",
+          "TimeoutError",
+        );
+      }
+      notifications.push(JSON.parse(String(init?.body)));
+      return new Response(null, { status: 204 });
+    },
   };
+  const record = () =>
+    recordIntelligenceOperation(
+      {
+        engine,
+        outcome: "upstream-error",
+        startedAt: Date.now(),
+        selection: {
+          version: strategyVersion,
+          engine: "simulation",
+          cards: [],
+          strategyIds: [],
+          families: [strategyFamily],
+          sourceClasses: [],
+          promptContext: "",
+        },
+      },
+      alertDelivery,
+    );
 
   try {
     await db.insert(intelligenceOperationsTable).values(
@@ -353,17 +354,10 @@ test("timed-out alert delivery releases its claim and retries once on later tele
     assert.equal(state?.notificationActive, null);
     assert.equal(state?.notificationClaimedAt, null);
   } finally {
-    globalThis.fetch = originalFetch;
-    if (originalWebhookUrl === undefined) {
-      delete process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
-    } else {
-      process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = originalWebhookUrl;
-    }
     await db.delete(intelligenceOperationsTable).where(operationDimensions);
     await db.delete(intelligenceAlertStatesTable).where(dimensions);
   }
 });
-
 
 test("UTC retention compaction and long-window reports have no boundary gap or overlap", async () => {
   const testId = randomUUID();

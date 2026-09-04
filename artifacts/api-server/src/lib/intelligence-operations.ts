@@ -27,6 +27,10 @@ export const INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS = 7;
 const INTELLIGENCE_OPERATION_COMPACTION_INTERVAL_MS = 6 * 60 * 60 * 1_000;
 
 type SqlExecutor = Pick<typeof db, "execute">;
+type IntelligenceAlertDelivery = {
+  webhookUrl?: string;
+  httpSender?: typeof fetch;
+};
 
 async function runIntelligenceOperationCompaction(
   executor: SqlExecutor,
@@ -226,27 +230,33 @@ export function scheduleIntelligenceOperationCompaction(
 
 async function sendAlertNotification(
   notification: IntelligenceAlertNotification,
+  delivery: IntelligenceAlertDelivery = {},
 ): Promise<boolean> {
-  const url = process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
+  const url = delivery.webhookUrl ?? process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
   if (!url) return false;
 
-  const response = await fetch(url, {
+  const response = await (delivery.httpSender ?? fetch)(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(notification),
     signal: AbortSignal.timeout(5_000),
   });
   if (!response.ok) {
-    throw new Error(`Operational alert channel returned HTTP ${response.status}`);
+    throw new Error(
+      `Operational alert channel returned HTTP ${response.status}`,
+    );
   }
   return true;
 }
 
-async function evaluateIntelligenceAlerts(metadata: {
-  engine: string;
-  strategyVersion: string;
-  strategyFamilies: string[];
-}): Promise<void> {
+async function evaluateIntelligenceAlerts(
+  metadata: {
+    engine: string;
+    strategyVersion: string;
+    strategyFamilies: string[];
+  },
+  delivery: IntelligenceAlertDelivery = {},
+): Promise<void> {
   const families =
     metadata.strategyFamilies.length > 0
       ? metadata.strategyFamilies
@@ -380,6 +390,7 @@ async function evaluateIntelligenceAlerts(metadata: {
             outcomeCounts,
             latency,
           }),
+          delivery,
         );
         await db
           .update(intelligenceAlertStatesTable)
@@ -439,14 +450,17 @@ async function evaluateIntelligenceAlerts(metadata: {
   }
 }
 
-export async function recordIntelligenceOperation(input: {
-  engine: string;
-  outcome: IntelligenceOutcome;
-  startedAt: number;
-  selection?: StrategySelection;
-  trace?: IntelligenceTrace;
-  failureClass?: string;
-}) {
+export async function recordIntelligenceOperation(
+  input: {
+    engine: string;
+    outcome: IntelligenceOutcome;
+    startedAt: number;
+    selection?: StrategySelection;
+    trace?: IntelligenceTrace;
+    failureClass?: string;
+  },
+  alertDelivery: IntelligenceAlertDelivery = {},
+) {
   const trace = input.trace;
   const strategyVersion =
     trace?.strategyVersion ?? input.selection?.version ?? "unselected";
@@ -461,11 +475,14 @@ export async function recordIntelligenceOperation(input: {
     latencyMs: Math.max(0, Date.now() - input.startedAt),
     chainStages: trace?.chainStages ?? [],
   });
-  await evaluateIntelligenceAlerts({
-    engine: input.engine,
-    strategyVersion,
-    strategyFamilies,
-  });
+  await evaluateIntelligenceAlerts(
+    {
+      engine: input.engine,
+      strategyVersion,
+      strategyFamilies,
+    },
+    alertDelivery,
+  );
 }
 
 export function engineFromAiPath(path: string): string {
