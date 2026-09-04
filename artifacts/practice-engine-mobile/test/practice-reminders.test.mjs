@@ -6,6 +6,7 @@ import {
   loadReminderSettings,
   parseReminderSettings,
   persistReminderSettings,
+  readReminderPermission,
   refreshRecommendationFromReminder,
   requestReminderPermissionAfterEnable,
   syncReminderSchedule,
@@ -97,6 +98,23 @@ test('permission is requested only after the explicit enable flow', async () => 
   const permission = await requestReminderPermissionAfterEnable(getPermissions, requestPermissions);
   assert.equal(requests, 1);
   assert.equal(permission.granted, true);
+});
+
+test('rejected permission-status reads report failure without blocking reminder initialization', async () => {
+  const result = await readReminderPermission(async () => {
+    throw new Error('notification service unavailable');
+  });
+
+  assert.equal(result.failed, true);
+  assert.equal(result.permission, null);
+});
+
+test('permission-status reads return the current status when the service recovers', async () => {
+  const permission = { granted: false, status: 'denied', canAskAgain: false };
+  const result = await readReminderPermission(async () => permission);
+
+  assert.equal(result.failed, false);
+  assert.deepEqual(result.permission, permission);
 });
 
 test('already-granted and permanently-denied permissions do not prompt again', async () => {

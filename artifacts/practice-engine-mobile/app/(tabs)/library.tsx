@@ -12,7 +12,7 @@ function ReminderSettings() {
   const c = useColors();
   const {
     settings, permission, canAskAgain, isReady, isSaving,
-    storageError, retryStorage,
+    storageError, permissionError, retryStorage, retryPermission,
     setWeekday, setTime, enable, togglePaused, disable, openSettings,
   } = usePracticeReminder();
 
@@ -43,6 +43,9 @@ function ReminderSettings() {
       </Text>
       {storageError ? (
         <State error={storageError} retry={() => void retryStorage()} />
+      ) : null}
+      {permissionError ? (
+        <State error={permissionError} retry={() => void retryPermission()} />
       ) : null}
       <View style={styles.days}>
         {WEEKDAYS.map((day) => {

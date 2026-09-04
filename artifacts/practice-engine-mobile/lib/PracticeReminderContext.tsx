@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Linking, Platform } from 'react-native';
 import { getNotifications } from './notifications';
 import {
   DEFAULT_REMINDER_SETTINGS,
   loadReminderSettings,
   persistReminderSettings,
+  readReminderPermission,
   type ReminderSettings,
   requestReminderPermissionAfterEnable,
   syncReminderSchedule,
@@ -32,7 +33,9 @@ type ReminderContextValue = {
   isReady: boolean;
   isSaving: boolean;
   storageError: string | null;
+  permissionError: string | null;
   retryStorage: () => Promise<void>;
+  retryPermission: () => Promise<void>;
   setWeekday: (weekday: number) => Promise<void>;
   setTime: (hour: number, minute: number) => Promise<void>;
   enable: () => Promise<boolean>;
@@ -60,7 +63,31 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
   const [isReady, setIsReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
   const [pendingSettings, setPendingSettings] = useState<ReminderSettings | null>(null);
+
+  const checkPermission = useCallback(async () => {
+    const notifications = getNotifications();
+    if (notifications) {
+      const result = await readReminderPermission(notifications.getPermissionsAsync);
+      if (result.failed) {
+        setPermissionError('Notification status could not be checked. You can still adjust your reminder, then try again.');
+        return false;
+      }
+      setPermission(result.permission.granted
+        ? 'granted'
+        : result.permission.status === 'denied' ? 'denied' : 'unknown');
+      setCanAskAgain(result.permission.canAskAgain);
+      setPermissionError(null);
+      return true;
+    }
+    if (Platform.OS !== 'web') {
+      setPermission('denied');
+      setCanAskAgain(false);
+    }
+    setPermissionError(null);
+    return true;
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -70,21 +97,13 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
         if (loaded.storageFailed) {
           setStorageError('Device storage is temporarily unavailable. Using default reminder settings.');
         }
-        const notifications = getNotifications();
-        if (notifications) {
-          const current = await notifications.getPermissionsAsync();
-          setPermission(current.granted ? 'granted' : current.status === 'denied' ? 'denied' : 'unknown');
-          setCanAskAgain(current.canAskAgain);
-        } else if (Platform.OS !== 'web') {
-          setPermission('denied');
-          setCanAskAgain(false);
-        }
+        await checkPermission();
       } finally {
         setIsReady(true);
       }
     };
     void load();
-  }, []);
+  }, [checkPermission]);
 
   const save = async (next: ReminderSettings) => {
     setIsSaving(true);
@@ -149,6 +168,7 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
     isReady,
     isSaving,
     storageError,
+    permissionError,
     retryStorage: async () => {
       if (pendingSettings) {
         await save(pendingSettings);
@@ -165,13 +185,21 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
         setIsSaving(false);
       }
     },
+    retryPermission: async () => {
+      setIsSaving(true);
+      try {
+        await checkPermission();
+      } finally {
+        setIsSaving(false);
+      }
+    },
     setWeekday,
     setTime: async (hour, minute) => { await save({ ...settings, hour, minute }); },
     enable,
     togglePaused: async () => { await save({ ...settings, paused: !settings.paused }); },
     disable: async () => { await save({ ...settings, enabled: false, paused: false }); },
     openSettings: async () => { await Linking.openSettings(); },
-  }), [settings, permission, canAskAgain, isReady, isSaving, storageError, pendingSettings]);
+  }), [settings, permission, canAskAgain, isReady, isSaving, storageError, permissionError, pendingSettings, checkPermission]);
 
   return <ReminderContext.Provider value={value}>{children}</ReminderContext.Provider>;
 }

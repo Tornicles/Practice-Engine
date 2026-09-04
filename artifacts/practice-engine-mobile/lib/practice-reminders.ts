@@ -146,6 +146,16 @@ export async function requestReminderPermissionAfterEnable(
   return permission;
 }
 
+export async function readReminderPermission(
+  getPermissions: () => Promise<ReminderPermission>,
+) {
+  try {
+    return { permission: await getPermissions(), failed: false } as const;
+  } catch {
+    return { permission: null, failed: true } as const;
+  }
+}
+
 export function getReminderNavigationTarget(data: Record<string, unknown> | undefined) {
   if (data?.destination !== 'today') return null;
   return {
