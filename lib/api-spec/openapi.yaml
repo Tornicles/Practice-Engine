@@ -142,7 +142,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: number
         name:
           type: string
         niche:
@@ -156,9 +156,9 @@ components:
         developmentFocus:
           type: string
         practiceScore:
-          type: integer
+          type: number
         streak:
-          type: integer
+          type: number
         updatedAt:
           type: string
           format: date-time
@@ -195,7 +195,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: number
         title:
           type: string
         situation:
@@ -241,13 +241,13 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: number
         scenario:
           type: string
         category:
           type: string
         score:
-          type: ["integer", "null"]
+          type: ["number", "null"]
         feedback:
           type: ["string", "null"]
         completedAt:
@@ -274,7 +274,7 @@ components:
           type: string
           minLength: 1
         score:
-          type: integer
+          type: number
           minimum: 0
           maximum: 100
         feedback:
@@ -291,7 +291,7 @@ components:
         name:
           type: string
         score:
-          type: integer
+          type: number
         trend:
           type: string
       required:
@@ -343,17 +343,17 @@ components:
         profile:
           $ref: "#/components/schemas/CoachProfile"
         experienceCount:
-          type: integer
+          type: number
         lessonCount:
-          type: integer
+          type: number
         principleCount:
-          type: integer
+          type: number
         frameworkCount:
-          type: integer
+          type: number
         ipAssetCount:
-          type: integer
+          type: number
         practiceSessionCount:
-          type: integer
+          type: number
         skills:
           type: array
           items:

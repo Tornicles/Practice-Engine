@@ -22,26 +22,26 @@ export const HealthCheckResponse = zod.object({
  */
 export const GetPracticeOverviewResponse = zod.object({
   "profile": zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "name": zod.string(),
   "niche": zod.string(),
   "experienceLevel": zod.string(),
   "audience": zod.string(),
   "goal": zod.string(),
   "developmentFocus": zod.string(),
-  "practiceScore": zod.int(),
-  "streak": zod.int(),
+  "practiceScore": zod.number(),
+  "streak": zod.number(),
   "updatedAt": zod.coerce.date()
 }),
-  "experienceCount": zod.int(),
-  "lessonCount": zod.int(),
-  "principleCount": zod.int(),
-  "frameworkCount": zod.int(),
-  "ipAssetCount": zod.int(),
-  "practiceSessionCount": zod.int(),
+  "experienceCount": zod.number(),
+  "lessonCount": zod.number(),
+  "principleCount": zod.number(),
+  "frameworkCount": zod.number(),
+  "ipAssetCount": zod.number(),
+  "practiceSessionCount": zod.number(),
   "skills": zod.array(zod.object({
   "name": zod.string(),
-  "score": zod.int(),
+  "score": zod.number(),
   "trend": zod.string()
 })),
   "jobs": zod.array(zod.object({
@@ -65,15 +65,15 @@ export const GetPracticeOverviewResponse = zod.object({
  * @summary Get the coach profile
  */
 export const GetPracticeProfileResponse = zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "name": zod.string(),
   "niche": zod.string(),
   "experienceLevel": zod.string(),
   "audience": zod.string(),
   "goal": zod.string(),
   "developmentFocus": zod.string(),
-  "practiceScore": zod.int(),
-  "streak": zod.int(),
+  "practiceScore": zod.number(),
+  "streak": zod.number(),
   "updatedAt": zod.coerce.date()
 })
 
@@ -94,15 +94,15 @@ export const UpdatePracticeProfileBody = zod.object({
 })
 
 export const UpdatePracticeProfileResponse = zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "name": zod.string(),
   "niche": zod.string(),
   "experienceLevel": zod.string(),
   "audience": zod.string(),
   "goal": zod.string(),
   "developmentFocus": zod.string(),
-  "practiceScore": zod.int(),
-  "streak": zod.int(),
+  "practiceScore": zod.number(),
+  "streak": zod.number(),
   "updatedAt": zod.coerce.date()
 })
 
@@ -111,7 +111,7 @@ export const UpdatePracticeProfileResponse = zod.object({
  * @summary List captured coaching experiences
  */
 export const ListExperiencesResponseItem = zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "title": zod.string(),
   "situation": zod.string(),
   "learning": zod.string(),
@@ -139,7 +139,7 @@ export const CreateExperienceBody = zod.object({
 })
 
 export const CreateExperienceResponse = zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "title": zod.string(),
   "situation": zod.string(),
   "learning": zod.string(),
@@ -153,10 +153,10 @@ export const CreateExperienceResponse = zod.object({
  * @summary List practice sessions
  */
 export const ListPracticeSessionsResponseItem = zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "scenario": zod.string(),
   "category": zod.string(),
-  "score": zod.int().nullable(),
+  "score": zod.number().nullable(),
   "feedback": zod.string().nullable(),
   "completedAt": zod.coerce.date().nullable(),
   "createdAt": zod.coerce.date()
@@ -178,15 +178,15 @@ export const createPracticeSessionBodyScoreMax = 100;
 export const CreatePracticeSessionBody = zod.object({
   "scenario": zod.string().min(1),
   "category": zod.string().min(1),
-  "score": zod.int().min(createPracticeSessionBodyScoreMin).max(createPracticeSessionBodyScoreMax),
+  "score": zod.number().min(createPracticeSessionBodyScoreMin).max(createPracticeSessionBodyScoreMax),
   "feedback": zod.string().min(1)
 })
 
 export const CreatePracticeSessionResponse = zod.object({
-  "id": zod.int(),
+  "id": zod.number(),
   "scenario": zod.string(),
   "category": zod.string(),
-  "score": zod.int().nullable(),
+  "score": zod.number().nullable(),
   "feedback": zod.string().nullable(),
   "completedAt": zod.coerce.date().nullable(),
   "createdAt": zod.coerce.date()
