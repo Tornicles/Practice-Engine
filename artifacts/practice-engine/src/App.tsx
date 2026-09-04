@@ -17,6 +17,7 @@ import { Shell } from '@/components/layout/Shell';
 import Dashboard from '@/pages/Dashboard';
 import Today from '@/pages/Today';
 import Practice from '@/pages/Practice';
+import Lab from '@/pages/Lab';
 import Knowledge from '@/pages/Knowledge';
 import Methodology from '@/pages/Methodology';
 import Passport from '@/pages/Passport';
@@ -27,6 +28,7 @@ import Products from '@/pages/Products';
 import Proof from '@/pages/Proof';
 import Delivery from '@/pages/Delivery';
 import Settings from '@/pages/Settings';
+import Onboarding from '@/pages/Onboarding';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,10 +44,12 @@ function Router() {
     <RoutedErrorBoundary>
       <Shell>
         <Switch>
+          <Route path="/onboarding" component={Onboarding} />
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/today" component={Today} />
           <Route path="/practice" component={Practice} />
+          <Route path="/lab" component={Lab} />
           <Route path="/knowledge" component={Knowledge} />
           <Route path="/methodology" component={Methodology} />
           <Route path="/passport" component={Passport} />

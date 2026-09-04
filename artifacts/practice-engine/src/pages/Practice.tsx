@@ -129,13 +129,13 @@ export default function Practice() {
 
   if (activeScenario) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 animate-in slide-in-from-bottom-4 duration-500 pb-12">
-        <Button variant="ghost" onClick={() => setActiveScenario(null)} className="-ml-4 text-muted-foreground">
+      <div className="mx-auto max-w-5xl space-y-6 animate-in slide-in-from-bottom-4 duration-500 pb-12">
+        <Button variant="ghost" onClick={() => setActiveScenario(null)} className="-ml-3 text-xs uppercase tracking-wider text-muted-foreground" data-testid="button-practice-back">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Library
         </Button>
 
         <div className="space-y-2">
-          <div className="flex gap-2 mb-2">
+           <div className="mb-2 flex gap-2">
             <Badge variant="outline">{activeScenario.category}</Badge>
             <Badge className={
               activeScenario.difficulty === 'Advanced' ? 'bg-destructive/20 text-destructive' :
@@ -143,12 +143,13 @@ export default function Practice() {
               'bg-emerald-500/20 text-emerald-500'
             }>{activeScenario.difficulty}</Badge>
           </div>
-          <h1 className="font-serif text-3xl font-medium">{activeScenario.title}</h1>
-          <p className="text-lg text-muted-foreground">{activeScenario.description}</p>
+           <div className="engine-kicker mb-2">SIMULATOR / ACTIVE SCENARIO</div>
+           <h1 className="engine-section-title">{activeScenario.title}</h1>
+           <p className="mt-2 text-sm text-muted-foreground">{activeScenario.description}</p>
         </div>
 
         {sessionState === "brief" && (
-          <Card className="border-primary/20 bg-primary/5">
+           <Card className="engine-card border-primary/25 bg-primary/[.04]">
             <CardHeader>
               <CardTitle>Session Brief</CardTitle>
             </CardHeader>
@@ -171,7 +172,7 @@ export default function Practice() {
         {sessionState === "simulating" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-4">
-              <Card className="border-border shadow-sm flex flex-col h-[600px]">
+               <Card className="engine-card flex h-[600px] flex-col">
                 <CardHeader className="flex flex-row items-center gap-4 border-b border-border/50 py-4 bg-muted/20">
                   <div className="h-10 w-10 bg-secondary rounded-full flex items-center justify-center">
                     <Bot className="h-5 w-5" />
@@ -258,8 +259,8 @@ export default function Practice() {
               </Card>
             </div>
             
-            <div className="space-y-6">
-              <Card className="border-border">
+             <div className="space-y-6">
+               <Card className="engine-card border-border">
                 <CardHeader className="bg-primary/5 border-b border-border/50 py-4">
                   <CardTitle className="text-sm uppercase tracking-wider text-primary">Private Observation</CardTitle>
                 </CardHeader>
@@ -293,7 +294,7 @@ export default function Practice() {
         )}
 
         {sessionState === "feedback" && (
-          <Card>
+           <Card className="engine-card">
             <CardHeader>
               <CardTitle>Session Reflection</CardTitle>
               <CardDescription>Consolidate your learning to finalize the score.</CardDescription>
@@ -344,9 +345,10 @@ export default function Practice() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="font-serif text-3xl font-medium tracking-tight mb-2">Practice Simulator</h1>
-        <p className="text-muted-foreground">Hone your skills in a safe environment before facing real clients.</p>
+       <div>
+         <div className="engine-kicker mb-3">WORKSPACE / DELIBERATE PRACTICE</div>
+         <h1 className="engine-section-title">Practice Simulator</h1>
+         <p className="mt-2 text-sm text-muted-foreground">Hone your skills in a safe environment before facing real clients.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -356,7 +358,7 @@ export default function Practice() {
           </h2>
           <div className="grid gap-4">
             {SCENARIOS.map(scenario => (
-              <Card key={scenario.id} className="hover:border-primary/50 transition-colors group cursor-pointer" onClick={() => handleStart(scenario)}>
+             <Card key={scenario.id} className="engine-card cursor-pointer transition-colors group hover:border-primary/50" onClick={() => handleStart(scenario)} data-testid={`card-scenario-${scenario.id}`}>
                 <CardContent className="p-6 flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex gap-2">
@@ -379,7 +381,7 @@ export default function Practice() {
             <History className="h-5 w-5 text-muted-foreground" /> Recent History
           </h2>
           
-          <Card>
+           <Card className="engine-card">
             <CardContent className="p-0">
               {sessionsLoading ? (
                 <div className="p-6 space-y-4">

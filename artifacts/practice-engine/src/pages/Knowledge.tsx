@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import { BookOpen, Plus, Loader2, Sparkles, MoveRight, Layers, FileText } from "lucide-react"
+import { BookOpen, Plus, Loader2, Sparkles, Layers, FileText } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Link } from "wouter"
@@ -95,15 +95,16 @@ export default function Knowledge() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-7 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-medium tracking-tight mb-2">Knowledge Vault</h1>
-          <p className="text-muted-foreground">Capture real experiences and extract repeatable principles.</p>
+           <div className="engine-kicker mb-3">DEVELOPMENT / LIVED EXPERIENCE</div>
+           <h1 className="engine-section-title">Knowledge Vault</h1>
+           <p className="mt-2 text-sm text-muted-foreground">Capture real experiences and extract repeatable principles.</p>
         </div>
         <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) resetModal(); else setIsModalOpen(true); }}>
           <DialogTrigger asChild>
-            <Button className="shrink-0"><Plus className="mr-2 h-4 w-4" /> Capture Experience</Button>
+             <Button className="shrink-0 uppercase tracking-[.08em]"><Plus className="mr-2 h-4 w-4" /> Capture experience</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -196,7 +197,7 @@ export default function Knowledge() {
             <Skeleton className="h-[300px] w-full" />
           </>
         ) : experiences?.length === 0 ? (
-          <div className="col-span-full py-16 text-center border-2 border-dashed rounded-xl bg-card/50">
+           <div className="col-span-full border border-dashed border-border bg-card/50 py-16 text-center">
             <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-medium mb-2">Your vault is empty</h3>
             <p className="text-muted-foreground mb-4">Start capturing experiences to build your distinctive methodology.</p>
@@ -204,7 +205,7 @@ export default function Knowledge() {
           </div>
         ) : (
           experiences?.map(exp => (
-            <Card key={exp.id} className="flex flex-col hover:border-primary/50 transition-colors group">
+             <Card key={exp.id} className="engine-card flex flex-col hover:border-primary/50 transition-colors group">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start mb-2">
                   <Badge variant={exp.status === 'processed' ? 'default' : 'secondary'} className="text-[10px] uppercase">
@@ -220,7 +221,7 @@ export default function Knowledge() {
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Situation</span>
                     <p className="text-sm line-clamp-2 text-foreground/80">{exp.situation}</p>
                   </div>
-                  <div className="bg-primary/5 rounded-md p-3 border border-primary/10">
+                   <div className="border border-primary/15 bg-primary/[.045] p-3">
                     <span className="text-xs font-semibold text-primary uppercase tracking-wider block mb-1 flex items-center gap-1">
                       <Sparkles className="h-3 w-3" /> Principle
                     </span>

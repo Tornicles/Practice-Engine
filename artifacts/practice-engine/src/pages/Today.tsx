@@ -6,11 +6,12 @@ export default function Today() {
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-end justify-between border-b border-border/50 pb-6">
+    <div className="mx-auto max-w-5xl space-y-7 animate-in fade-in duration-500">
+      <div className="flex items-end justify-between border-b border-border pb-6">
         <div>
-          <h1 className="font-serif text-4xl font-medium tracking-tight mb-2">Today</h1>
-          <p className="text-muted-foreground flex items-center gap-2">
+          <div className="engine-kicker mb-3">WORKSPACE / DAILY SEQUENCE</div>
+          <h1 className="engine-section-title">Today</h1>
+          <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" /> {today}
           </p>
         </div>
@@ -28,7 +29,7 @@ export default function Today() {
               <Clock className="h-5 w-5 text-muted-foreground" /> Pending Tasks
             </h2>
             <div className="space-y-3">
-              <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
+              <Card className="engine-card cursor-pointer transition-colors group hover:border-primary/50">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-4 w-4 rounded-full border border-primary/50 group-hover:border-primary flex items-center justify-center">
@@ -39,7 +40,7 @@ export default function Today() {
                   <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                 </CardContent>
               </Card>
-              <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
+              <Card className="engine-card cursor-pointer transition-colors group hover:border-primary/50">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-4 w-4 rounded-full border border-primary/50 group-hover:border-primary flex items-center justify-center">
@@ -55,7 +56,7 @@ export default function Today() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border-border bg-card">
+          <Card className="engine-card border-border bg-card">
             <CardHeader className="bg-primary/5 border-b border-border/50">
               <CardTitle className="text-base">Daily Reflection</CardTitle>
               <CardDescription>What is the most important coaching realization you had today?</CardDescription>

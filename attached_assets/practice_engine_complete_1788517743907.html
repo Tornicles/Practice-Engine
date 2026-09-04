@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Practice Engine</title>
+<style>
+:root{
+  --bg:#0b0d10; --panel:#12161b; --panel2:#171c22; --line:#27303a;
+  --text:#f4f6f8; --muted:#98a3af; --gold:#c9a84e; --green:#4fd18b;
+  --blue:#62a8ff; --purple:#ad7cff; --orange:#ffad5c; --red:#ff6b6b;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit} button{cursor:pointer}
+.app{display:none;min-height:100vh}.app.active{display:flex}
+.sidebar{width:250px;border-right:1px solid var(--line);background:#0d1014;padding:22px 14px;position:fixed;inset:0 auto 0 0;z-index:10}
+.logo{font-weight:800;font-size:20px;padding:0 12px 24px}.logo span{color:var(--gold)}
+.nav{display:grid;gap:5px}.nav button{background:none;border:0;color:var(--muted);padding:12px;border-radius:9px;text-align:left}.nav button:hover,.nav button.active{background:var(--panel2);color:white}.nav .section{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#56616d;padding:18px 12px 6px}
+.profile-mini{position:absolute;bottom:20px;left:14px;right:14px;border-top:1px solid var(--line);padding:16px 10px}.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#755c1d);display:grid;place-items:center;font-weight:800}
+.main{margin-left:250px;width:calc(100% - 250px)}.topbar{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;background:rgba(11,13,16,.94);backdrop-filter:blur(10px);z-index:5}
+.page{padding:30px 34px;max-width:1450px;margin:auto}.view{display:none}.view.active{display:block}
+h1{font-size:30px;margin:0 0 7px} h2{font-size:20px;margin:0 0 15px} h3{font-size:15px;margin:0 0 7px}.sub{color:var(--muted);margin:0 0 25px}.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:19px}.card:hover{border-color:#3a4652}.metric{font-size:28px;font-weight:800}.muted{color:var(--muted)}.small{font-size:12px}.tag{display:inline-block;padding:5px 8px;border-radius:6px;background:#202831;color:#b8c4d0;font-size:11px;margin:2px}
+.btn{border:1px solid var(--line);background:var(--panel2);color:white;border-radius:8px;padding:10px 14px}.btn.primary{background:var(--gold);color:#101010;border-color:var(--gold);font-weight:700}.btn.ghost{background:transparent}.btn.danger{border-color:#603033;color:#ff9b9b}.row{display:flex;gap:10px;align-items:center}.between{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.progress{height:7px;background:#222a31;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:var(--gold);border-radius:10px}.list{display:grid;gap:9px}.item{padding:13px;border:1px solid var(--line);border-radius:10px;background:#101419}.item button{border:0;background:none;color:inherit;text-align:left;width:100%}
+.hero{padding:25px;background:linear-gradient(135deg,#171b20,#101318);border:1px solid var(--line);border-radius:16px;margin-bottom:20px}.hero strong{color:var(--gold)}
+.kpi{display:flex;justify-content:space-between;margin-bottom:10px}.score{font-size:38px;font-weight:900}
+table{width:100%;border-collapse:collapse}th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;place-items:center;z-index:30}.modal.open{display:grid}.modalbox{width:min(650px,92vw);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}.close{float:right;background:none;border:0;color:var(--muted);font-size:22px}
+.onboarding{min-height:100vh;display:none;align-items:center;justify-content:center;padding:25px;background:radial-gradient(circle at 50% 0,#20201a 0,#0b0d10 40%)}.onboarding.active{display:flex}.onbox{width:min(850px,95vw)}.onlogo{text-align:center;font-size:28px;font-weight:900;margin-bottom:28px}.onlogo span{color:var(--gold)}.step{display:none}.step.active{display:block}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.choice{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:18px;min-height:110px;color:white;text-align:left}.choice.selected{border-color:var(--gold);background:#1d1a11}.onfooter{display:flex;justify-content:space-between;margin-top:22px}.dots{text-align:center;margin-top:20px}.dots b{display:inline-block;width:7px;height:7px;background:#3b434c;border-radius:50%;margin:3px}.dots b.active{background:var(--gold)}
+input,textarea,select{width:100%;background:#0d1115;color:white;border:1px solid var(--line);border-radius:8px;padding:11px;margin-top:7px}textarea{min-height:120px;resize:vertical}
+.timeline{border-left:2px solid #2a323a;padding-left:18px;display:grid;gap:16px}.timeline .item{position:relative}.timeline .item:before{content:"";width:9px;height:9px;background:var(--gold);border-radius:50%;position:absolute;left:-24px;top:17px}
+.empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+@media(max-width:900px){.sidebar{width:70px}.sidebar .nav button span,.sidebar .section,.profile-mini div:not(.avatar),.logo{display:none}.main{margin-left:70px;width:calc(100% - 70px)}.g4,.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.page{padding:20px 15px}.g4,.g3,.g2,.choices{grid-template-columns:1fr}.topbar{padding:0 15px}}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<section id="onboarding" class="onboarding active">
+<div class="onbox">
+<div class="onlogo">THE <span>PRACTICE ENGINE</span></div>
+
+<div class="step active" data-step="1">
+<h1>Build your coaching practice.</h1><p class="sub">The Practice Engine helps you become a better coach, build your methodology, develop your brand, and turn real experience into intellectual property.</p>
+<div class="card"><h2>What do you want to accomplish?</h2><div class="choices">
+<button class="choice" onclick="selectChoice(this)">Become a better coach</button>
+<button class="choice" onclick="selectChoice(this)">Build my coaching brand</button>
+<button class="choice" onclick="selectChoice(this)">Create courses & IP</button>
+<button class="choice" onclick="selectChoice(this)">Practice real scenarios</button>
+<button class="choice" onclick="selectChoice(this)">Grow my coaching business</button>
+<button class="choice" onclick="selectChoice(this)">All of the above</button>
+</div></div>
+</div>
+
+<div class="step" data-step="2">
+<h1>Tell us about your coaching.</h1><p class="sub">This becomes the first layer of your Coach Passport.</p>
+<div class="grid g2">
+<div class="card"><label>Coach name<input id="coachName" placeholder="Your name"></label></div>
+<div class="card"><label>Coaching niche<input placeholder="e.g. Leadership, Career, Business"></label></div>
+<div class="card"><label>Experience level<select><option>New coach</option><option>Developing coach</option><option>Experienced coach</option><option>Expert / Master coach</option></select></label></div>
+<div class="card"><label>Who do you help?<input placeholder="Describe your ideal client"></label></div>
+</div>
+</div>
+
+<div class="step" data-step="3">
+<h1>How do you want to develop?</h1><p class="sub">The system will personalize your practice path.</p>
+<div class="choices">
+<button class="choice" onclick="selectChoice(this)">Daily guided development</button>
+<button class="choice" onclick="selectChoice(this)">Scenario practice</button>
+<button class="choice" onclick="selectChoice(this)">Real client improvement</button>
+<button class="choice" onclick="selectChoice(this)">Build my methodology</button>
+<button class="choice" onclick="selectChoice(this)">Build authority</button>
+<button class="choice" onclick="selectChoice(this)">Create a course</button>
+</div>
+</div>
+
+<div class="step" data-step="4">
+<h1>Your Practice Engine is ready.</h1><p class="sub">Your workspace will continuously connect learning, practice, experience, methodology, brand, IP and products.</p>
+<div class="hero"><strong>EXPERIENCE → EXPERTISE → IP</strong><p class="muted">Capture what you live. Reflect on it. Practice it. Prove it. Teach it. Turn it into something valuable.</p></div>
+</div>
+
+<div class="onfooter"><button class="btn ghost" id="backBtn" onclick="prevStep()">Back</button><button class="btn primary" id="nextBtn" onclick="nextStep()">Continue</button></div>
+<div class="dots" id="dots"></div>
+</div>
+</section>
+
+<!-- APP -->
+<section id="app" class="app">
+<aside class="sidebar">
+<div class="logo">PRACTICE<span>ENGINE</span></div>
+<div class="nav">
+<div class="section">Workspace</div>
+<button class="active" data-view="dashboard" onclick="showView('dashboard',this)">◈ <span>Dashboard</span></button>
+<button data-view="today" onclick="showView('today',this)">◷ <span>Today</span></button>
+<button data-view="practice" onclick="showView('practice',this)">◉ <span>Practice Simulator</span></button>
+<button data-view="delivery" onclick="showView('delivery',this)">◇ <span>Delivery Studio</span></button>
+<div class="section">Development</div>
+<button data-view="lab" onclick="showView('lab',this)">◆ <span>Coach Lab</span></button>
+<button data-view="knowledge" onclick="showView('knowledge',this)">▣ <span>Knowledge Vault</span></button>
+<button data-view="methodology" onclick="showView('methodology',this)">✦ <span>My Methodology</span></button>
+<div class="section">Authority & IP</div>
+<button data-view="brand" onclick="showView('brand',this)">◈ <span>Brand Lab</span></button>
+<button data-view="courses" onclick="showView('courses',this)">▤ <span>Course Builder</span></button>
+<button data-view="content" onclick="showView('content',this)">◇ <span>Content Studio</span></button>
+<button data-view="products" onclick="showView('products',this)">◆ <span>Offers & Products</span></button>
+<div class="section">Evidence</div>
+<button data-view="proof" onclick="showView('proof',this)">✓ <span>Proof & Outcomes</span></button>
+<button data-view="passport" onclick="showView('passport',this)">◎ <span>Coach Passport</span></button>
+<button data-view="settings" onclick="showView('settings',this)">⚙ <span>Settings</span></button>
+</div>
+<div class="profile-mini"><div class="row"><div class="avatar">TM</div><div><b id="miniName">Coach</b><div class="small muted">Developing</div></div></div></div>
+</aside>
+
+<main class="main">
+<header class="topbar"><div class="muted" id="crumb">Dashboard</div><div class="row"><span class="tag">Practice Score 74</span><button class="btn" onclick="openModal('quick')">+ Capture Experience</button></div></header>
+
+<div class="page">
+<!-- DASHBOARD -->
+<div id="dashboard" class="view active">
+<h1>Good morning, Coach.</h1><p class="sub">Your practice is becoming your expertise.</p>
+<div class="hero"><div class="between"><div><span class="tag">TODAY'S FOCUS</span><h2>Improve your questioning under resistance.</h2><p class="muted">One focused practice can improve the skill you use with real clients today.</p></div><button class="btn primary" onclick="showView('practice')">Start Practice</button></div></div>
+<div class="grid g4">
+<div class="card"><div class="muted small">PRACTICE SCORE</div><div class="metric">74</div><div class="progress"><i style="width:74%"></i></div></div>
+<div class="card"><div class="muted small">EXPERIENCES CAPTURED</div><div class="metric">28</div><span class="muted small">+4 this month</span></div>
+<div class="card"><div class="muted small">FRAMEWORKS</div><div class="metric">6</div><span class="muted small">2 being tested</span></div>
+<div class="card"><div class="muted small">IP ASSETS</div><div class="metric">43</div><span class="muted small">Across 7 formats</span></div>
+</div>
+<br>
+<div class="grid g3">
+<div class="card"><h2>Today's 3 Jobs</h2><div class="list">
+<div class="item"><b>01 · Practice</b><p class="muted small">10-minute resistant-client simulation.</p><button class="btn" onclick="showView('practice')">Do it</button></div>
+<div class="item"><b>02 · Reflect</b><p class="muted small">Capture one experience from this week.</p><button class="btn" onclick="openModal('quick')">Capture</button></div>
+<div class="item"><b>03 · Build</b><p class="muted small">Turn one lesson into a framework step.</p><button class="btn" onclick="showView('methodology')">Build</button></div>
+</div></div>
+<div class="card"><h2>Development</h2><div class="kpi"><span>Questioning</span><b>82%</b></div><div class="progress"><i style="width:82%"></i></div><br><div class="kpi"><span>Listening</span><b>76%</b></div><div class="progress"><i style="width:76%"></i></div><br><div class="kpi"><span>Reframing</span><b>61%</b></div><div class="progress"><i style="width:61%"></i></div><br><div class="kpi"><span>Challenge</span><b>58%</b></div><div class="progress"><i style="width:58%"></i></div></div>
+<div class="card"><h2>Experience → IP</h2><div class="timeline"><div class="item"><b>Client resistance</b><div class="small muted">Captured experience</div></div><div class="item"><b>Resistance is data</b><div class="small muted">Extracted principle</div></div><div class="item"><b>R.E.A.D. Framework</b><div class="small muted">Framework in testing</div></div><div class="item"><b>Module 2 lesson</b><div class="small muted">Course asset generated</div></div></div></div>
+</div>
+</div>
+
+<!-- TODAY -->
+<div id="today" class="view"><h1>Today</h1><p class="sub">Three sequenced actions. Do the work, don't just read advice.</p>
+<div class="grid g3">
+<div class="card"><span class="tag">01 · PRACTICE</span><h2>Resistance Drill</h2><p class="muted">Coach an uncertain executive who challenges every question.</p><p><b>10 min</b> · Difficulty 3/5</p><button class="btn primary" onclick="showView('practice')">Start</button></div>
+<div class="card"><span class="tag">02 · REFLECT</span><h2>Experience Capture</h2><p class="muted">Document a moment from a real coaching engagement.</p><p><b>8 min</b> · Knowledge Vault</p><button class="btn primary" onclick="openModal('quick')">Capture</button></div>
+<div class="card"><span class="tag">03 · BUILD</span><h2>Framework Builder</h2><p class="muted">Turn one validated lesson into a repeatable method.</p><p><b>15 min</b> · Methodology</p><button class="btn primary" onclick="showView('methodology')">Build</button></div>
+</div><br><div class="card"><h2>Daily streak</h2><div class="metric">17 days</div><p class="muted">You have completed 48 practice actions in the last 30 days.</p></div>
+</div>
+
+<!-- PRACTICE -->
+<div id="practice" class="view"><div class="between"><div><h1>Practice Simulator</h1><p class="sub">Practice difficult moments before they happen with real clients.</p></div><button class="btn" onclick="openModal('scenario')">Create Scenario</button></div>
+<div class="grid g3">
+<div class="card"><span class="tag">CLIENT</span><h2>The Resistant Executive</h2><p class="muted">“I've heard all of this before. I don't think coaching is going to change anything.”</p><div class="row"><span class="tag">Resistance</span><span class="tag">Leadership</span></div><br><button class="btn primary" onclick="startSimulation()">Enter Simulation</button></div>
+<div class="card"><span class="tag">PROSPECT</span><h2>The Skeptical Buyer</h2><p class="muted">A prospect questions your value, methodology and price.</p><br><button class="btn" onclick="startSimulation()">Practice Sales</button></div>
+<div class="card"><span class="tag">CLIENT</span><h2>The Stuck Client</h2><p class="muted">A client keeps describing problems but avoids taking action.</p><br><button class="btn" onclick="startSimulation()">Practice</button></div>
+</div><br>
+<div class="card"><h2>Recent performance</h2><table><tr><th>Scenario</th><th>Skill</th><th>Score</th><th>Trend</th></tr><tr><td>Resistant Executive</td><td>Questioning</td><td>82</td><td>↑</td></tr><tr><td>Difficult Conversation</td><td>Challenge</td><td>64</td><td>↑</td></tr><tr><td>Skeptical Buyer</td><td>Discovery</td><td>77</td><td>→</td></tr></table></div>
+</div>
+
+<!-- DELIVERY -->
+<div id="delivery" class="view"><h1>Delivery Studio</h1><p class="sub">Prepare, deliver, reflect and improve your real coaching work.</p>
+<div class="grid g2"><div class="card"><h2>Prepare a Session</h2><label>Client objective<input placeholder="What does the client need to accomplish?"></label><label>Context<textarea placeholder="Relevant context, previous commitments, known patterns..."></textarea></label><button class="btn primary">Generate Session Plan</button></div>
+<div class="card"><h2>Post-Session Reflection</h2><p class="muted">After a session, capture what happened while it is fresh.</p><div class="list"><div class="item">What did the client actually need?</div><div class="item">Where did you create movement?</div><div class="item">Where did you miss an opportunity?</div><div class="item">What will you do differently next time?</div></div><button class="btn primary" onclick="openModal('reflection')">Start Reflection</button></div></div><br>
+<div class="card"><h2>Delivery trends</h2><div class="grid g4"><div><div class="muted small">STRUCTURE</div><div class="score">86</div></div><div><div class="muted small">LISTENING</div><div class="score">78</div></div><div><div class="muted small">INTERVENTION</div><div class="score">71</div></div><div><div class="muted small">OUTCOME</div><div class="score">83</div></div></div></div>
+</div>
+
+<!-- LAB -->
+<div id="lab" class="view"><h1>Coach Lab</h1><p class="sub">Your structured coaching development curriculum.</p><div class="grid g3">
+<div class="card"><span class="tag">FOUNDATION</span><h2>Coaching Fundamentals</h2><p class="muted">Core principles, boundaries, session architecture and coaching mindset.</p><div class="progress"><i style="width:92%"></i></div><p class="small muted">92% complete</p><button class="btn">Continue</button></div>
+<div class="card"><span class="tag">SKILL</span><h2>Questioning Mastery</h2><p class="muted">Build questions that create clarity rather than simply gather information.</p><div class="progress"><i style="width:68%"></i></div><p class="small muted">68% complete</p><button class="btn primary" onclick="startSimulation()">Practice Skill</button></div>
+<div class="card"><span class="tag">ADVANCED</span><h2>Coaching Resistance</h2><p class="muted">Recognize resistance and choose an appropriate intervention.</p><div class="progress"><i style="width:42%"></i></div><p class="small muted">42% complete</p><button class="btn">Continue</button></div>
+</div><br><div class="card"><h2>Competency map</h2><table><tr><th>Competency</th><th>Knowledge</th><th>Practice</th><th>Real Delivery</th><th>Status</th></tr><tr><td>Listening</td><td>92%</td><td>81%</td><td>76%</td><td>Strong</td></tr><tr><td>Questioning</td><td>88%</td><td>82%</td><td>79%</td><td>Strong</td></tr><tr><td>Reframing</td><td>73%</td><td>61%</td><td>58%</td><td>Developing</td></tr><tr><td>Challenge</td><td>68%</td><td>58%</td><td>52%</td><td>Priority</td></tr></table></div></div>
+
+<!-- KNOWLEDGE -->
+<div id="knowledge" class="view"><div class="between"><div><h1>Knowledge Vault</h1><p class="sub">Your experiences become a structured body of expertise.</p></div><button class="btn primary" onclick="openModal('quick')">+ Capture Experience</button></div>
+<div class="grid g4"><div class="card"><div class="muted small">EXPERIENCES</div><div class="metric">28</div></div><div class="card"><div class="muted small">LESSONS</div><div class="metric">19</div></div><div class="card"><div class="muted small">PRINCIPLES</div><div class="metric">12</div></div><div class="card"><div class="muted small">FRAMEWORKS</div><div class="metric">6</div></div></div><br>
+<div class="grid g2"><div class="card"><h2>Recent experiences</h2><div class="list"><div class="item"><b>Client resisted accountability</b><p class="small muted">Captured Aug 31 · Converted to lesson</p></div><div class="item"><b>Leadership transition conversation</b><p class="small muted">Captured Aug 28 · Needs reflection</p></div><div class="item"><b>Client discovered hidden constraint</b><p class="small muted">Captured Aug 25 · Framework candidate</p></div></div></div>
+<div class="card"><h2>Knowledge pipeline</h2><div class="timeline"><div class="item"><b>Experience</b><div class="small muted">What happened?</div></div><div class="item"><b>Reflection</b><div class="small muted">What did you learn?</div></div><div class="item"><b>Principle</b><div class="small muted">What does it mean?</div></div><div class="item"><b>Framework</b><div class="small muted">Can it be repeated?</div></div><div class="item"><b>Proof</b><div class="small muted">Did it work?</div></div></div></div></div></div>
+
+<!-- METHODOLOGY -->
+<div id="methodology" class="view"><div class="between"><div><h1>My Methodology</h1><p class="sub">Build the coaching method that belongs to you.</p></div><button class="btn primary" onclick="openModal('framework')">+ Build Framework</button></div>
+<div class="hero"><span class="tag">SIGNATURE METHOD</span><h2>R.E.A.D. Framework</h2><p class="muted">A repeatable method for navigating client resistance.</p><div class="grid g4"><div class="card"><b>R</b><p class="small muted">Recognize</p></div><div class="card"><b>E</b><p class="small muted">Explore</p></div><div class="card"><b>A</b><p class="small muted">Align</p></div><div class="card"><b>D</b><p class="small muted">Decide</p></div></div></div>
+<div class="grid g3"><div class="card"><h2>Frameworks</h2><p>6 total · 2 testing</p><button class="btn">View Library</button></div><div class="card"><h2>Exercises</h2><p>17 repeatable coaching exercises</p><button class="btn">View Exercises</button></div><div class="card"><h2>Principles</h2><p>12 principles extracted from experience</p><button class="btn">View Principles</button></div></div></div>
+
+<!-- BRAND -->
+<div id="brand" class="view"><h1>Coach Brand Lab</h1><p class="sub">Turn genuine expertise into recognizable authority.</p><div class="grid g2">
+<div class="card"><h2>Brand Core</h2><label>Positioning<input value="I help ambitious leaders turn complexity into focused action."></label><label>Promise<input value="Clarity, decisions and measurable movement."></label><label>Ideal Client<input value="Growth-stage leaders navigating major transitions."></label><button class="btn primary">Save Brand Core</button></div>
+<div class="card"><h2>Authority System</h2><div class="list"><div class="item"><b>Signature methodology</b><p class="small muted">R.E.A.D. Framework</p></div><div class="item"><b>Content pillars</b><p class="small muted">Leadership · Decision-making · Accountability</p></div><div class="item"><b>Proof bank</b><p class="small muted">14 verified outcome stories</p></div><div class="item"><b>Voice</b><p class="small muted">Direct · practical · challenging</p></div></div><button class="btn">Run Brand Diagnostic</button></div></div><br><div class="card"><h2>Brand → Content → Authority</h2><p class="muted">Your brand is continuously fed by your methodology, experiences, proof and point of view.</p></div></div>
+
+<!-- COURSES -->
+<div id="courses" class="view"><div class="between"><div><h1>Course Builder</h1><p class="sub">Build courses from lived experience, tested knowledge and real outcomes.</p></div><button class="btn primary" onclick="openModal('course')">+ New Course</button></div>
+<div class="hero"><strong>COURSE CREATION IS A DEVELOPMENT JOURNEY.</strong><p class="muted">The engine does not start with a blank course template. It starts by making you document, reflect, test, prove and organize what you actually know.</p></div>
+<div class="grid g3"><div class="card"><span class="tag">IN PROGRESS</span><h2>Leading Through Uncertainty</h2><p class="muted">8 modules · 63% complete</p><div class="progress"><i style="width:63%"></i></div><br><button class="btn primary">Continue Build</button></div>
+<div class="card"><span class="tag">IDEA</span><h2>Coaching Accountability</h2><p class="muted">7 experiences captured · 3 principles identified</p><button class="btn">Develop Idea</button></div>
+<div class="card"><span class="tag">READY</span><h2>Decision Clarity Workshop</h2><p class="muted">Framework tested with 5 clients.</p><button class="btn">Turn Into Course</button></div></div>
+<br><div class="card"><h2>Course development pipeline</h2><div class="grid g4"><div><b>01</b><p class="small muted">Experiences</p></div><div><b>02</b><p class="small muted">Principles</p></div><div><b>03</b><p class="small muted">Framework</p></div><div><b>04</b><p class="small muted">Testing & Proof</p></div></div></div></div>
+
+<!-- CONTENT -->
+<div id="content" class="view"><div class="between"><div><h1>Content Studio</h1><p class="sub">Turn your knowledge and proof into authority-building content.</p></div><button class="btn primary" onclick="openModal('content')">Create Asset</button></div>
+<div class="grid g3"><div class="card"><h2>Experience → Post</h2><p class="muted">Choose an experience and turn the lesson into a perspective-driven post.</p><button class="btn">Create</button></div><div class="card"><h2>Framework → Carousel</h2><p class="muted">Explain your methodology clearly and visually.</p><button class="btn">Create</button></div><div class="card"><h2>Proof → Case Study</h2><p class="muted">Turn an outcome into evidence that builds trust.</p><button class="btn">Create</button></div></div><br><div class="card"><h2>Content library</h2><table><tr><th>Asset</th><th>Source</th><th>Format</th><th>Status</th></tr><tr><td>Why clarity fails leaders</td><td>Experience #28</td><td>LinkedIn</td><td>Draft</td></tr><tr><td>R.E.A.D. Framework</td><td>Methodology</td><td>Carousel</td><td>Published</td></tr><tr><td>Executive transition case</td><td>Proof #14</td><td>Case Study</td><td>Review</td></tr></table></div></div>
+
+<!-- PRODUCTS -->
+<div id="products" class="view"><h1>Offers & Products</h1><p class="sub">Package your expertise into valuable ways people can work with you.</p><div class="grid g3">
+<div class="card"><span class="tag">CORE</span><h2>1:1 Executive Coaching</h2><p class="muted">Your flagship service.</p><b>$3,500</b><br><br><button class="btn">Manage Offer</button></div>
+<div class="card"><span class="tag">SCALABLE</span><h2>Decision Clarity Course</h2><p class="muted">Self-paced educational product.</p><b>$497</b><br><br><button class="btn">Open Product</button></div>
+<div class="card"><span class="tag">ENTRY</span><h2>Decision Diagnostic</h2><p class="muted">Interactive lead magnet and qualification tool.</p><b>Free</b><br><br><button class="btn">Manage</button></div></div></div>
+
+<!-- PROOF -->
+<div id="proof" class="view"><div class="between"><div><h1>Proof & Outcomes</h1><p class="sub">Build evidence for your coaching, methodology and products.</p></div><button class="btn primary" onclick="openModal('proof')">+ Capture Proof</button></div>
+<div class="grid g4"><div class="card"><div class="muted small">OUTCOMES</div><div class="metric">31</div></div><div class="card"><div class="muted small">CASE STUDIES</div><div class="metric">14</div></div><div class="card"><div class="muted small">TESTIMONIALS</div><div class="metric">22</div></div><div class="card"><div class="muted small">FRAMEWORK TESTS</div><div class="metric">9</div></div></div><br><div class="card"><h2>Evidence bank</h2><table><tr><th>Evidence</th><th>What it proves</th><th>Source</th><th>Status</th></tr><tr><td>Client reduced decision cycle</td><td>R.E.A.D. effectiveness</td><td>Client outcome</td><td>Verified</td></tr><tr><td>Leadership transition success</td><td>Methodology</td><td>Case study</td><td>Verified</td></tr><tr><td>Course pilot feedback</td><td>Teaching effectiveness</td><td>Student feedback</td><td>Review</td></tr></table></div></div>
+
+<!-- PASSPORT -->
+<div id="passport" class="view"><h1>Coach Passport</h1><p class="sub">Your persistent professional identity inside the Practice Engine.</p><div class="grid g3">
+<div class="card"><h2>Identity</h2><div class="avatar" style="margin-bottom:12px">TM</div><h3 id="passportName">Coach</h3><p class="muted">Leadership & Business Coach</p><span class="tag">Developing</span></div>
+<div class="card"><h2>Expertise</h2><p><b>Experience:</b> 28</p><p><b>Principles:</b> 12</p><p><b>Frameworks:</b> 6</p><p><b>Exercises:</b> 17</p></div>
+<div class="card"><h2>Authority</h2><p><b>Proof:</b> 31 outcomes</p><p><b>Content:</b> 43 assets</p><p><b>Courses:</b> 3</p><p><b>Products:</b> 4</p></div></div><br><div class="card"><h2>Development profile</h2><div class="grid g2"><div><div class="kpi"><span>Coaching skill</span><b>78</b></div><div class="progress"><i style="width:78%"></i></div></div><div><div class="kpi"><span>Methodology maturity</span><b>71</b></div><div class="progress"><i style="width:71%"></i></div></div><div><div class="kpi"><span>Brand authority</span><b>69</b></div><div class="progress"><i style="width:69%"></i></div></div><div><div class="kpi"><span>IP maturity</span><b>64</b></div><div class="progress"><i style="width:64%"></i></div></div></div></div></div>
+
+<!-- SETTINGS -->
+<div id="settings" class="view"><h1>Settings</h1><p class="sub">Configure your Practice Engine.</p><div class="grid g2"><div class="card"><h2>Profile</h2><label>Name<input id="settingsName" value=""></label><label>Niche<input value="Leadership & Business Coaching"></label><button class="btn primary" onclick="saveName()">Save</button></div><div class="card"><h2>AI Practice Preferences</h2><div class="list"><div class="item">Use my methodology as primary context</div><div class="item">Challenge me rather than simply agree</div><div class="item">Require evidence before turning lessons into IP</div><div class="item">Keep my voice consistent across generated content</div></div></div></div></div>
+</div>
+</main>
+</section>
+
+<!-- MODALS -->
+<div id="modal" class="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
+
+<script>
+let currentStep=1;
+const steps=[...document.querySelectorAll('.step')];
+function renderSteps(){
+ steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===currentStep));
+ document.getElementById('backBtn').style.visibility=currentStep===1?'hidden':'visible';
+ document.getElementById('nextBtn').textContent=currentStep===4?'Enter Practice Engine':'Continue';
+ document.getElementById('dots').innerHTML=[1,2,3,4].map(n=>`<b class="${n===currentStep?'active':''}"></b>`).join('');
+}
+function nextStep(){if(currentStep<4){currentStep++;renderSteps()}else{launchApp()}}
+function prevStep(){if(currentStep>1){currentStep--;renderSteps()}}
+function selectChoice(el){el.parentElement.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function launchApp(){
+ const name=document.getElementById('coachName').value.trim()||'Coach';
+ document.getElementById('miniName').textContent=name;
+ document.getElementById('passportName').textContent=name;
+ document.getElementById('settingsName').value=name;
+ document.getElementById('onboarding').classList.remove('active');
+ document.getElementById('app').classList.add('active');
+}
+function showView(id,btn){
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+ if(btn) btn.classList.add('active'); else document.querySelector(`.nav button[data-view="${id}"]`)?.classList.add('active');
+ document.getElementById('crumb').textContent=id.replaceAll('-',' ').replace(/\b\w/g,c=>c.toUpperCase());
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function openModal(type){
+ const c=document.getElementById('modalContent');
+ const map={
+ quick:`<h2>Capture an Experience</h2><p class="muted">The system will help turn this into knowledge and potential IP.</p><label>What happened?<textarea placeholder="Describe the real situation..."></textarea></label><label>What did you learn?<textarea placeholder="What changed in your understanding?"></textarea></label><label>Why does it matter?<textarea placeholder="What principle might this reveal?"></textarea></label><button class="btn primary" onclick="closeModal()">Save Experience</button>`,
+ scenario:`<h2>Create Practice Scenario</h2><label>Scenario<input placeholder="Describe the client/prospect"></label><label>Difficulty<select><option>1 · Cooperative</option><option>2 · Uncertain</option><option>3 · Resistant</option><option>4 · Difficult</option><option>5 · Complex</option></select></label><button class="btn primary" onclick="closeModal()">Create Scenario</button>`,
+ reflection:`<h2>Post-Session Reflection</h2><p class="muted">Answer honestly. This becomes practice data, not a performance report.</p><label>What worked?<textarea></textarea></label><label>What did you miss?<textarea></textarea></label><label>What will you practice next?<textarea></textarea></label><button class="btn primary" onclick="closeModal()">Save Reflection</button>`,
+ framework:`<h2>Build a Framework</h2><label>Framework problem<input placeholder="What repeatable problem does it solve?"></label><label>Source experiences<textarea placeholder="Select or describe the experiences behind it..."></textarea></label><button class="btn primary" onclick="closeModal()">Start Builder</button>`,
+ course:`<h2>New Course</h2><label>Course idea<input placeholder="What transformation can you teach?"></label><label>Who is it for?<input placeholder="Target learner"></label><button class="btn primary" onclick="closeModal()">Start Experience Audit</button>`,
+ content:`<h2>Create Content</h2><label>Source<select><option>Experience</option><option>Principle</option><option>Framework</option><option>Case Study</option><option>Course</option></select></label><label>Format<select><option>LinkedIn post</option><option>Article</option><option>Video script</option><option>Carousel</option><option>Podcast</option></select></label><button class="btn primary" onclick="closeModal()">Create Draft</button>`,
+ proof:`<h2>Capture Proof</h2><label>Outcome<input placeholder="What changed?"></label><label>Evidence<textarea placeholder="What evidence supports the outcome?"></textarea></label><button class="btn primary" onclick="closeModal()">Save Proof</button>`
+ };
+ c.innerHTML=map[type]||map.quick;
+ document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function startSimulation(){openModal('scenario')}
+function saveName(){
+ const n=document.getElementById('settingsName').value.trim()||'Coach';
+ document.getElementById('miniName').textContent=n;document.getElementById('passportName').textContent=n;
+}
+renderSteps();
+</script>
+</body>
+</html>

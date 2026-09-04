@@ -1,140 +1,125 @@
 import { useGetPracticeOverview } from "@workspace/api-client-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Activity, BookOpen, Target, Network, Zap } from "lucide-react";
-import { NextActionWidget } from "@/components/NextActionWidget";
 import { Link } from "wouter";
-import { Badge } from "@/components/ui/badge";
+import { Activity, ArrowRight, BookOpen, Network, Target, Zap } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { NextActionWidget } from "@/components/NextActionWidget";
 
 export default function Dashboard() {
-  const { data: overview, isLoading } = useGetPracticeOverview();
+  const { data: overview, isLoading, isError, refetch } = useGetPracticeOverview();
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-[200px] w-full" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="h-[120px]" />
-          <Skeleton className="h-[120px]" />
-          <Skeleton className="h-[120px]" />
-        </div>
+      <div className="space-y-5" data-testid="state-dashboard-loading">
+        <Skeleton className="h-28 w-full" />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Skeleton className="h-24" /><Skeleton className="h-24" /><Skeleton className="h-24" /><Skeleton className="h-24" /></div>
+        <div className="grid gap-4 lg:grid-cols-[1.25fr_.75fr]"><Skeleton className="h-80" /><Skeleton className="h-80" /></div>
       </div>
     );
   }
 
+  if (isError) {
+    return (
+      <div className="engine-card border-destructive/50 p-8 text-center" data-testid="state-dashboard-error">
+        <div className="engine-kicker mb-3 text-destructive">WORKSPACE OFFLINE</div>
+        <h1 className="text-xl font-semibold">Could not load your practice overview.</h1>
+        <p className="mt-2 text-sm text-muted-foreground">The workspace is still intact. Try reconnecting to see the latest signal.</p>
+        <button onClick={() => refetch()} className="mt-5 border border-border px-3 py-2 text-xs uppercase tracking-wider hover:border-primary hover:text-primary" data-testid="button-retry-dashboard">Retry connection</button>
+      </div>
+    );
+  }
+
+  const profile = overview?.profile;
+  const activity = overview?.recentActivity ?? [];
+  const stats = [
+    { label: "Practice sessions", value: overview?.practiceSessionCount ?? 0, icon: Activity },
+    { label: "Experiences captured", value: overview?.experienceCount ?? 0, icon: BookOpen },
+    { label: "Frameworks built", value: overview?.frameworkCount ?? 0, icon: Network },
+    { label: "IP assets", value: overview?.ipAssetCount ?? 0, icon: Zap },
+  ];
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-end">
+    <div className="space-y-6" data-testid="page-dashboard">
+      <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 sm:flex-row sm:items-end">
         <div>
-          <h1 className="font-serif text-3xl font-medium tracking-tight mb-2">Practice Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {overview?.profile.name || "Coach"}.</p>
+          <div className="engine-kicker mb-3">PRACTICE OS / OVERVIEW</div>
+          <h1 className="engine-section-title">Good morning, {profile?.name || "Coach"}.</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Your practice is becoming your expertise.</p>
         </div>
-        <div className="text-right">
-          <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">Mastery Score</div>
-          <div className="text-4xl font-mono text-primary font-bold">{overview?.profile.practiceScore || 0}</div>
-        </div>
+        <Link href="/today" className="inline-flex items-center gap-2 text-xs uppercase tracking-[.1em] text-primary hover:underline" data-testid="link-dashboard-today">
+          View today’s sequence <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Card className="bg-secondary/20 border-border/50">
-              <CardContent className="p-6">
-                <Activity className="h-5 w-5 text-muted-foreground mb-4" />
-                <div className="text-2xl font-bold">{overview?.practiceSessionCount || 0}</div>
-                <div className="text-xs text-muted-foreground mt-1">Practice Sessions</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-secondary/20 border-border/50">
-              <CardContent className="p-6">
-                <BookOpen className="h-5 w-5 text-muted-foreground mb-4" />
-                <div className="text-2xl font-bold">{overview?.experienceCount || 0}</div>
-                <div className="text-xs text-muted-foreground mt-1">Experiences Vaulted</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-secondary/20 border-border/50">
-              <CardContent className="p-6">
-                <Network className="h-5 w-5 text-muted-foreground mb-4" />
-                <div className="text-2xl font-bold">{overview?.frameworkCount || 0}</div>
-                <div className="text-xs text-muted-foreground mt-1">Frameworks Built</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-secondary/20 border-border/50">
-              <CardContent className="p-6">
-                <Zap className="h-5 w-5 text-muted-foreground mb-4" />
-                <div className="text-2xl font-bold">{overview?.ipAssetCount || 0}</div>
-                <div className="text-xs text-muted-foreground mt-1">Total IP Assets</div>
-              </CardContent>
-            </Card>
+      <section className="engine-card border-primary/30 bg-primary/[.045] p-5 md:p-6" data-testid="card-dashboard-focus">
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
+          <div>
+            <div className="engine-kicker mb-2 text-primary">TODAY’S FOCUS</div>
+            <h2 className="text-lg font-semibold">Improve your questioning under resistance.</h2>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">One focused practice can improve the skill you use with real clients today.</p>
           </div>
+          <Link href="/practice" className="inline-flex h-9 shrink-0 items-center justify-center border border-primary bg-primary px-4 text-xs font-semibold uppercase tracking-[.08em] text-primary-foreground hover:bg-primary/90" data-testid="link-dashboard-start-practice">Start practice</Link>
+        </div>
+      </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {overview?.recentActivity && overview.recentActivity.length > 0 ? (
-                <div className="space-y-6">
-                  {overview.recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex gap-4 items-start relative before:absolute before:left-2 before:top-8 before:bottom-[-24px] last:before:hidden before:w-px before:bg-border">
-                      <div className="h-4 w-4 rounded-full bg-primary/20 border border-primary z-10 shrink-0 mt-1" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-sm">{activity.title}</h4>
-                          <Badge variant="outline" className="text-[10px] scale-90 origin-left">{activity.kind}</Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">{activity.detail}</p>
-                        <span className="text-xs text-muted-foreground mt-2 block opacity-60">
-                          {new Date(activity.createdAt).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-sm text-muted-foreground">
-                  No recent activity recorded yet.
-                </div>
-              )}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {stats.map(({ label, value, icon: Icon }, index) => (
+          <Card key={label} className="engine-card" data-testid={`card-dashboard-stat-${index}`}>
+            <CardContent className="p-4">
+              <div className="mb-4 flex items-center justify-between"><span className="engine-kicker">{label}</span><Icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /></div>
+              <div className="font-mono text-2xl text-foreground">{value}</div>
             </CardContent>
           </Card>
-        </div>
+        ))}
+      </div>
 
-        <div className="space-y-8">
-          <NextActionWidget />
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" /> Skill Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-5">
-                {overview?.skills?.map(skill => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between items-end mb-2 text-sm">
-                      <span className="font-medium">{skill.name}</span>
-                      <span className="font-mono text-primary">{skill.score}%</span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${skill.score}%` }}
-                      />
-                    </div>
+      <div className="grid gap-4 lg:grid-cols-[1.25fr_.75fr]">
+        <Card className="engine-card">
+          <CardHeader className="border-b border-border pb-4"><CardTitle className="text-base">Recent activity</CardTitle></CardHeader>
+          <CardContent className="pt-5">
+            {activity.length ? (
+              <div className="space-y-0">
+                {activity.map((entry, index) => (
+                  <div key={entry.id} className="relative flex gap-3 border-b border-border/70 pb-4 pt-1 last:border-0 last:pb-0" data-testid={`row-activity-${entry.id}`}>
+                    <div className="relative mt-1 flex h-4 w-4 shrink-0 items-center justify-center"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{index < activity.length - 1 && <span className="absolute top-3 h-12 w-px bg-border" />}</div>
+                    <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="text-sm font-medium">{entry.title}</h3><span className="engine-kicker border border-border px-1.5 py-0.5">{entry.kind}</span></div><p className="mt-1 text-xs text-muted-foreground">{entry.detail}</p><p className="mt-2 font-mono text-[10px] text-muted-foreground/70">{new Date(entry.createdAt).toLocaleString()}</p></div>
                   </div>
                 ))}
-                {(!overview?.skills || overview.skills.length === 0) && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Complete practice sessions to unlock skill tracking.
-                  </p>
-                )}
               </div>
+            ) : <div className="border border-dashed border-border p-8 text-center text-sm text-muted-foreground" data-testid="state-dashboard-empty">No activity recorded yet. Start a practice session to create your first signal.</div>}
+          </CardContent>
+        </Card>
+
+        <div className="space-y-4">
+          <NextActionWidget />
+          <Card className="engine-card">
+            <CardHeader className="border-b border-border pb-4"><CardTitle className="flex items-center gap-2 text-base"><Target className="h-4 w-4 text-primary" /> Skill progress</CardTitle></CardHeader>
+            <CardContent className="space-y-4 pt-5">
+              {overview?.skills?.length ? overview.skills.map((skill) => (
+                <div key={skill.name} data-testid={`row-skill-${skill.name.toLowerCase().replaceAll(" ", "-")}`}>
+                  <div className="mb-2 flex justify-between text-xs"><span>{skill.name}</span><span className="font-mono text-primary">{skill.score}%</span></div>
+                  <div className="engine-progress"><div style={{ width: `${skill.score}%` }} /></div>
+                </div>
+              )) : <p className="text-sm text-muted-foreground">Complete a session to unlock skill tracking.</p>}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <Card className="engine-card">
+        <CardHeader className="border-b border-border pb-4"><CardTitle className="text-base">Experience <span className="px-1 text-primary">→</span> Expertise <span className="px-1 text-primary">→</span> IP</CardTitle></CardHeader>
+        <CardContent className="grid gap-0 pt-0 md:grid-cols-3">
+          {[
+            ["01", "Lived experience", overview?.experienceCount ?? 0, "Capture what happened in the room."],
+            ["02", "Structural knowledge", (overview?.lessonCount ?? 0) + (overview?.principleCount ?? 0), "Name the lesson and the principle."],
+            ["03", "Reusable IP", overview?.ipAssetCount ?? 0, "Prove it, teach it, package it."],
+          ].map(([step, label, value, detail]) => (
+            <div key={step} className="border-b border-border p-5 first:pl-0 last:border-0 md:border-b-0 md:border-r md:last:border-0" data-testid={`card-chain-${step}`}>
+              <div className="engine-kicker mb-4 text-primary">{step}</div><div className="flex items-end gap-3"><span className="font-mono text-2xl">{value}</span><span className="mb-1 text-sm font-medium">{label}</span></div><p className="mt-2 text-xs text-muted-foreground">{detail}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }

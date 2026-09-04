@@ -7,7 +7,7 @@ import {
   useGenerateKnowledgeAsset,
   getListKnowledgeAssetsQueryKey
 } from "@workspace/api-client-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -69,10 +69,11 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-7 animate-in fade-in duration-500">
       <div>
-        <h1 className="font-serif text-3xl font-medium tracking-tight mb-2">{title}</h1>
-        <p className="text-muted-foreground">{description}</p>
+        <div className="engine-kicker mb-3">DEVELOPMENT / STRUCTURAL IP</div>
+        <h1 className="engine-section-title">{title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -83,7 +84,7 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
               <Skeleton className="h-40 w-full" />
             </div>
           ) : assets.length === 0 ? (
-            <div className="py-16 text-center border-2 border-dashed rounded-xl bg-card/30">
+              <div className="border border-dashed border-border bg-card/30 py-16 text-center">
               <Box className="h-10 w-10 text-muted-foreground mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No assets found</h3>
               <p className="text-muted-foreground mb-4 max-w-sm mx-auto">
@@ -93,14 +94,14 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
           ) : (
             <div className="grid gap-6">
               {assets.map(asset => (
-                <Card key={asset.id} className="overflow-hidden border-border/50">
-                  <div className="bg-primary/5 px-6 py-3 border-b border-border/50 flex justify-between items-center">
+                  <Card key={asset.id} className="engine-card overflow-hidden border-border/50">
+                   <div className="flex items-center justify-between border-b border-border/50 bg-primary/[.035] px-5 py-3">
                     <Badge variant="outline" className="uppercase text-[10px] tracking-wider">{asset.type}</Badge>
                     <span className="text-xs text-muted-foreground">{new Date(asset.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-xl font-medium">{asset.title}</CardTitle>
-                    <div className="flex items-start gap-2 mt-2 p-3 bg-secondary/30 rounded-md border border-border/50">
+                   <CardHeader className="p-5">
+                     <CardTitle className="text-lg font-medium">{asset.title}</CardTitle>
+                     <div className="mt-3 flex items-start gap-2 border border-border/50 bg-secondary/30 p-3">
                       <GitMerge className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                       <p className="text-xs text-muted-foreground italic leading-relaxed">
                         <span className="font-semibold text-foreground not-italic">Lineage: </span> 
@@ -108,7 +109,7 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
                       </p>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                   <CardContent className="px-5 pb-5">
                     <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/80 leading-relaxed whitespace-pre-wrap">
                       {asset.content}
                     </div>
@@ -120,8 +121,8 @@ export function AssetWorkspace({ title, description, allowedTypes, emptyMessage 
         </div>
 
         <div className="space-y-6">
-          <Card className="sticky top-6 border-primary/20 bg-card">
-            <CardHeader className="bg-primary/5 border-b border-border/50">
+           <Card className="engine-card sticky top-6 border-primary/25 bg-primary/[.025]">
+             <CardHeader className="border-b border-border/50 bg-primary/[.035]">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Sparkles className="h-5 w-5 text-primary" /> Generate Asset
               </CardTitle>

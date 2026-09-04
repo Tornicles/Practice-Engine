@@ -46,13 +46,14 @@ export default function Settings() {
   if (isLoading) return <div className="p-8">Loading settings...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="mx-auto max-w-3xl space-y-7 animate-in fade-in duration-500">
       <div>
-        <h1 className="font-serif text-3xl font-medium tracking-tight mb-2">Settings</h1>
-        <p className="text-muted-foreground">Manage your coach profile and system preferences.</p>
+        <div className="engine-kicker mb-3">SYSTEM / PROFILE</div>
+        <h1 className="engine-section-title">Settings</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Manage your coach profile and system preferences.</p>
       </div>
 
-      <Card>
+      <Card className="engine-card">
         <CardHeader>
           <CardTitle>Coach Profile</CardTitle>
           <CardDescription>This information contextualizes the AI's intelligence generation.</CardDescription>

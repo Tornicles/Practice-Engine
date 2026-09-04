@@ -41,11 +41,11 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         
         <div className="mb-10 text-center space-y-4">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[0_0_30px_rgba(212,175,55,0.3)] mb-4">
+           <div className="mb-4 inline-flex h-12 w-12 items-center justify-center border border-primary/60 bg-primary/10 text-primary">
             <Zap className="h-8 w-8" />
           </div>
           <h1 className="font-serif text-3xl font-medium tracking-tight">Practice Engine</h1>
@@ -54,7 +54,7 @@ export default function Onboarding() {
           </p>
         </div>
 
-        <Card className="border-border/50 bg-card/80 backdrop-blur">
+         <Card className="engine-card bg-card">
           {step === 1 && (
             <>
               <CardHeader>
@@ -66,7 +66,7 @@ export default function Onboarding() {
                   <Label htmlFor="name">Your Name</Label>
                   <Input 
                     id="name" 
-                    placeholder="Jane Doe" 
+                     placeholder="Your name" 
                     value={formData.name}
                     onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
                   />
