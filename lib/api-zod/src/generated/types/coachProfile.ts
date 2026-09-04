@@ -5,6 +5,7 @@
  * Practice Engine API
  * OpenAPI spec version: 0.1.0
  */
+import type { OnboardingData } from './onboardingData';
 
 export interface CoachProfile {
   id: number;
@@ -17,6 +18,7 @@ export interface CoachProfile {
   workingPreferences: string;
   onboardingStep: number;
   onboardingCompleted: boolean;
+  onboardingData: OnboardingData;
   practiceScore: number;
   streak: number;
   updatedAt: Date;

@@ -60,6 +60,46 @@ async function getOrCreateProfile(userId: string) {
   return concurrentProfile;
 }
 
+async function validateOnboardingReferences(
+  userId: string,
+  onboardingData: {
+    practice?: { sessionId?: number };
+    firstExperience?: { experienceId?: number };
+  } | undefined,
+): Promise<string | undefined> {
+  const sessionId = onboardingData?.practice?.sessionId;
+  if (sessionId) {
+    const [session] = await db
+      .select({ id: practiceSessionsTable.id })
+      .from(practiceSessionsTable)
+      .where(
+        and(
+          eq(practiceSessionsTable.id, sessionId),
+          eq(practiceSessionsTable.userId, userId),
+        ),
+      )
+      .limit(1);
+    if (!session) return "Practice session not found.";
+  }
+
+  const experienceId = onboardingData?.firstExperience?.experienceId;
+  if (experienceId) {
+    const [experience] = await db
+      .select({ id: experiencesTable.id })
+      .from(experiencesTable)
+      .where(
+        and(
+          eq(experiencesTable.id, experienceId),
+          eq(experiencesTable.userId, userId),
+        ),
+      )
+      .limit(1);
+    if (!experience) return "Experience not found.";
+  }
+
+  return undefined;
+}
+
 router.get("/practice/profile", async (req, res): Promise<void> => {
   const profile = await getOrCreateProfile(authenticatedUserId(req));
   res.json(GetPracticeProfileResponse.parse(profile));
@@ -74,6 +114,15 @@ router.patch("/practice/profile", async (req, res): Promise<void> => {
   }
 
   const userId = authenticatedUserId(req);
+  const referenceError = await validateOnboardingReferences(
+    userId,
+    parsed.data.onboardingData,
+  );
+  if (referenceError) {
+    res.status(404).json({ error: referenceError });
+    return;
+  }
+
   const profile = await getOrCreateProfile(userId);
   const [updated] = await db
     .update(coachProfilesTable)
@@ -175,6 +224,19 @@ router.get("/practice/overview", async (req, res): Promise<void> => {
   ]
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .slice(0, 5);
+  const ratings = profile.onboardingData.skillRatings;
+  const skills = [
+    ["Questioning", ratings?.questioning],
+    ["Listening", ratings?.listening],
+    ["Reframing", ratings?.reframing],
+    ["Challenging", ratings?.challenging],
+  ].map(([name, rating], index) => ({
+    name: String(name),
+    score: typeof rating === "number" ? rating * 10 : [82, 76, 61, 58][index]!,
+    trend: typeof rating === "number" ? "Self-assessed" : ["Improving", "Steady", "Developing", "Priority"][index]!,
+  }));
+  const primaryGoal = profile.onboardingData.goals?.primaryGoal ?? profile.goal;
+  const firstBuild = profile.onboardingData.build?.firstBuild?.title;
 
   res.json(
     GetPracticeOverviewResponse.parse({
@@ -185,18 +247,13 @@ router.get("/practice/overview", async (req, res): Promise<void> => {
       frameworkCount: assets.filter((asset) => asset.type === "framework").length,
       ipAssetCount: assets.length,
       practiceSessionCount: sessions.length,
-      skills: [
-        { name: "Questioning", score: 82, trend: "Improving" },
-        { name: "Listening", score: 76, trend: "Steady" },
-        { name: "Reframing", score: 61, trend: "Developing" },
-        { name: "Challenge", score: 58, trend: "Priority" },
-      ],
+       skills,
       jobs: [
         {
           id: "practice-resistance",
           kind: "Practice",
           title: "Resistance drill",
-          description: "Coach an executive who challenges every question.",
+          description: `Practice toward ${primaryGoal}.`,
           duration: "10 min",
         },
         {
@@ -209,8 +266,10 @@ router.get("/practice/overview", async (req, res): Promise<void> => {
         {
           id: "build-framework",
           kind: "Build",
-          title: "Advance one principle",
-          description: "Connect a validated principle to your signature method.",
+          title: firstBuild ?? "Advance one principle",
+          description: firstBuild
+            ? "Move your first onboarding build forward."
+            : "Connect a validated principle to your signature method.",
           duration: "15 min",
         },
       ],

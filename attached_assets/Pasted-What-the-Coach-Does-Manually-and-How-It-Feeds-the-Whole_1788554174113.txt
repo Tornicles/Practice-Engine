@@ -1,0 +1,739 @@
+What the Coach Does Manually — and How It Feeds the Whole Practice Engine
+
+The important distinction is:
+
+The coach provides the real-world input. The Practice Engine organizes, analyzes, connects, evaluates, and turns that input into development and assets.
+
+The coach should do meaningful work inside every dashboard. The AI should not simply generate everything for them.
+
+1. HOME
+What the coach does manually
+
+The coach primarily reviews and chooses what to do.
+
+They can:
+
+Review today's priorities
+Review development progress
+Review recent practice performance
+Review experiences captured
+Review methodology/IP being developed
+Review active courses/products
+Review proof and outcomes
+Start today's recommended activities
+Override/customize today's priorities when appropriate
+What it contributes
+
+Home doesn't primarily create information.
+
+It orchestrates information from the entire system.
+
+Example:
+
+Practice Simulator says questioning is weak
+
+Delivery Studio shows the same issue in real sessions
+Coach Lab has a relevant lesson
+→ Home recommends questioning practice today.
+
+Home = Command Center.
+
+2. TODAY
+What the coach does manually
+
+The coach completes their daily work.
+
+The system can give them three core jobs:
+
+Job 1 — Practice
+
+Complete a coaching exercise or simulation.
+
+Job 2 — Reflect
+
+Record something from real coaching.
+
+Job 3 — Build
+
+Develop an asset from their accumulated knowledge.
+
+The coach marks work complete, writes reflections, completes exercises, practices scenarios, or develops an asset.
+
+What it contributes
+
+Today's work feeds multiple systems simultaneously.
+
+For example:
+
+Practice → Skill Performance
+
+Reflection → Experience Vault
+
+Build → Methodology / Content / Course / Product
+
+Today = Execution Layer.
+
+3. COACH LAB
+What the coach does manually
+
+The coach:
+
+Takes lessons
+Reads learning material
+Answers questions
+Completes exercises
+Makes decisions in coaching scenarios
+Performs assessments
+Reflects on their understanding
+Completes development challenges
+Applies concepts to their own coaching
+
+The coach isn't simply watching videos.
+
+They must demonstrate understanding and application.
+
+What it contributes
+
+It develops the coach's:
+
+Knowledge
+Coaching judgment
+Techniques
+Mental models
+Decision-making
+Coaching capability
+
+Those results feed the Coach Passport and influence future practice recommendations.
+
+Coach Lab = Development.
+
+4. PRACTICE SIMULATOR
+What the coach does manually
+
+The coach actually coaches.
+
+They interact with an AI client.
+
+For example:
+
+Client is resistant.
+
+The coach:
+
+Asks questions
+Listens
+Responds
+Challenges
+Reframes
+Chooses interventions
+Handles resistance
+Attempts to move the conversation forward
+
+They can then:
+
+Review evaluation
+See missed opportunities
+Retry the scenario
+Try a different approach
+Compare attempts
+What it contributes
+
+The simulator produces demonstrated performance data.
+
+It can identify:
+
+Strong skills
+Weak skills
+Recurring mistakes
+Intervention patterns
+Judgment problems
+Improvement over time
+
+That data feeds:
+
+Coach Lab → Today → Coach Passport → Development Plan
+
+Practice Simulator = Skill Demonstration.
+
+5. DELIVERY STUDIO
+What the coach does manually
+
+Before a real coaching session:
+
+Define client/session context
+Define objective
+Identify what they want to accomplish
+Think through potential challenges
+Choose their intended approach
+
+After the session:
+
+Record what happened
+Reflect on the conversation
+Identify what worked
+Identify what didn't
+Identify surprises
+Evaluate their own performance
+Record what they would do differently
+What it contributes
+
+This creates real-world coaching evidence.
+
+It connects:
+
+Simulation performance
+
+with
+
+Actual coaching performance.
+
+It also produces experiences for the Experience Vault.
+
+Delivery Studio = Real-World Practice Data.
+
+6. EXPERIENCE VAULT
+What the coach does manually
+
+The coach captures experiences.
+
+They can create an experience record containing:
+
+What happened
+Who/what was involved
+Situation
+Problem
+What they initially thought
+What they did
+What happened
+What surprised them
+What they learned
+What they would do differently
+
+They can also add:
+
+Stories
+Examples
+Client situations
+Observations
+Mistakes
+Successes
+Lessons
+Reflections
+What it contributes
+
+This becomes the raw material for the coach's intellectual property.
+
+The system can help transform:
+
+Experience → Lesson
+
+Lesson → Principle
+
+Principle → Framework
+
+Framework → Methodology
+
+Experience → Story
+
+Experience → Case Study
+
+Experience → Content
+
+Experience → Course Material
+
+Experience Vault = Source of Experience.
+
+7. METHODOLOGY
+What the coach does manually
+
+The coach works on their own way of thinking and coaching.
+
+They:
+
+Review potential principles
+Validate or reject AI suggestions
+Edit principles
+Explain how they coach
+Define processes
+Organize frameworks
+Name frameworks
+Add examples
+Add exercises
+Test frameworks against real experiences
+Refine their methodology
+
+The system should always make it clear:
+
+AI proposes. Coach validates.
+
+What it contributes
+
+This creates the coach's proprietary intellectual foundation.
+
+It feeds:
+
+Brand
+Content
+Courses
+Workshops
+Offers
+Products
+Coaching delivery
+
+Methodology = Intellectual Property Engine.
+
+8. BRAND LAB
+What the coach does manually
+
+The coach defines and refines:
+
+Who they help
+Who they want to help
+What they want to be known for
+Problems they solve
+Their beliefs
+Their point of view
+Their story
+Their differentiation
+Their promise
+Their voice
+Their positioning
+
+They review AI-generated suggestions and decide:
+
+Keep / Edit / Reject
+
+What it contributes
+
+The Brand Lab turns the coach's actual expertise and methodology into market positioning.
+
+It informs:
+
+Content
+Offers
+Courses
+Messaging
+Profile
+Authority building
+Audience development
+
+Brand Lab = Market Identity.
+
+9. CONTENT STUDIO
+What the coach does manually
+
+The coach:
+
+Chooses topics
+Adds their opinions
+Adds experiences
+Adds stories
+Adds examples
+Records videos
+Writes or edits content
+Selects content formats
+Reviews AI drafts
+Approves final content
+Publishes
+
+The system should not simply manufacture generic posts.
+
+It should pull from:
+
+Experience + Methodology + Brand + Proof
+
+What it contributes
+
+It converts internal expertise into external authority.
+
+For example:
+
+Experience
+
+→ lesson
+
+→ framework
+
+→ LinkedIn post
+
+→ video
+
+→ podcast
+
+→ article
+
+→ lead magnet.
+
+Content Studio = Authority Distribution.
+
+10. COURSE BUILDER
+What the coach does manually
+
+The coach builds the course through guided work.
+
+They:
+
+Choose the transformation
+Define the learner
+Select relevant experiences
+Explain lessons
+Validate principles
+Organize modules
+Write lesson material
+Create exercises
+Create assignments
+Add stories
+Add case studies
+Create assessments
+Add resources
+Review AI structure
+Edit content
+Test the course
+
+The system should continually ask:
+
+“What do you actually know from experience that belongs here?”
+
+What it contributes
+
+It transforms expertise into structured educational IP.
+
+Experience
+
+→ Expertise
+
+→ Methodology
+
+→ Curriculum
+
+→ Course
+
+→ Teaching
+
+→ Feedback
+
+→ Improved course
+
+Course Builder = Expertise-to-Education Engine.
+
+11. OFFERS & PRODUCTS
+What the coach does manually
+
+The coach decides:
+
+What they want to sell
+Who it is for
+Transformation
+Delivery format
+Duration
+Pricing
+Packaging
+Included components
+Requirements
+Positioning
+Offer structure
+
+They can create:
+
+Coaching programs
+Group programs
+Workshops
+Masterclasses
+Courses
+Assessments
+Toolkits
+Digital products
+What it contributes
+
+It converts expertise and IP into commercial offers.
+
+The system can connect the offer back to:
+
+Brand
+Methodology
+Content
+Proof
+Courses
+Client outcomes
+
+Offers & Products = Commercialization.
+
+12. PROOF & OUTCOMES
+What the coach does manually
+
+The coach records actual results.
+
+They can capture:
+
+Client baseline
+Goals
+Progress
+Outcomes
+Metrics
+Feedback
+Testimonials
+Case studies
+Before/after situations
+Lessons from outcomes
+
+They should verify what is actually supported.
+
+What it contributes
+
+Proof strengthens almost everything else.
+
+Proof → Brand credibility
+
+Proof → Content
+
+Proof → Sales
+
+Proof → Offers
+
+Proof → Course marketing
+
+Proof → Authority
+
+Proof → Methodology refinement
+
+Proof & Outcomes = Evidence Layer.
+
+13. COACH PASSPORT
+What the coach does manually
+
+The coach reviews and controls their professional identity.
+
+They can:
+
+Edit profile information
+Review skills
+Review experience
+Review expertise
+Review methodology
+Review brand
+Review IP
+Review courses
+Review products
+Review proof
+Review development history
+
+They can correct information when necessary.
+
+What it contributes
+
+The Passport becomes the persistent context for the entire AI system.
+
+When the coach asks the system for help, the AI doesn't start from zero.
+
+It knows:
+
+Who this coach is
+What they know
+What they've experienced
+How they coach
+What they're building
+What they're good at
+Where they're weak
+What they've already created
+What proof they have
+
+Coach Passport = Persistent Coach Context.
+
+How the Manual Work Connects
+
+The important part is that one action should often create value in multiple places.
+
+For example:
+
+A coach finishes a difficult client session.
+
+They open Delivery Studio.
+
+They record:
+
+“The client kept saying they wanted accountability, but every time I challenged them, they became defensive.”
+
+That creates an Experience Record.
+
+↓
+
+Experience Vault asks:
+
+What did you learn?
+
+Coach writes:
+
+“I realized the client wanted accountability imposed on them rather than taking ownership.”
+
+↓
+
+The system identifies a potential principle:
+
+Ownership must precede accountability.
+
+Coach validates it.
+
+↓
+
+Methodology now contains a potential principle.
+
+↓
+
+The coach develops:
+
+Ownership → Diagnosis → Alignment → Commitment
+
+↓
+
+Content Studio turns it into content.
+
+↓
+
+Course Builder uses it as a lesson.
+
+↓
+
+Offers & Products can eventually use it in a coaching program.
+
+↓
+
+A real client applies it.
+
+↓
+
+Proof & Outcomes captures the result.
+
+↓
+
+That proof strengthens the Brand Lab.
+
+↓
+
+The stronger brand attracts more relevant clients.
+
+↓
+
+The coach gets more real experiences.
+
+↓
+
+Those experiences return to the Experience Vault.
+
+And the cycle continues.
+
+The Real Data Flow
+
+The system can therefore be understood as five layers:
+
+1. EXPERIENCE
+
+Delivery Studio + Experience Vault
+
+The coach lives, coaches, observes, reflects and records.
+
+↓
+
+2. DEVELOPMENT
+
+Coach Lab + Practice Simulator
+
+The coach learns, practices, gets evaluated and improves.
+
+↓
+
+3. EXPERTISE
+
+Experience Vault + Methodology
+
+Experience becomes lessons, principles, frameworks and methodology.
+
+↓
+
+4. AUTHORITY & IP
+
+Brand + Content + Courses
+
+Expertise becomes positioning, authority, education and intellectual property.
+
+↓
+
+5. BUSINESS
+
+Offers + Proof
+
+Expertise becomes products, clients, outcomes and evidence.
+
+The Complete Practice Engine Loop
+                    COACH
+                      │
+                      ▼
+              ┌───────────────┐
+              │   COACH LAB   │
+              │    LEARN      │
+              └───────┬───────┘
+                      ▼
+              ┌───────────────┐
+              │    PRACTICE   │
+              │   SIMULATOR   │
+              └───────┬───────┘
+                      ▼
+              ┌───────────────┐
+              │    DELIVERY   │
+              │     STUDIO    │
+              └───────┬───────┘
+                      ▼
+              ┌───────────────┐
+              │   EXPERIENCE  │
+              │     VAULT     │
+              └───────┬───────┘
+                      ▼
+              ┌───────────────┐
+              │  METHODOLOGY  │
+              └───────┬───────┘
+                      │
+             ┌────────┼────────┐
+             ▼        ▼        ▼
+          BRAND    CONTENT   COURSE
+             │        │        │
+             └────────┼────────┘
+                      ▼
+              ┌───────────────┐
+              │    OFFERS &   │
+              │    PRODUCTS   │
+              └───────┬───────┘
+                      ▼
+              ┌───────────────┐
+              │     REAL      │
+              │    CLIENTS    │
+              └───────┬───────┘
+                      ▼
+              ┌───────────────┐
+              │    PROOF &    │
+              │    OUTCOMES   │
+              └───────┬───────┘
+                      │
+                      ▼
+                    BRAND
+                      │
+                      ▼
+                 MORE CLIENTS
+                      │
+                      ▼
+                MORE EXPERIENCE
+                      │
+                      └──────────► LOOP
+
+And Coach Passport sits across the entire system, maintaining the coach's evolving identity, while the 1k Prompts intelligence layer sits underneath the entire system, determining how the system interprets context, asks questions, evaluates work, generates guidance, and recommends the next action.
+
+The fundamental rule
+
+The coach does the work.
+
+The system does four things with that work:
+
+Captures it
+Evaluates it
+Connects it
+Turns it into the next opportunity for development or creation
+
+That is what makes this a Practice Engine, rather than simply a collection of coaching software dashboards.

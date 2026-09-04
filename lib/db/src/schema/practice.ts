@@ -15,6 +15,121 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
+const onboardingText = z.string().max(10_000);
+
+/**
+ * A deliberately additive document. Individual onboarding screens may save
+ * independently, so all fields are optional and profiles created before the
+ * 15-step flow remain valid.
+ */
+export const onboardingDataSchema = z.object({
+  goals: z.object({
+    primaryGoal: onboardingText.optional(),
+    outcomes: z.array(onboardingText).max(20).optional(),
+    motivations: z.array(onboardingText).max(20).optional(),
+  }).optional(),
+  profileDetails: z.object({
+    name: onboardingText.optional(),
+    niche: onboardingText.optional(),
+    audience: onboardingText.optional(),
+    yearsCoaching: z.number().min(0).max(100).optional(),
+    currentStage: onboardingText.optional(),
+    coachingTypes: z.array(onboardingText).max(20).optional(),
+  }).optional(),
+  experienceDiscovery: z.record(z.string(), z.union([onboardingText, z.number(), z.boolean(), z.array(onboardingText)])).optional(),
+  skillRatings: z.object({
+    listening: z.number().int().min(1).max(5).optional(),
+    questioning: z.number().int().min(1).max(5).optional(),
+    reframing: z.number().int().min(1).max(5).optional(),
+    challenging: z.number().int().min(1).max(5).optional(),
+    accountability: z.number().int().min(1).max(5).optional(),
+    sessionStructure: z.number().int().min(1).max(5).optional(),
+    handlingResistance: z.number().int().min(1).max(5).optional(),
+    interventionSelection: z.number().int().min(1).max(5).optional(),
+    coachingJudgment: z.number().int().min(1).max(5).optional(),
+  }).optional(),
+  miniScenario: z.object({
+    choice: onboardingText.optional(),
+    evaluation: onboardingText.optional(),
+    score: z.number().min(0).max(100).optional(),
+  }).optional(),
+  practice: z.object({
+    sessionId: z.number().int().positive().optional(),
+    result: onboardingText.optional(),
+    skipped: z.boolean().optional(),
+  }).optional(),
+  development: z.object({
+    modes: z.array(onboardingText).max(10).optional(),
+    dailyTimeCommitment: z.enum(["10", "15", "30", "45", "60+"]).optional(),
+    minutesPerWeek: z.number().int().min(0).max(10_080).optional(),
+    schedule: onboardingText.optional(),
+  }).optional(),
+  brand: z.object({
+    discovery: z.record(z.string(), onboardingText).optional(),
+    reviewState: z.enum(["draft", "reviewed", "accepted", "editing"]).optional(),
+  }).optional(),
+  methodology: z.object({
+    discovery: z.record(z.string(), onboardingText).optional(),
+    candidates: z.array(z.object({ title: onboardingText, description: onboardingText.optional() })).max(20).optional(),
+    reviewState: z.enum(["draft", "keep", "edit", "discard"]).optional(),
+  }).optional(),
+  build: z.object({
+    ambitions: z.array(onboardingText).max(20).optional(),
+    firstBuild: z.object({ title: onboardingText.optional(), type: onboardingText.optional(), description: onboardingText.optional() }).optional(),
+  }).optional(),
+  firstExperience: z.object({
+    experienceId: z.number().int().positive().optional(),
+    captureState: z.enum(["draft", "saved", "skipped"]).optional(),
+    whatHappened: onboardingText.optional(),
+    whoWasInvolved: onboardingText.optional(),
+    whatDidYouDo: onboardingText.optional(),
+    whatWereYouThinking: onboardingText.optional(),
+    whatWorked: onboardingText.optional(),
+    whatDidNotWork: onboardingText.optional(),
+    whatDidYouLearn: onboardingText.optional(),
+    whatWillYouDoDifferently: onboardingText.optional(),
+  }).optional(),
+  experienceAnalysis: z.object({
+    experience: onboardingText.optional(),
+    lesson: onboardingText.optional(),
+    principle: onboardingText.optional(),
+    framework: onboardingText.optional(),
+    reviewState: z.enum(["draft", "reviewed", "accepted", "editing"]).optional(),
+    notes: onboardingText.optional(),
+  }).optional(),
+  firstChallenge: z.object({
+    result: onboardingText.optional(),
+    score: z.number().min(0).max(100).optional(),
+    completed: z.boolean().optional(),
+    overallScore: z.number().min(0).max(100).optional(),
+    questioningScore: z.number().min(0).max(100).optional(),
+    listeningScore: z.number().min(0).max(100).optional(),
+    reframingScore: z.number().min(0).max(100).optional(),
+    challengingScore: z.number().min(0).max(100).optional(),
+    accountabilityScore: z.number().min(0).max(100).optional(),
+    strengths: z.array(onboardingText).max(20).optional(),
+    improvements: z.array(onboardingText).max(20).optional(),
+  }).optional(),
+  thirtyDayPlan: z.object({
+    plan: z.array(onboardingText).max(31).optional(),
+    sections: z.object({
+      foundation: z.array(onboardingText).max(31).optional(),
+      practice: z.array(onboardingText).max(31).optional(),
+      reflection: z.array(onboardingText).max(31).optional(),
+      building: z.array(onboardingText).max(31).optional(),
+      milestones: z.array(onboardingText).max(31).optional(),
+    }).optional(),
+    accepted: z.boolean().optional(),
+    customization: onboardingText.optional(),
+  }).optional(),
+  passport: z.object({
+    reviewed: z.boolean().optional(),
+    notes: onboardingText.optional(),
+  }).optional(),
+}).passthrough();
+
+export type OnboardingData = z.infer<typeof onboardingDataSchema>;
+
 export const coachProfilesTable = pgTable("coach_profiles", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull().unique().default("legacy"),
@@ -27,6 +142,10 @@ export const coachProfilesTable = pgTable("coach_profiles", {
   workingPreferences: text("working_preferences").notNull().default("Challenge me; require evidence; preserve my voice"),
   onboardingStep: integer("onboarding_step").notNull().default(1),
   onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
+  onboardingData: jsonb("onboarding_data")
+    .$type<OnboardingData>()
+    .notNull()
+    .default({}),
   practiceScore: integer("practice_score").notNull().default(74),
   streak: integer("streak").notNull().default(17),
   updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -206,7 +325,10 @@ export const intelligenceRateLimitsTable = pgTable("intelligence_rate_limits", {
     .defaultNow(),
 });
 
-export const insertCoachProfileSchema = createInsertSchema(coachProfilesTable).omit({
+export const insertCoachProfileSchema = createInsertSchema(coachProfilesTable, {
+  onboardingStep: z.number().int().min(1).max(15),
+  onboardingData: onboardingDataSchema,
+}).omit({
   id: true,
   userId: true,
   updatedAt: true,

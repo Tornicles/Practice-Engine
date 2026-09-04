@@ -5,6 +5,7 @@
  * Practice Engine API
  * OpenAPI spec version: 0.1.0
  */
+import type { OnboardingData } from './onboardingData';
 
 export interface CoachProfileUpdate {
   /** @minLength 1 */
@@ -17,8 +18,9 @@ export interface CoachProfileUpdate {
   workingPreferences?: string;
   /**
      * @minimum 1
-     * @maximum 4
+     * @maximum 15
      */
   onboardingStep?: number;
   onboardingCompleted?: boolean;
+  onboardingData?: OnboardingData;
 }

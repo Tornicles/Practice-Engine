@@ -1,2 +1,2 @@
-export * from "./generated/api.ts";
-export type * from "./generated/types/index.ts";
+export * from './generated/api.ts';
+export * from './generated/types/index.ts';

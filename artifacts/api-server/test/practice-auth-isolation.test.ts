@@ -323,3 +323,126 @@ test("Practice APIs reject anonymous access and isolate every user-owned resourc
     );
   }
 });
+
+test("Onboarding accepts all 15 steps, resumes JSON state, and protects linked records", async () => {
+  const testId = randomUUID();
+  const aliceId = `onboarding-alice-${testId}`;
+  const bobId = `onboarding-bob-${testId}`;
+  const server = await startServer();
+
+  try {
+    const initial = await server.request("/practice/profile", { userId: aliceId });
+    assert.equal(initial.status, 200);
+    assert.deepEqual(initial.body.onboardingData, {});
+
+    const invalidStep = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: { onboardingStep: 16 },
+    });
+    assert.equal(invalidStep.status, 400);
+
+    const bobSession = await server.request("/practice/sessions", {
+      method: "POST",
+      userId: bobId,
+      body: {
+        scenario: "Bob onboarding practice",
+        category: "Questioning",
+        score: 85,
+        feedback: "Private session",
+      },
+    });
+    assert.equal(bobSession.status, 201);
+
+    const crossAccountReference = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: {
+        onboardingStep: 6,
+        onboardingData: { practice: { sessionId: bobSession.body.id } },
+      },
+    });
+    assert.equal(crossAccountReference.status, 404);
+
+    const ownSession = await server.request("/practice/sessions", {
+      method: "POST",
+      userId: aliceId,
+      body: {
+        scenario: "Alice onboarding practice",
+        category: "Questioning",
+        score: 91,
+        feedback: "Strong curiosity",
+      },
+    });
+    assert.equal(ownSession.status, 201);
+
+    const onboardingData = {
+      goals: { primaryGoal: "Build a durable coaching practice" },
+      skillRatings: {
+        questioning: 5,
+        listening: 4,
+        reframing: 4,
+        challenging: 3,
+        accountability: 4,
+        sessionStructure: 3,
+        handlingResistance: 3,
+        interventionSelection: 4,
+        coachingJudgment: 4,
+      },
+      practice: { sessionId: ownSession.body.id, result: "completed" },
+      development: { dailyTimeCommitment: "30" },
+      firstExperience: {
+        whatHappened: "A client hesitated over a decision.",
+        whoWasInvolved: "Coach and client",
+        whatDidYouDo: "Asked a clarifying question.",
+        whatWereYouThinking: "Slow the moment down.",
+        whatWorked: "The client named the concern.",
+        whatDidNotWork: "I rushed the close.",
+        whatDidYouLearn: "Leave more silence.",
+        whatWillYouDoDifferently: "Pause before reframing.",
+      },
+      experienceAnalysis: {
+        experience: "Decision hesitation",
+        lesson: "Name the underlying concern",
+        principle: "Pause before advice",
+        framework: "Decision pause",
+        reviewState: "accepted",
+      },
+      firstChallenge: {
+        completed: true,
+        result: "completed",
+        overallScore: 82,
+        questioningScore: 90,
+        listeningScore: 85,
+        reframingScore: 75,
+        challengingScore: 70,
+        accountabilityScore: 80,
+      },
+      thirtyDayPlan: {
+        sections: { practice: ["Practice daily"], reflection: ["Reflect weekly"] },
+        accepted: true,
+        customization: "Keep weekends open",
+      },
+      passport: { reviewed: true },
+    };
+    const saved = await server.request("/practice/profile", {
+      method: "PATCH",
+      userId: aliceId,
+      body: { onboardingStep: 15, onboardingCompleted: true, onboardingData },
+    });
+    assert.equal(saved.status, 200);
+    assert.equal(saved.body.onboardingStep, 15);
+    assert.deepEqual(saved.body.onboardingData, onboardingData);
+
+    const resumed = await server.request("/practice/profile", { userId: aliceId });
+    assert.equal(resumed.status, 200);
+    assert.equal(resumed.body.onboardingCompleted, true);
+    assert.deepEqual(resumed.body.onboardingData, onboardingData);
+  } finally {
+    await server.close();
+    await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, aliceId));
+    await db.delete(practiceSessionsTable).where(eq(practiceSessionsTable.userId, bobId));
+    await db.delete(coachProfilesTable).where(eq(coachProfilesTable.userId, aliceId));
+    await db.delete(coachProfilesTable).where(eq(coachProfilesTable.userId, bobId));
+  }
+});

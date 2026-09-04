@@ -1,65 +1,105 @@
-import React, { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Platform, View, StyleSheet, Text, Pressable } from 'react-native';
 import { Redirect } from 'expo-router';
-import { useGetPracticeProfile, useUpdatePracticeProfile } from '@workspace/api-client-react';
-import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
-import { Button, Field, ScreenTitle, State } from '@/components/UI';
-import { useColors } from '@/hooks/useColors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
+import { State } from '@/components/UI';
+import { useColors } from '@/hooks/useColors';
+import { Feather } from '@expo/vector-icons';
+import { useGetPracticeProfile, useUpdatePracticeProfile, CoachProfileUpdate } from '@workspace/api-client-react';
 
-const steps = [
-  { title: 'Your practice', fields: [['name', 'Name', 'What should we call you?']] },
-  { title: 'Your craft', fields: [['niche', 'Coaching niche', 'What kind of coaching do you do?'], ['experienceLevel', 'Experience level', 'How would you describe your experience?']] },
-  { title: 'Your clients', fields: [['audience', 'Audience', 'Who do you serve?'], ['goal', 'Primary goal', 'What outcome matters most now?']] },
-  { title: 'Your direction', fields: [['developmentFocus', 'Development focus', 'What capability are you deliberately building?'], ['workingPreferences', 'Working preferences', 'How do you prefer to practice?']] },
-] as const;
+import {
+  Step1Welcome, Step2Goals, Step3Profile, Step4Experience,
+  Step5Skills, Step6Development, Step7Brand, Step8Methodology,
+  Step9Build, Step10ExperienceCapture, Step11Analysis,
+  Step12FirstChallenge, Step13Plan, Step14Passport
+} from '@/components/onboarding/OnboardingSteps';
 
 export default function Onboarding() {
   const c = useColors();
   const insets = useSafeAreaInsets();
-  const profile = useGetPracticeProfile();
-  const update = useUpdatePracticeProfile();
-  const [selectedStep, setSelectedStep] = useState<number | null>(null);
-  const [draft, setDraft] = useState<Record<string, string>>({});
-  if (profile.isLoading) return <View style={{ flex: 1, backgroundColor: c.background }}><State loading /></View>;
-  if (profile.error || !profile.data) return <View style={{ flex: 1, backgroundColor: c.background }}><State error={profile.error} retry={profile.refetch} /></View>;
-  if (profile.data.onboardingCompleted) return <Redirect href="/(tabs)" />;
+  const profileQuery = useGetPracticeProfile();
+  const updateProfile = useUpdatePracticeProfile();
 
-  const index = selectedStep ?? Math.max(0, profile.data.onboardingStep - 1);
-  const step = steps[index];
-  const fields = step.fields.map(([key, label, placeholder]) => ({ key, label, placeholder, value: draft[key] ?? profile.data[key] ?? '' }));
-  const next = () => {
-    if (update.isPending) return;
-    update.mutate({
-      data: {
-        ...Object.fromEntries(fields.map((field) => [field.key, field.value.trim()])),
-        onboardingStep: Math.min(4, index + 2),
-        onboardingCompleted: index === steps.length - 1,
-      },
+  if (profileQuery.isLoading) return <View style={{ flex: 1, backgroundColor: c.background }}><State loading /></View>;
+  if (profileQuery.error || !profileQuery.data) return <View style={{ flex: 1, backgroundColor: c.background }}><State error={profileQuery.error} retry={profileQuery.refetch} /></View>;
+  if (profileQuery.data.onboardingCompleted) return <Redirect href="/(tabs)" />;
+
+  const profile = profileQuery.data;
+  const currentStep = Math.max(1, Math.min(15, profile.onboardingStep || 1));
+
+  const handleNext = (updates: Partial<CoachProfileUpdate>) => {
+    updateProfile.mutate({
+      data: updates
     }, {
       onSuccess: () => {
-        if (index < steps.length - 1) setSelectedStep(index + 1);
-        void profile.refetch();
-      },
+        void profileQuery.refetch();
+      }
     });
   };
 
-  return <KeyboardAwareScrollViewCompat style={{ flex: 1, backgroundColor: c.background }} contentContainerStyle={[styles.wrap, { paddingTop: Platform.OS === 'web' ? 87 : insets.top + 24 }]} bottomOffset={40}>
-    <View style={styles.inner}>
-      <Text style={[styles.progress, { color: c.primary }]}>SETUP {index + 1} / {steps.length}</Text>
-      <View style={[styles.rule, { backgroundColor: c.border }]}><View style={[styles.fill, { backgroundColor: c.primary, width: `${(index + 1) * 25}%` }]} /></View>
-      <ScreenTitle kicker="Startup Man · private practice profile" title={step.title} detail="This shapes the work Startup Man recommends." />
-      {fields.map((field) => <Field key={field.key} label={field.label} value={field.value} onChangeText={(value) => setDraft((current) => ({ ...current, [field.key]: value }))} placeholder={field.placeholder} />)}
-      <Button testID="onboarding-next" label={update.isPending ? 'Saving your profile' : index === 3 ? 'Enter Startup Man' : 'Continue'} onPress={next} disabled={fields.some((field) => !field.value.trim()) || update.isPending} />
-      {update.error ? <State error={update.error} /> : null}
-    </View>
-  </KeyboardAwareScrollViewCompat>;
+  const handleBack = () => {
+    handleNext({ onboardingStep: Math.max(1, currentStep - 1) });
+  };
+
+  const renderStep = () => {
+    const props = { profile, onNext: handleNext, onBack: handleBack, isSaving: updateProfile.isPending };
+    switch (currentStep) {
+      case 1: return <Step1Welcome {...props} />;
+      case 2: return <Step2Goals {...props} />;
+      case 3: return <Step3Profile {...props} />;
+      case 4: return <Step4Experience {...props} />;
+      case 5: return <Step5Skills {...props} />;
+      case 6: return <Step6Development {...props} />;
+      case 7: return <Step7Brand {...props} />;
+      case 8: return <Step8Methodology {...props} />;
+      case 9: return <Step9Build {...props} />;
+      case 10: return <Step10ExperienceCapture {...props} />;
+      case 11: return <Step11Analysis {...props} />;
+      case 12: return <Step12FirstChallenge {...props} />;
+      case 13: return <Step13Plan {...props} />;
+      case 14: return <Step14Passport {...props} />;
+      default: return null;
+    }
+  };
+
+  return (
+    <KeyboardAwareScrollViewCompat 
+      style={{ flex: 1, backgroundColor: c.background }} 
+      contentContainerStyle={[styles.wrap, { paddingTop: Platform.OS === 'web' ? 87 : insets.top + 24 }]} 
+      bottomOffset={40}
+    >
+      <View style={styles.inner}>
+        {currentStep > 1 && currentStep < 15 && (
+          <View style={styles.header}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Pressable 
+                onPress={handleBack} 
+                disabled={updateProfile.isPending}
+                style={{ opacity: updateProfile.isPending ? 0.5 : 1, paddingVertical: 4, paddingRight: 16 }}
+                hitSlop={8}
+              >
+                <Feather name="arrow-left" size={20} color={c.primary} />
+              </Pressable>
+              <Text style={[styles.progress, { color: c.primary }]}>STEP {currentStep} / 14</Text>
+            </View>
+            <View style={[styles.rule, { backgroundColor: c.border }]}>
+              <View style={[styles.fill, { backgroundColor: c.primary, width: `${(currentStep / 14) * 100}%` }]} />
+            </View>
+          </View>
+        )}
+        {renderStep()}
+        {updateProfile.error ? <State error={updateProfile.error} /> : null}
+      </View>
+    </KeyboardAwareScrollViewCompat>
+  );
 }
 
 const styles = StyleSheet.create({
   wrap: { flexGrow: 1, paddingHorizontal: 20, paddingBottom: 40 },
-  inner: { width: '100%', maxWidth: 520, alignSelf: 'center', gap: 18 },
+  inner: { width: '100%', maxWidth: 520, alignSelf: 'center', gap: 12 },
+  header: { gap: 12, marginBottom: 12 },
   progress: { fontFamily: 'Inter_600SemiBold', fontSize: 11, letterSpacing: 1.4 },
-  rule: { height: 4, width: '100%' },
-  fill: { height: 4 },
+  rule: { height: 4, width: '100%', borderRadius: 2 },
+  fill: { height: 4, borderRadius: 2 },
 });

@@ -20,6 +20,192 @@ export const HealthCheckResponse = zod.object({
 /**
  * @summary Get the workspace overview
  */
+export const getPracticeOverviewResponseProfileOnboardingDataGoalsPrimaryGoalMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataGoalsOutcomesItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataGoalsOutcomesMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataGoalsMotivationsItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataGoalsMotivationsMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsNameMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsNicheMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsAudienceMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsYearsCoachingMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsYearsCoachingMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsCurrentStageMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsCoachingTypesItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataProfileDetailsCoachingTypesMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceDiscoveryOneMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceDiscoveryFourItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsListeningMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsListeningMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsQuestioningMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsQuestioningMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsReframingMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsReframingMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsChallengingMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsChallengingMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsAccountabilityMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsAccountabilityMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsSessionStructureMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsSessionStructureMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsHandlingResistanceMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsHandlingResistanceMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsInterventionSelectionMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsInterventionSelectionMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsCoachingJudgmentMax = 5;
+export const getPracticeOverviewResponseProfileOnboardingDataSkillRatingsCoachingJudgmentMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMiniScenarioChoiceMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMiniScenarioEvaluationMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMiniScenarioScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataMiniScenarioScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataPracticeSessionIdMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataPracticeResultMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataDevelopmentModesItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataDevelopmentModesMax = 10;
+
+export const getPracticeOverviewResponseProfileOnboardingDataDevelopmentMinutesPerWeekMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataDevelopmentMinutesPerWeekMax = 10080;
+export const getPracticeOverviewResponseProfileOnboardingDataDevelopmentMinutesPerWeekMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataDevelopmentScheduleMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataBrandDiscoveryMaxOne = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMethodologyDiscoveryMaxOne = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMethodologyCandidatesItemTitleMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMethodologyCandidatesItemDescriptionMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataMethodologyCandidatesMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataBuildAmbitionsItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataBuildAmbitionsMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataBuildFirstBuildTitleMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataBuildFirstBuildTypeMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataBuildFirstBuildDescriptionMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceExperienceIdMultipleOf = 1;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatHappenedMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhoWasInvolvedMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatDidYouDoMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatWereYouThinkingMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatWorkedMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatDidNotWorkMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatDidYouLearnMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisExperienceMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisLessonMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisPrincipleMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisFrameworkMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisNotesMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeResultMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeOverallScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeOverallScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeQuestioningScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeQuestioningScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeListeningScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeListeningScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeReframingScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeReframingScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeChallengingScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeChallengingScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeAccountabilityScoreMin = 0;
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeAccountabilityScoreMax = 100;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeStrengthsItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeStrengthsMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeImprovementsItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataFirstChallengeImprovementsMax = 20;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanPlanItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanPlanMax = 31;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsFoundationItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsFoundationMax = 31;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsPracticeItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsPracticeMax = 31;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsReflectionItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsReflectionMax = 31;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsBuildingItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsBuildingMax = 31;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsMilestonesItemMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsMilestonesMax = 31;
+
+export const getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanCustomizationMax = 10000;
+
+export const getPracticeOverviewResponseProfileOnboardingDataPassportNotesMax = 10000;
+
+
+
 export const GetPracticeOverviewResponse = zod.object({
   "profile": zod.object({
   "id": zod.number(),
@@ -32,6 +218,118 @@ export const GetPracticeOverviewResponse = zod.object({
   "workingPreferences": zod.string(),
   "onboardingStep": zod.number(),
   "onboardingCompleted": zod.boolean(),
+  "onboardingData": zod.object({
+  "goals": zod.object({
+  "primaryGoal": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataGoalsPrimaryGoalMax).optional(),
+  "outcomes": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataGoalsOutcomesItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataGoalsOutcomesMax).optional(),
+  "motivations": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataGoalsMotivationsItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataGoalsMotivationsMax).optional()
+}).optional(),
+  "profileDetails": zod.object({
+  "name": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsNameMax).optional(),
+  "niche": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsNicheMax).optional(),
+  "audience": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsAudienceMax).optional(),
+  "yearsCoaching": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsYearsCoachingMin).max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsYearsCoachingMax).optional(),
+  "currentStage": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsCurrentStageMax).optional(),
+  "coachingTypes": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsCoachingTypesItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataProfileDetailsCoachingTypesMax).optional()
+}).optional(),
+  "experienceDiscovery": zod.record(zod.string(), zod.union([zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceDiscoveryOneMax),zod.number(),zod.boolean(),zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceDiscoveryFourItemMax))])).optional(),
+  "skillRatings": zod.object({
+  "listening": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsListeningMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsListeningMultipleOf).optional(),
+  "questioning": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsQuestioningMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsQuestioningMultipleOf).optional(),
+  "reframing": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsReframingMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsReframingMultipleOf).optional(),
+  "challenging": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsChallengingMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsChallengingMultipleOf).optional(),
+  "accountability": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsAccountabilityMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsAccountabilityMultipleOf).optional(),
+  "sessionStructure": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsSessionStructureMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsSessionStructureMultipleOf).optional(),
+  "handlingResistance": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsHandlingResistanceMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsHandlingResistanceMultipleOf).optional(),
+  "interventionSelection": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsInterventionSelectionMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsInterventionSelectionMultipleOf).optional(),
+  "coachingJudgment": zod.number().min(1).max(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsCoachingJudgmentMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataSkillRatingsCoachingJudgmentMultipleOf).optional()
+}).optional(),
+  "miniScenario": zod.object({
+  "choice": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataMiniScenarioChoiceMax).optional(),
+  "evaluation": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataMiniScenarioEvaluationMax).optional(),
+  "score": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataMiniScenarioScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataMiniScenarioScoreMax).optional()
+}).optional(),
+  "practice": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(getPracticeOverviewResponseProfileOnboardingDataPracticeSessionIdMultipleOf).optional(),
+  "result": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataPracticeResultMax).optional(),
+  "skipped": zod.boolean().optional()
+}).optional(),
+  "development": zod.object({
+  "modes": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataDevelopmentModesItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataDevelopmentModesMax).optional(),
+  "dailyTimeCommitment": zod.enum(['10', '15', '30', '45', '60+']).optional(),
+  "minutesPerWeek": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataDevelopmentMinutesPerWeekMin).max(getPracticeOverviewResponseProfileOnboardingDataDevelopmentMinutesPerWeekMax).multipleOf(getPracticeOverviewResponseProfileOnboardingDataDevelopmentMinutesPerWeekMultipleOf).optional(),
+  "schedule": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataDevelopmentScheduleMax).optional()
+}).optional(),
+  "brand": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(getPracticeOverviewResponseProfileOnboardingDataBrandDiscoveryMaxOne)).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+}).optional(),
+  "methodology": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(getPracticeOverviewResponseProfileOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
+  "candidates": zod.array(zod.object({
+  "title": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataMethodologyCandidatesItemTitleMax),
+  "description": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataMethodologyCandidatesItemDescriptionMax).optional()
+})).max(getPracticeOverviewResponseProfileOnboardingDataMethodologyCandidatesMax).optional(),
+  "reviewState": zod.enum(['draft', 'keep', 'edit', 'discard']).optional()
+}).optional(),
+  "build": zod.object({
+  "ambitions": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataBuildAmbitionsItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataBuildAmbitionsMax).optional(),
+  "firstBuild": zod.object({
+  "title": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataBuildFirstBuildTitleMax).optional(),
+  "type": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataBuildFirstBuildTypeMax).optional(),
+  "description": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataBuildFirstBuildDescriptionMax).optional()
+}).optional()
+}).optional(),
+  "firstExperience": zod.object({
+  "experienceId": zod.number().min(1).multipleOf(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceExperienceIdMultipleOf).optional(),
+  "captureState": zod.enum(['draft', 'saved', 'skipped']).optional(),
+  "whatHappened": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatHappenedMax).optional(),
+  "whoWasInvolved": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhoWasInvolvedMax).optional(),
+  "whatDidYouDo": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatDidYouDoMax).optional(),
+  "whatWereYouThinking": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatWereYouThinkingMax).optional(),
+  "whatWorked": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatWorkedMax).optional(),
+  "whatDidNotWork": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatDidNotWorkMax).optional(),
+  "whatDidYouLearn": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatDidYouLearnMax).optional(),
+  "whatWillYouDoDifferently": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax).optional()
+}).optional(),
+  "experienceAnalysis": zod.object({
+  "experience": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisExperienceMax).optional(),
+  "lesson": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisLessonMax).optional(),
+  "principle": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisPrincipleMax).optional(),
+  "framework": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisFrameworkMax).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "notes": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataExperienceAnalysisNotesMax).optional()
+}).optional(),
+  "firstChallenge": zod.object({
+  "result": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeResultMax).optional(),
+  "score": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeScoreMax).optional(),
+  "completed": zod.boolean().optional(),
+  "overallScore": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeOverallScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeOverallScoreMax).optional(),
+  "questioningScore": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeQuestioningScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeQuestioningScoreMax).optional(),
+  "listeningScore": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeListeningScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeListeningScoreMax).optional(),
+  "reframingScore": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeReframingScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeReframingScoreMax).optional(),
+  "challengingScore": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeChallengingScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeChallengingScoreMax).optional(),
+  "accountabilityScore": zod.number().min(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeAccountabilityScoreMin).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeAccountabilityScoreMax).optional(),
+  "strengths": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeStrengthsItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeStrengthsMax).optional(),
+  "improvements": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeImprovementsItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataFirstChallengeImprovementsMax).optional()
+}).optional(),
+  "thirtyDayPlan": zod.object({
+  "plan": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanPlanItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanPlanMax).optional(),
+  "sections": zod.object({
+  "foundation": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsFoundationItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsFoundationMax).optional(),
+  "practice": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsPracticeItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsPracticeMax).optional(),
+  "reflection": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsReflectionItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsReflectionMax).optional(),
+  "building": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsBuildingItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsBuildingMax).optional(),
+  "milestones": zod.array(zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsMilestonesItemMax)).max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanSectionsMilestonesMax).optional()
+}).optional(),
+  "accepted": zod.boolean().optional(),
+  "customization": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataThirtyDayPlanCustomizationMax).optional()
+}).optional(),
+  "passport": zod.object({
+  "reviewed": zod.boolean().optional(),
+  "notes": zod.string().max(getPracticeOverviewResponseProfileOnboardingDataPassportNotesMax).optional()
+}).optional()
+}).describe('Additive, resumable state for the 15-step coach onboarding. Every property is optional so profiles created before onboarding data existed remain valid and each step can be persisted independently.'),
   "practiceScore": zod.number(),
   "streak": zod.number(),
   "updatedAt": zod.coerce.date()
@@ -67,6 +365,192 @@ export const GetPracticeOverviewResponse = zod.object({
 /**
  * @summary Get the coach profile
  */
+export const getPracticeProfileResponseOnboardingDataGoalsPrimaryGoalMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataGoalsOutcomesItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataGoalsOutcomesMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataGoalsMotivationsItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataGoalsMotivationsMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsNameMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsNicheMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsAudienceMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMin = 0;
+export const getPracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsCurrentStageMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataExperienceDiscoveryOneMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataExperienceDiscoveryFourItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsListeningMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsListeningMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsQuestioningMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsQuestioningMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsReframingMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsReframingMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsChallengingMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsChallengingMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMax = 5;
+export const getPracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataMiniScenarioChoiceMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataMiniScenarioEvaluationMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataMiniScenarioScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataMiniScenarioScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataPracticeSessionIdMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataPracticeResultMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataDevelopmentModesItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataDevelopmentModesMax = 10;
+
+export const getPracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMin = 0;
+export const getPracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMax = 10080;
+export const getPracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataDevelopmentScheduleMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataBrandDiscoveryMaxOne = 10000;
+
+export const getPracticeProfileResponseOnboardingDataMethodologyDiscoveryMaxOne = 10000;
+
+export const getPracticeProfileResponseOnboardingDataMethodologyCandidatesItemTitleMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataMethodologyCandidatesItemDescriptionMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataMethodologyCandidatesMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataBuildAmbitionsItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataBuildAmbitionsMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataBuildFirstBuildTitleMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataBuildFirstBuildTypeMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataBuildFirstBuildDescriptionMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceExperienceIdMultipleOf = 1;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatHappenedMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhoWasInvolvedMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouDoMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatWereYouThinkingMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatWorkedMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatDidNotWorkMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouLearnMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataExperienceAnalysisExperienceMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataExperienceAnalysisLessonMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataExperienceAnalysisPrincipleMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataExperienceAnalysisFrameworkMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeResultMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMin = 0;
+export const getPracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMax = 100;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeStrengthsItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeStrengthsMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeImprovementsItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataFirstChallengeImprovementsMax = 20;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanPlanItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanPlanMax = 31;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationMax = 31;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeMax = 31;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionMax = 31;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingMax = 31;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesItemMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesMax = 31;
+
+export const getPracticeProfileResponseOnboardingDataThirtyDayPlanCustomizationMax = 10000;
+
+export const getPracticeProfileResponseOnboardingDataPassportNotesMax = 10000;
+
+
+
 export const GetPracticeProfileResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
@@ -78,6 +562,118 @@ export const GetPracticeProfileResponse = zod.object({
   "workingPreferences": zod.string(),
   "onboardingStep": zod.number(),
   "onboardingCompleted": zod.boolean(),
+  "onboardingData": zod.object({
+  "goals": zod.object({
+  "primaryGoal": zod.string().max(getPracticeProfileResponseOnboardingDataGoalsPrimaryGoalMax).optional(),
+  "outcomes": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataGoalsOutcomesItemMax)).max(getPracticeProfileResponseOnboardingDataGoalsOutcomesMax).optional(),
+  "motivations": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataGoalsMotivationsItemMax)).max(getPracticeProfileResponseOnboardingDataGoalsMotivationsMax).optional()
+}).optional(),
+  "profileDetails": zod.object({
+  "name": zod.string().max(getPracticeProfileResponseOnboardingDataProfileDetailsNameMax).optional(),
+  "niche": zod.string().max(getPracticeProfileResponseOnboardingDataProfileDetailsNicheMax).optional(),
+  "audience": zod.string().max(getPracticeProfileResponseOnboardingDataProfileDetailsAudienceMax).optional(),
+  "yearsCoaching": zod.number().min(getPracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMin).max(getPracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMax).optional(),
+  "currentStage": zod.string().max(getPracticeProfileResponseOnboardingDataProfileDetailsCurrentStageMax).optional(),
+  "coachingTypes": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesItemMax)).max(getPracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesMax).optional()
+}).optional(),
+  "experienceDiscovery": zod.record(zod.string(), zod.union([zod.string().max(getPracticeProfileResponseOnboardingDataExperienceDiscoveryOneMax),zod.number(),zod.boolean(),zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataExperienceDiscoveryFourItemMax))])).optional(),
+  "skillRatings": zod.object({
+  "listening": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsListeningMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsListeningMultipleOf).optional(),
+  "questioning": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsQuestioningMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsQuestioningMultipleOf).optional(),
+  "reframing": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsReframingMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsReframingMultipleOf).optional(),
+  "challenging": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsChallengingMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsChallengingMultipleOf).optional(),
+  "accountability": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMultipleOf).optional(),
+  "sessionStructure": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMultipleOf).optional(),
+  "handlingResistance": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMultipleOf).optional(),
+  "interventionSelection": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMultipleOf).optional(),
+  "coachingJudgment": zod.number().min(1).max(getPracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMax).multipleOf(getPracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMultipleOf).optional()
+}).optional(),
+  "miniScenario": zod.object({
+  "choice": zod.string().max(getPracticeProfileResponseOnboardingDataMiniScenarioChoiceMax).optional(),
+  "evaluation": zod.string().max(getPracticeProfileResponseOnboardingDataMiniScenarioEvaluationMax).optional(),
+  "score": zod.number().min(getPracticeProfileResponseOnboardingDataMiniScenarioScoreMin).max(getPracticeProfileResponseOnboardingDataMiniScenarioScoreMax).optional()
+}).optional(),
+  "practice": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(getPracticeProfileResponseOnboardingDataPracticeSessionIdMultipleOf).optional(),
+  "result": zod.string().max(getPracticeProfileResponseOnboardingDataPracticeResultMax).optional(),
+  "skipped": zod.boolean().optional()
+}).optional(),
+  "development": zod.object({
+  "modes": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataDevelopmentModesItemMax)).max(getPracticeProfileResponseOnboardingDataDevelopmentModesMax).optional(),
+  "dailyTimeCommitment": zod.enum(['10', '15', '30', '45', '60+']).optional(),
+  "minutesPerWeek": zod.number().min(getPracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMin).max(getPracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMax).multipleOf(getPracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMultipleOf).optional(),
+  "schedule": zod.string().max(getPracticeProfileResponseOnboardingDataDevelopmentScheduleMax).optional()
+}).optional(),
+  "brand": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(getPracticeProfileResponseOnboardingDataBrandDiscoveryMaxOne)).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+}).optional(),
+  "methodology": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(getPracticeProfileResponseOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
+  "candidates": zod.array(zod.object({
+  "title": zod.string().max(getPracticeProfileResponseOnboardingDataMethodologyCandidatesItemTitleMax),
+  "description": zod.string().max(getPracticeProfileResponseOnboardingDataMethodologyCandidatesItemDescriptionMax).optional()
+})).max(getPracticeProfileResponseOnboardingDataMethodologyCandidatesMax).optional(),
+  "reviewState": zod.enum(['draft', 'keep', 'edit', 'discard']).optional()
+}).optional(),
+  "build": zod.object({
+  "ambitions": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataBuildAmbitionsItemMax)).max(getPracticeProfileResponseOnboardingDataBuildAmbitionsMax).optional(),
+  "firstBuild": zod.object({
+  "title": zod.string().max(getPracticeProfileResponseOnboardingDataBuildFirstBuildTitleMax).optional(),
+  "type": zod.string().max(getPracticeProfileResponseOnboardingDataBuildFirstBuildTypeMax).optional(),
+  "description": zod.string().max(getPracticeProfileResponseOnboardingDataBuildFirstBuildDescriptionMax).optional()
+}).optional()
+}).optional(),
+  "firstExperience": zod.object({
+  "experienceId": zod.number().min(1).multipleOf(getPracticeProfileResponseOnboardingDataFirstExperienceExperienceIdMultipleOf).optional(),
+  "captureState": zod.enum(['draft', 'saved', 'skipped']).optional(),
+  "whatHappened": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatHappenedMax).optional(),
+  "whoWasInvolved": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhoWasInvolvedMax).optional(),
+  "whatDidYouDo": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouDoMax).optional(),
+  "whatWereYouThinking": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatWereYouThinkingMax).optional(),
+  "whatWorked": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatWorkedMax).optional(),
+  "whatDidNotWork": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatDidNotWorkMax).optional(),
+  "whatDidYouLearn": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouLearnMax).optional(),
+  "whatWillYouDoDifferently": zod.string().max(getPracticeProfileResponseOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax).optional()
+}).optional(),
+  "experienceAnalysis": zod.object({
+  "experience": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisExperienceMax).optional(),
+  "lesson": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisLessonMax).optional(),
+  "principle": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisPrincipleMax).optional(),
+  "framework": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisFrameworkMax).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "notes": zod.string().max(getPracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax).optional()
+}).optional(),
+  "firstChallenge": zod.object({
+  "result": zod.string().max(getPracticeProfileResponseOnboardingDataFirstChallengeResultMax).optional(),
+  "score": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeScoreMax).optional(),
+  "completed": zod.boolean().optional(),
+  "overallScore": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMax).optional(),
+  "questioningScore": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMax).optional(),
+  "listeningScore": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMax).optional(),
+  "reframingScore": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMax).optional(),
+  "challengingScore": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMax).optional(),
+  "accountabilityScore": zod.number().min(getPracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMin).max(getPracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMax).optional(),
+  "strengths": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataFirstChallengeStrengthsItemMax)).max(getPracticeProfileResponseOnboardingDataFirstChallengeStrengthsMax).optional(),
+  "improvements": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataFirstChallengeImprovementsItemMax)).max(getPracticeProfileResponseOnboardingDataFirstChallengeImprovementsMax).optional()
+}).optional(),
+  "thirtyDayPlan": zod.object({
+  "plan": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanPlanItemMax)).max(getPracticeProfileResponseOnboardingDataThirtyDayPlanPlanMax).optional(),
+  "sections": zod.object({
+  "foundation": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationItemMax)).max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationMax).optional(),
+  "practice": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeItemMax)).max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeMax).optional(),
+  "reflection": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionItemMax)).max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionMax).optional(),
+  "building": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingItemMax)).max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingMax).optional(),
+  "milestones": zod.array(zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesItemMax)).max(getPracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesMax).optional()
+}).optional(),
+  "accepted": zod.boolean().optional(),
+  "customization": zod.string().max(getPracticeProfileResponseOnboardingDataThirtyDayPlanCustomizationMax).optional()
+}).optional(),
+  "passport": zod.object({
+  "reviewed": zod.boolean().optional(),
+  "notes": zod.string().max(getPracticeProfileResponseOnboardingDataPassportNotesMax).optional()
+}).optional()
+}).describe('Additive, resumable state for the 15-step coach onboarding. Every property is optional so profiles created before onboarding data existed remain valid and each step can be persisted independently.'),
   "practiceScore": zod.number(),
   "streak": zod.number(),
   "updatedAt": zod.coerce.date()
@@ -88,7 +684,191 @@ export const GetPracticeProfileResponse = zod.object({
  * @summary Update the coach profile
  */
 
-export const updatePracticeProfileBodyOnboardingStepMax = 4;
+export const updatePracticeProfileBodyOnboardingStepMax = 15;
+
+export const updatePracticeProfileBodyOnboardingDataGoalsPrimaryGoalMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataGoalsOutcomesItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataGoalsOutcomesMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataGoalsMotivationsItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataGoalsMotivationsMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsNameMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsNicheMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsAudienceMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsYearsCoachingMin = 0;
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsYearsCoachingMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsCurrentStageMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsCoachingTypesItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataProfileDetailsCoachingTypesMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceDiscoveryOneMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceDiscoveryFourItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsListeningMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsListeningMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsQuestioningMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsQuestioningMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsReframingMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsReframingMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsChallengingMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsChallengingMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsAccountabilityMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsAccountabilityMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsSessionStructureMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsSessionStructureMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsHandlingResistanceMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsHandlingResistanceMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsInterventionSelectionMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsInterventionSelectionMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsCoachingJudgmentMax = 5;
+export const updatePracticeProfileBodyOnboardingDataSkillRatingsCoachingJudgmentMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataMiniScenarioChoiceMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataMiniScenarioEvaluationMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataMiniScenarioScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataMiniScenarioScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataPracticeSessionIdMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataPracticeResultMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataDevelopmentModesItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataDevelopmentModesMax = 10;
+
+export const updatePracticeProfileBodyOnboardingDataDevelopmentMinutesPerWeekMin = 0;
+export const updatePracticeProfileBodyOnboardingDataDevelopmentMinutesPerWeekMax = 10080;
+export const updatePracticeProfileBodyOnboardingDataDevelopmentMinutesPerWeekMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataDevelopmentScheduleMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataBrandDiscoveryMaxOne = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataMethodologyDiscoveryMaxOne = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataMethodologyCandidatesItemTitleMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataMethodologyCandidatesItemDescriptionMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataMethodologyCandidatesMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataBuildAmbitionsItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataBuildAmbitionsMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataBuildFirstBuildTitleMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataBuildFirstBuildTypeMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataBuildFirstBuildDescriptionMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceExperienceIdMultipleOf = 1;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatHappenedMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhoWasInvolvedMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatDidYouDoMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatWereYouThinkingMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatWorkedMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatDidNotWorkMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatDidYouLearnMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisExperienceMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisLessonMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisPrincipleMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisFrameworkMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataExperienceAnalysisNotesMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeResultMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeOverallScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeOverallScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeQuestioningScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeQuestioningScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeListeningScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeListeningScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeReframingScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeReframingScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeChallengingScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeChallengingScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeAccountabilityScoreMin = 0;
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeAccountabilityScoreMax = 100;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeStrengthsItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeStrengthsMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeImprovementsItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataFirstChallengeImprovementsMax = 20;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanPlanItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanPlanMax = 31;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsFoundationItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsFoundationMax = 31;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsPracticeItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsPracticeMax = 31;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsReflectionItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsReflectionMax = 31;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsBuildingItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsBuildingMax = 31;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsMilestonesItemMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsMilestonesMax = 31;
+
+export const updatePracticeProfileBodyOnboardingDataThirtyDayPlanCustomizationMax = 10000;
+
+export const updatePracticeProfileBodyOnboardingDataPassportNotesMax = 10000;
 
 
 
@@ -101,8 +881,306 @@ export const UpdatePracticeProfileBody = zod.object({
   "developmentFocus": zod.string().optional(),
   "workingPreferences": zod.string().optional(),
   "onboardingStep": zod.number().min(1).max(updatePracticeProfileBodyOnboardingStepMax).optional(),
-  "onboardingCompleted": zod.boolean().optional()
+  "onboardingCompleted": zod.boolean().optional(),
+  "onboardingData": zod.object({
+  "goals": zod.object({
+  "primaryGoal": zod.string().max(updatePracticeProfileBodyOnboardingDataGoalsPrimaryGoalMax).optional(),
+  "outcomes": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataGoalsOutcomesItemMax)).max(updatePracticeProfileBodyOnboardingDataGoalsOutcomesMax).optional(),
+  "motivations": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataGoalsMotivationsItemMax)).max(updatePracticeProfileBodyOnboardingDataGoalsMotivationsMax).optional()
+}).optional(),
+  "profileDetails": zod.object({
+  "name": zod.string().max(updatePracticeProfileBodyOnboardingDataProfileDetailsNameMax).optional(),
+  "niche": zod.string().max(updatePracticeProfileBodyOnboardingDataProfileDetailsNicheMax).optional(),
+  "audience": zod.string().max(updatePracticeProfileBodyOnboardingDataProfileDetailsAudienceMax).optional(),
+  "yearsCoaching": zod.number().min(updatePracticeProfileBodyOnboardingDataProfileDetailsYearsCoachingMin).max(updatePracticeProfileBodyOnboardingDataProfileDetailsYearsCoachingMax).optional(),
+  "currentStage": zod.string().max(updatePracticeProfileBodyOnboardingDataProfileDetailsCurrentStageMax).optional(),
+  "coachingTypes": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataProfileDetailsCoachingTypesItemMax)).max(updatePracticeProfileBodyOnboardingDataProfileDetailsCoachingTypesMax).optional()
+}).optional(),
+  "experienceDiscovery": zod.record(zod.string(), zod.union([zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceDiscoveryOneMax),zod.number(),zod.boolean(),zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceDiscoveryFourItemMax))])).optional(),
+  "skillRatings": zod.object({
+  "listening": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsListeningMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsListeningMultipleOf).optional(),
+  "questioning": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsQuestioningMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsQuestioningMultipleOf).optional(),
+  "reframing": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsReframingMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsReframingMultipleOf).optional(),
+  "challenging": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsChallengingMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsChallengingMultipleOf).optional(),
+  "accountability": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsAccountabilityMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsAccountabilityMultipleOf).optional(),
+  "sessionStructure": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsSessionStructureMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsSessionStructureMultipleOf).optional(),
+  "handlingResistance": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsHandlingResistanceMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsHandlingResistanceMultipleOf).optional(),
+  "interventionSelection": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsInterventionSelectionMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsInterventionSelectionMultipleOf).optional(),
+  "coachingJudgment": zod.number().min(1).max(updatePracticeProfileBodyOnboardingDataSkillRatingsCoachingJudgmentMax).multipleOf(updatePracticeProfileBodyOnboardingDataSkillRatingsCoachingJudgmentMultipleOf).optional()
+}).optional(),
+  "miniScenario": zod.object({
+  "choice": zod.string().max(updatePracticeProfileBodyOnboardingDataMiniScenarioChoiceMax).optional(),
+  "evaluation": zod.string().max(updatePracticeProfileBodyOnboardingDataMiniScenarioEvaluationMax).optional(),
+  "score": zod.number().min(updatePracticeProfileBodyOnboardingDataMiniScenarioScoreMin).max(updatePracticeProfileBodyOnboardingDataMiniScenarioScoreMax).optional()
+}).optional(),
+  "practice": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(updatePracticeProfileBodyOnboardingDataPracticeSessionIdMultipleOf).optional(),
+  "result": zod.string().max(updatePracticeProfileBodyOnboardingDataPracticeResultMax).optional(),
+  "skipped": zod.boolean().optional()
+}).optional(),
+  "development": zod.object({
+  "modes": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataDevelopmentModesItemMax)).max(updatePracticeProfileBodyOnboardingDataDevelopmentModesMax).optional(),
+  "dailyTimeCommitment": zod.enum(['10', '15', '30', '45', '60+']).optional(),
+  "minutesPerWeek": zod.number().min(updatePracticeProfileBodyOnboardingDataDevelopmentMinutesPerWeekMin).max(updatePracticeProfileBodyOnboardingDataDevelopmentMinutesPerWeekMax).multipleOf(updatePracticeProfileBodyOnboardingDataDevelopmentMinutesPerWeekMultipleOf).optional(),
+  "schedule": zod.string().max(updatePracticeProfileBodyOnboardingDataDevelopmentScheduleMax).optional()
+}).optional(),
+  "brand": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileBodyOnboardingDataBrandDiscoveryMaxOne)).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+}).optional(),
+  "methodology": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileBodyOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
+  "candidates": zod.array(zod.object({
+  "title": zod.string().max(updatePracticeProfileBodyOnboardingDataMethodologyCandidatesItemTitleMax),
+  "description": zod.string().max(updatePracticeProfileBodyOnboardingDataMethodologyCandidatesItemDescriptionMax).optional()
+})).max(updatePracticeProfileBodyOnboardingDataMethodologyCandidatesMax).optional(),
+  "reviewState": zod.enum(['draft', 'keep', 'edit', 'discard']).optional()
+}).optional(),
+  "build": zod.object({
+  "ambitions": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataBuildAmbitionsItemMax)).max(updatePracticeProfileBodyOnboardingDataBuildAmbitionsMax).optional(),
+  "firstBuild": zod.object({
+  "title": zod.string().max(updatePracticeProfileBodyOnboardingDataBuildFirstBuildTitleMax).optional(),
+  "type": zod.string().max(updatePracticeProfileBodyOnboardingDataBuildFirstBuildTypeMax).optional(),
+  "description": zod.string().max(updatePracticeProfileBodyOnboardingDataBuildFirstBuildDescriptionMax).optional()
+}).optional()
+}).optional(),
+  "firstExperience": zod.object({
+  "experienceId": zod.number().min(1).multipleOf(updatePracticeProfileBodyOnboardingDataFirstExperienceExperienceIdMultipleOf).optional(),
+  "captureState": zod.enum(['draft', 'saved', 'skipped']).optional(),
+  "whatHappened": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatHappenedMax).optional(),
+  "whoWasInvolved": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhoWasInvolvedMax).optional(),
+  "whatDidYouDo": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatDidYouDoMax).optional(),
+  "whatWereYouThinking": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatWereYouThinkingMax).optional(),
+  "whatWorked": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatWorkedMax).optional(),
+  "whatDidNotWork": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatDidNotWorkMax).optional(),
+  "whatDidYouLearn": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatDidYouLearnMax).optional(),
+  "whatWillYouDoDifferently": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax).optional()
+}).optional(),
+  "experienceAnalysis": zod.object({
+  "experience": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisExperienceMax).optional(),
+  "lesson": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisLessonMax).optional(),
+  "principle": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisPrincipleMax).optional(),
+  "framework": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisFrameworkMax).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "notes": zod.string().max(updatePracticeProfileBodyOnboardingDataExperienceAnalysisNotesMax).optional()
+}).optional(),
+  "firstChallenge": zod.object({
+  "result": zod.string().max(updatePracticeProfileBodyOnboardingDataFirstChallengeResultMax).optional(),
+  "score": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeScoreMax).optional(),
+  "completed": zod.boolean().optional(),
+  "overallScore": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeOverallScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeOverallScoreMax).optional(),
+  "questioningScore": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeQuestioningScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeQuestioningScoreMax).optional(),
+  "listeningScore": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeListeningScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeListeningScoreMax).optional(),
+  "reframingScore": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeReframingScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeReframingScoreMax).optional(),
+  "challengingScore": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeChallengingScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeChallengingScoreMax).optional(),
+  "accountabilityScore": zod.number().min(updatePracticeProfileBodyOnboardingDataFirstChallengeAccountabilityScoreMin).max(updatePracticeProfileBodyOnboardingDataFirstChallengeAccountabilityScoreMax).optional(),
+  "strengths": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataFirstChallengeStrengthsItemMax)).max(updatePracticeProfileBodyOnboardingDataFirstChallengeStrengthsMax).optional(),
+  "improvements": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataFirstChallengeImprovementsItemMax)).max(updatePracticeProfileBodyOnboardingDataFirstChallengeImprovementsMax).optional()
+}).optional(),
+  "thirtyDayPlan": zod.object({
+  "plan": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanPlanItemMax)).max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanPlanMax).optional(),
+  "sections": zod.object({
+  "foundation": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsFoundationItemMax)).max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsFoundationMax).optional(),
+  "practice": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsPracticeItemMax)).max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsPracticeMax).optional(),
+  "reflection": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsReflectionItemMax)).max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsReflectionMax).optional(),
+  "building": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsBuildingItemMax)).max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsBuildingMax).optional(),
+  "milestones": zod.array(zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsMilestonesItemMax)).max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanSectionsMilestonesMax).optional()
+}).optional(),
+  "accepted": zod.boolean().optional(),
+  "customization": zod.string().max(updatePracticeProfileBodyOnboardingDataThirtyDayPlanCustomizationMax).optional()
+}).optional(),
+  "passport": zod.object({
+  "reviewed": zod.boolean().optional(),
+  "notes": zod.string().max(updatePracticeProfileBodyOnboardingDataPassportNotesMax).optional()
+}).optional()
+}).optional().describe('Additive, resumable state for the 15-step coach onboarding. Every property is optional so profiles created before onboarding data existed remain valid and each step can be persisted independently.')
 })
+
+export const updatePracticeProfileResponseOnboardingDataGoalsPrimaryGoalMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataGoalsOutcomesItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataGoalsOutcomesMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataGoalsMotivationsItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataGoalsMotivationsMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsNameMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsNicheMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsAudienceMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMin = 0;
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsCurrentStageMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceDiscoveryOneMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceDiscoveryFourItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsListeningMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsListeningMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsQuestioningMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsQuestioningMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsReframingMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsReframingMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsChallengingMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsChallengingMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMax = 5;
+export const updatePracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataMiniScenarioChoiceMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataMiniScenarioEvaluationMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataMiniScenarioScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataMiniScenarioScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataPracticeSessionIdMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataPracticeResultMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataDevelopmentModesItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataDevelopmentModesMax = 10;
+
+export const updatePracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMin = 0;
+export const updatePracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMax = 10080;
+export const updatePracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataDevelopmentScheduleMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataBrandDiscoveryMaxOne = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataMethodologyDiscoveryMaxOne = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataMethodologyCandidatesItemTitleMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataMethodologyCandidatesItemDescriptionMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataMethodologyCandidatesMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataBuildAmbitionsItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataBuildAmbitionsMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataBuildFirstBuildTitleMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataBuildFirstBuildTypeMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataBuildFirstBuildDescriptionMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceExperienceIdMultipleOf = 1;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatHappenedMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhoWasInvolvedMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouDoMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatWereYouThinkingMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatWorkedMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatDidNotWorkMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouLearnMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisExperienceMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisLessonMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisPrincipleMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisFrameworkMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeResultMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMin = 0;
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMax = 100;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeStrengthsItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeStrengthsMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeImprovementsItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataFirstChallengeImprovementsMax = 20;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanPlanItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanPlanMax = 31;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationMax = 31;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeMax = 31;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionMax = 31;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingMax = 31;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesItemMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesMax = 31;
+
+export const updatePracticeProfileResponseOnboardingDataThirtyDayPlanCustomizationMax = 10000;
+
+export const updatePracticeProfileResponseOnboardingDataPassportNotesMax = 10000;
+
+
 
 export const UpdatePracticeProfileResponse = zod.object({
   "id": zod.number(),
@@ -115,6 +1193,118 @@ export const UpdatePracticeProfileResponse = zod.object({
   "workingPreferences": zod.string(),
   "onboardingStep": zod.number(),
   "onboardingCompleted": zod.boolean(),
+  "onboardingData": zod.object({
+  "goals": zod.object({
+  "primaryGoal": zod.string().max(updatePracticeProfileResponseOnboardingDataGoalsPrimaryGoalMax).optional(),
+  "outcomes": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataGoalsOutcomesItemMax)).max(updatePracticeProfileResponseOnboardingDataGoalsOutcomesMax).optional(),
+  "motivations": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataGoalsMotivationsItemMax)).max(updatePracticeProfileResponseOnboardingDataGoalsMotivationsMax).optional()
+}).optional(),
+  "profileDetails": zod.object({
+  "name": zod.string().max(updatePracticeProfileResponseOnboardingDataProfileDetailsNameMax).optional(),
+  "niche": zod.string().max(updatePracticeProfileResponseOnboardingDataProfileDetailsNicheMax).optional(),
+  "audience": zod.string().max(updatePracticeProfileResponseOnboardingDataProfileDetailsAudienceMax).optional(),
+  "yearsCoaching": zod.number().min(updatePracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMin).max(updatePracticeProfileResponseOnboardingDataProfileDetailsYearsCoachingMax).optional(),
+  "currentStage": zod.string().max(updatePracticeProfileResponseOnboardingDataProfileDetailsCurrentStageMax).optional(),
+  "coachingTypes": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesItemMax)).max(updatePracticeProfileResponseOnboardingDataProfileDetailsCoachingTypesMax).optional()
+}).optional(),
+  "experienceDiscovery": zod.record(zod.string(), zod.union([zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceDiscoveryOneMax),zod.number(),zod.boolean(),zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceDiscoveryFourItemMax))])).optional(),
+  "skillRatings": zod.object({
+  "listening": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsListeningMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsListeningMultipleOf).optional(),
+  "questioning": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsQuestioningMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsQuestioningMultipleOf).optional(),
+  "reframing": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsReframingMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsReframingMultipleOf).optional(),
+  "challenging": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsChallengingMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsChallengingMultipleOf).optional(),
+  "accountability": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsAccountabilityMultipleOf).optional(),
+  "sessionStructure": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsSessionStructureMultipleOf).optional(),
+  "handlingResistance": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsHandlingResistanceMultipleOf).optional(),
+  "interventionSelection": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsInterventionSelectionMultipleOf).optional(),
+  "coachingJudgment": zod.number().min(1).max(updatePracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMax).multipleOf(updatePracticeProfileResponseOnboardingDataSkillRatingsCoachingJudgmentMultipleOf).optional()
+}).optional(),
+  "miniScenario": zod.object({
+  "choice": zod.string().max(updatePracticeProfileResponseOnboardingDataMiniScenarioChoiceMax).optional(),
+  "evaluation": zod.string().max(updatePracticeProfileResponseOnboardingDataMiniScenarioEvaluationMax).optional(),
+  "score": zod.number().min(updatePracticeProfileResponseOnboardingDataMiniScenarioScoreMin).max(updatePracticeProfileResponseOnboardingDataMiniScenarioScoreMax).optional()
+}).optional(),
+  "practice": zod.object({
+  "sessionId": zod.number().min(1).multipleOf(updatePracticeProfileResponseOnboardingDataPracticeSessionIdMultipleOf).optional(),
+  "result": zod.string().max(updatePracticeProfileResponseOnboardingDataPracticeResultMax).optional(),
+  "skipped": zod.boolean().optional()
+}).optional(),
+  "development": zod.object({
+  "modes": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataDevelopmentModesItemMax)).max(updatePracticeProfileResponseOnboardingDataDevelopmentModesMax).optional(),
+  "dailyTimeCommitment": zod.enum(['10', '15', '30', '45', '60+']).optional(),
+  "minutesPerWeek": zod.number().min(updatePracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMin).max(updatePracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMax).multipleOf(updatePracticeProfileResponseOnboardingDataDevelopmentMinutesPerWeekMultipleOf).optional(),
+  "schedule": zod.string().max(updatePracticeProfileResponseOnboardingDataDevelopmentScheduleMax).optional()
+}).optional(),
+  "brand": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileResponseOnboardingDataBrandDiscoveryMaxOne)).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional()
+}).optional(),
+  "methodology": zod.object({
+  "discovery": zod.record(zod.string(), zod.string().max(updatePracticeProfileResponseOnboardingDataMethodologyDiscoveryMaxOne)).optional(),
+  "candidates": zod.array(zod.object({
+  "title": zod.string().max(updatePracticeProfileResponseOnboardingDataMethodologyCandidatesItemTitleMax),
+  "description": zod.string().max(updatePracticeProfileResponseOnboardingDataMethodologyCandidatesItemDescriptionMax).optional()
+})).max(updatePracticeProfileResponseOnboardingDataMethodologyCandidatesMax).optional(),
+  "reviewState": zod.enum(['draft', 'keep', 'edit', 'discard']).optional()
+}).optional(),
+  "build": zod.object({
+  "ambitions": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataBuildAmbitionsItemMax)).max(updatePracticeProfileResponseOnboardingDataBuildAmbitionsMax).optional(),
+  "firstBuild": zod.object({
+  "title": zod.string().max(updatePracticeProfileResponseOnboardingDataBuildFirstBuildTitleMax).optional(),
+  "type": zod.string().max(updatePracticeProfileResponseOnboardingDataBuildFirstBuildTypeMax).optional(),
+  "description": zod.string().max(updatePracticeProfileResponseOnboardingDataBuildFirstBuildDescriptionMax).optional()
+}).optional()
+}).optional(),
+  "firstExperience": zod.object({
+  "experienceId": zod.number().min(1).multipleOf(updatePracticeProfileResponseOnboardingDataFirstExperienceExperienceIdMultipleOf).optional(),
+  "captureState": zod.enum(['draft', 'saved', 'skipped']).optional(),
+  "whatHappened": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatHappenedMax).optional(),
+  "whoWasInvolved": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhoWasInvolvedMax).optional(),
+  "whatDidYouDo": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouDoMax).optional(),
+  "whatWereYouThinking": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatWereYouThinkingMax).optional(),
+  "whatWorked": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatWorkedMax).optional(),
+  "whatDidNotWork": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatDidNotWorkMax).optional(),
+  "whatDidYouLearn": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatDidYouLearnMax).optional(),
+  "whatWillYouDoDifferently": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstExperienceWhatWillYouDoDifferentlyMax).optional()
+}).optional(),
+  "experienceAnalysis": zod.object({
+  "experience": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisExperienceMax).optional(),
+  "lesson": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisLessonMax).optional(),
+  "principle": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisPrincipleMax).optional(),
+  "framework": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisFrameworkMax).optional(),
+  "reviewState": zod.enum(['draft', 'reviewed', 'accepted', 'editing']).optional(),
+  "notes": zod.string().max(updatePracticeProfileResponseOnboardingDataExperienceAnalysisNotesMax).optional()
+}).optional(),
+  "firstChallenge": zod.object({
+  "result": zod.string().max(updatePracticeProfileResponseOnboardingDataFirstChallengeResultMax).optional(),
+  "score": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeScoreMax).optional(),
+  "completed": zod.boolean().optional(),
+  "overallScore": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeOverallScoreMax).optional(),
+  "questioningScore": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeQuestioningScoreMax).optional(),
+  "listeningScore": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeListeningScoreMax).optional(),
+  "reframingScore": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeReframingScoreMax).optional(),
+  "challengingScore": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeChallengingScoreMax).optional(),
+  "accountabilityScore": zod.number().min(updatePracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMin).max(updatePracticeProfileResponseOnboardingDataFirstChallengeAccountabilityScoreMax).optional(),
+  "strengths": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataFirstChallengeStrengthsItemMax)).max(updatePracticeProfileResponseOnboardingDataFirstChallengeStrengthsMax).optional(),
+  "improvements": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataFirstChallengeImprovementsItemMax)).max(updatePracticeProfileResponseOnboardingDataFirstChallengeImprovementsMax).optional()
+}).optional(),
+  "thirtyDayPlan": zod.object({
+  "plan": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanPlanItemMax)).max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanPlanMax).optional(),
+  "sections": zod.object({
+  "foundation": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationItemMax)).max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsFoundationMax).optional(),
+  "practice": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeItemMax)).max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsPracticeMax).optional(),
+  "reflection": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionItemMax)).max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsReflectionMax).optional(),
+  "building": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingItemMax)).max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsBuildingMax).optional(),
+  "milestones": zod.array(zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesItemMax)).max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanSectionsMilestonesMax).optional()
+}).optional(),
+  "accepted": zod.boolean().optional(),
+  "customization": zod.string().max(updatePracticeProfileResponseOnboardingDataThirtyDayPlanCustomizationMax).optional()
+}).optional(),
+  "passport": zod.object({
+  "reviewed": zod.boolean().optional(),
+  "notes": zod.string().max(updatePracticeProfileResponseOnboardingDataPassportNotesMax).optional()
+}).optional()
+}).describe('Additive, resumable state for the 15-step coach onboarding. Every property is optional so profiles created before onboarding data existed remain valid and each step can be persisted independently.'),
   "practiceScore": zod.number(),
   "streak": zod.number(),
   "updatedAt": zod.coerce.date()

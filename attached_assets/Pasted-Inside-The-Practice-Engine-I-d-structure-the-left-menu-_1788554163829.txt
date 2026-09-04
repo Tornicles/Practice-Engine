@@ -1,0 +1,166 @@
+Inside **The Practice Engine**, I’d structure the left menu as:
+
+### Main Navigation
+
+1. **Home**
+
+   * Personalized dashboard
+   * Today’s focus
+   * Progress
+   * Current development journey
+   * Experience → IP progress
+
+2. **Today**
+
+   * Daily development plan
+   * Practice assignment
+   * Reflection
+   * Build task
+   * Daily priorities
+
+3. **Coach Lab**
+
+   * Coach training
+   * Skills development
+   * Lessons
+   * Assessments
+   * Challenges
+   * Development pathways
+
+4. **Practice Simulator**
+
+   * AI client simulations
+   * Difficult conversations
+   * Discovery calls
+   * Resistance scenarios
+   * Coaching scenarios
+   * Retry & improve
+   * Performance evaluation
+
+5. **Delivery Studio**
+
+   * Prepare a coaching session
+   * Session objectives
+   * Delivery tools
+   * Post-session reflection
+   * Session evaluation
+   * Delivery improvement
+
+6. **Experience Vault**
+
+   * Experiences
+   * Lessons
+   * Insights
+   * Stories
+   * Case studies
+   * Evidence
+   * Reflections
+
+7. **Methodology**
+
+   * Principles
+   * Frameworks
+   * Models
+   * Processes
+   * Tools
+   * Signature methodology
+
+8. **Brand Lab**
+
+   * Positioning
+   * Niche
+   * Ideal client
+   * Brand story
+   * Messaging
+   * Voice
+   * Authority
+   * Differentiation
+
+9. **Content Studio**
+
+   * Content ideas
+   * Posts
+   * Articles
+   * Videos
+   * Podcasts
+   * Lead magnets
+   * Authority content
+
+10. **Course Builder**
+
+    * Course projects
+    * Curriculum
+    * Modules
+    * Lessons
+    * Exercises
+    * Assignments
+    * Assessments
+    * Resources
+    * Course publishing
+
+11. **Offers & Products**
+
+    * Coaching offers
+    * Programs
+    * Workshops
+    * Masterclasses
+    * Courses
+    * Digital products
+    * Pricing & packaging
+
+12. **Proof & Outcomes**
+
+    * Client outcomes
+    * Testimonials
+    * Case studies
+    * Results
+    * Before/after
+    * Proof bank
+
+13. **Coach Passport**
+
+    * Coach profile
+    * Skills
+    * Expertise
+    * Experience
+    * Methodology
+    * Brand
+    * IP
+    * Courses
+    * Proof
+    * Development history
+
+### Bottom Navigation
+
+14. **Notifications**
+15. **Settings**
+16. **Help**
+
+---
+
+### The key structure
+
+The menu should visually communicate the progression:
+
+**BECOME A BETTER COACH**
+→ Coach Lab
+→ Practice Simulator
+→ Delivery Studio
+
+**TURN EXPERIENCE INTO EXPERTISE**
+→ Experience Vault
+→ Methodology
+
+**BECOME A RECOGNIZED COACH**
+→ Brand Lab
+→ Content Studio
+
+**TURN EXPERTISE INTO IP**
+→ Course Builder
+→ Offers & Products
+→ Proof & Outcomes
+
+**YOUR PROFESSIONAL IDENTITY**
+→ Coach Passport
+
+I would **not** put the 1,000 Prompts in the menu. It should remain the hidden intelligence/orchestration layer powering these areas.

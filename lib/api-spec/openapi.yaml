@@ -247,6 +247,8 @@ components:
           type: number
         onboardingCompleted:
           type: boolean
+        onboardingData:
+          $ref: "#/components/schemas/OnboardingData"
         practiceScore:
           type: number
         streak:
@@ -265,6 +267,7 @@ components:
         - workingPreferences
         - onboardingStep
         - onboardingCompleted
+        - onboardingData
         - practiceScore
         - streak
         - updatedAt
@@ -289,9 +292,200 @@ components:
         onboardingStep:
           type: number
           minimum: 1
-          maximum: 4
+          maximum: 15
         onboardingCompleted:
           type: boolean
+        onboardingData:
+          $ref: "#/components/schemas/OnboardingData"
+    OnboardingData:
+      description: >-
+        Additive, resumable state for the 15-step coach onboarding. Every
+        property is optional so profiles created before onboarding data existed
+        remain valid and each step can be persisted independently.
+      type: object
+      properties:
+        goals:
+          type: object
+          properties:
+            primaryGoal: { type: string, maxLength: 10000 }
+            outcomes:
+              type: array
+              maxItems: 20
+              items: { type: string, maxLength: 10000 }
+            motivations:
+              type: array
+              maxItems: 20
+              items: { type: string, maxLength: 10000 }
+        profileDetails:
+          type: object
+          properties:
+            name: { type: string, maxLength: 10000 }
+            niche: { type: string, maxLength: 10000 }
+            audience: { type: string, maxLength: 10000 }
+            yearsCoaching: { type: number, minimum: 0, maximum: 100 }
+            currentStage: { type: string, maxLength: 10000 }
+            coachingTypes:
+              type: array
+              maxItems: 20
+              items: { type: string, maxLength: 10000 }
+        experienceDiscovery:
+          type: object
+          additionalProperties:
+            oneOf:
+              - { type: string, maxLength: 10000 }
+              - { type: number }
+              - { type: boolean }
+              - type: array
+                items: { type: string, maxLength: 10000 }
+        skillRatings:
+          type: object
+          properties:
+            listening: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            questioning: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            reframing: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            challenging: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            accountability: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            sessionStructure: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            handlingResistance: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            interventionSelection: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+            coachingJudgment: { type: number, minimum: 1, maximum: 5, multipleOf: 1 }
+        miniScenario:
+          type: object
+          properties:
+            choice: { type: string, maxLength: 10000 }
+            evaluation: { type: string, maxLength: 10000 }
+            score: { type: number, minimum: 0, maximum: 100 }
+        practice:
+          type: object
+          properties:
+            sessionId: { type: number, minimum: 1, multipleOf: 1 }
+            result: { type: string, maxLength: 10000 }
+            skipped: { type: boolean }
+        development:
+          type: object
+          properties:
+            modes:
+              type: array
+              maxItems: 10
+              items: { type: string, maxLength: 10000 }
+            dailyTimeCommitment: { type: string, enum: ["10", "15", "30", "45", "60+"] }
+            minutesPerWeek: { type: number, minimum: 0, maximum: 10080, multipleOf: 1 }
+            schedule: { type: string, maxLength: 10000 }
+        brand:
+          type: object
+          properties:
+            discovery:
+              type: object
+              additionalProperties: { type: string, maxLength: 10000 }
+            reviewState: { type: string, enum: [draft, reviewed, accepted, editing] }
+        methodology:
+          type: object
+          properties:
+            discovery:
+              type: object
+              additionalProperties: { type: string, maxLength: 10000 }
+            candidates:
+              type: array
+              maxItems: 20
+              items:
+                type: object
+                required: [title]
+                properties:
+                  title: { type: string, maxLength: 10000 }
+                  description: { type: string, maxLength: 10000 }
+            reviewState: { type: string, enum: [draft, keep, edit, discard] }
+        build:
+          type: object
+          properties:
+            ambitions:
+              type: array
+              maxItems: 20
+              items: { type: string, maxLength: 10000 }
+            firstBuild:
+              type: object
+              properties:
+                title: { type: string, maxLength: 10000 }
+                type: { type: string, maxLength: 10000 }
+                description: { type: string, maxLength: 10000 }
+        firstExperience:
+          type: object
+          properties:
+            experienceId: { type: number, minimum: 1, multipleOf: 1 }
+            captureState: { type: string, enum: [draft, saved, skipped] }
+            whatHappened: { type: string, maxLength: 10000 }
+            whoWasInvolved: { type: string, maxLength: 10000 }
+            whatDidYouDo: { type: string, maxLength: 10000 }
+            whatWereYouThinking: { type: string, maxLength: 10000 }
+            whatWorked: { type: string, maxLength: 10000 }
+            whatDidNotWork: { type: string, maxLength: 10000 }
+            whatDidYouLearn: { type: string, maxLength: 10000 }
+            whatWillYouDoDifferently: { type: string, maxLength: 10000 }
+        experienceAnalysis:
+          type: object
+          properties:
+            experience: { type: string, maxLength: 10000 }
+            lesson: { type: string, maxLength: 10000 }
+            principle: { type: string, maxLength: 10000 }
+            framework: { type: string, maxLength: 10000 }
+            reviewState: { type: string, enum: [draft, reviewed, accepted, editing] }
+            notes: { type: string, maxLength: 10000 }
+        firstChallenge:
+          type: object
+          properties:
+            result: { type: string, maxLength: 10000 }
+            score: { type: number, minimum: 0, maximum: 100 }
+            completed: { type: boolean }
+            overallScore: { type: number, minimum: 0, maximum: 100 }
+            questioningScore: { type: number, minimum: 0, maximum: 100 }
+            listeningScore: { type: number, minimum: 0, maximum: 100 }
+            reframingScore: { type: number, minimum: 0, maximum: 100 }
+            challengingScore: { type: number, minimum: 0, maximum: 100 }
+            accountabilityScore: { type: number, minimum: 0, maximum: 100 }
+            strengths:
+              type: array
+              maxItems: 20
+              items: { type: string, maxLength: 10000 }
+            improvements:
+              type: array
+              maxItems: 20
+              items: { type: string, maxLength: 10000 }
+        thirtyDayPlan:
+          type: object
+          properties:
+            plan:
+              type: array
+              maxItems: 31
+              items: { type: string, maxLength: 10000 }
+            sections:
+              type: object
+              properties:
+                foundation:
+                  type: array
+                  maxItems: 31
+                  items: { type: string, maxLength: 10000 }
+                practice:
+                  type: array
+                  maxItems: 31
+                  items: { type: string, maxLength: 10000 }
+                reflection:
+                  type: array
+                  maxItems: 31
+                  items: { type: string, maxLength: 10000 }
+                building:
+                  type: array
+                  maxItems: 31
+                  items: { type: string, maxLength: 10000 }
+                milestones:
+                  type: array
+                  maxItems: 31
+                  items: { type: string, maxLength: 10000 }
+            accepted: { type: boolean }
+            customization: { type: string, maxLength: 10000 }
+        passport:
+          type: object
+          properties:
+            reviewed: { type: boolean }
+            notes: { type: string, maxLength: 10000 }
     Experience:
       type: object
       properties:

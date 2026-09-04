@@ -9,6 +9,373 @@ export interface HealthStatus {
   status: string;
 }
 
+export type OnboardingDataDevelopmentDailyTimeCommitment = typeof OnboardingDataDevelopmentDailyTimeCommitment[keyof typeof OnboardingDataDevelopmentDailyTimeCommitment];
+
+
+export const OnboardingDataDevelopmentDailyTimeCommitment = {
+  NUMBER_10: '10',
+  NUMBER_15: '15',
+  NUMBER_30: '30',
+  NUMBER_45: '45',
+  '60+': '60+',
+} as const;
+
+export type OnboardingDataBrandReviewState = typeof OnboardingDataBrandReviewState[keyof typeof OnboardingDataBrandReviewState];
+
+
+export const OnboardingDataBrandReviewState = {
+  draft: 'draft',
+  reviewed: 'reviewed',
+  accepted: 'accepted',
+  editing: 'editing',
+} as const;
+
+export type OnboardingDataMethodologyReviewState = typeof OnboardingDataMethodologyReviewState[keyof typeof OnboardingDataMethodologyReviewState];
+
+
+export const OnboardingDataMethodologyReviewState = {
+  draft: 'draft',
+  keep: 'keep',
+  edit: 'edit',
+  discard: 'discard',
+} as const;
+
+export type OnboardingDataFirstExperienceCaptureState = typeof OnboardingDataFirstExperienceCaptureState[keyof typeof OnboardingDataFirstExperienceCaptureState];
+
+
+export const OnboardingDataFirstExperienceCaptureState = {
+  draft: 'draft',
+  saved: 'saved',
+  skipped: 'skipped',
+} as const;
+
+export type OnboardingDataExperienceAnalysisReviewState = typeof OnboardingDataExperienceAnalysisReviewState[keyof typeof OnboardingDataExperienceAnalysisReviewState];
+
+
+export const OnboardingDataExperienceAnalysisReviewState = {
+  draft: 'draft',
+  reviewed: 'reviewed',
+  accepted: 'accepted',
+  editing: 'editing',
+} as const;
+
+export type OnboardingDataGoals = {
+  /** @maxLength 10000 */
+  primaryGoal?: string;
+  /**
+     * @maxItems 20
+     * @items.maxLength 10000
+     */
+  outcomes?: string[];
+  /**
+     * @maxItems 20
+     * @items.maxLength 10000
+     */
+  motivations?: string[];
+};
+
+export type OnboardingDataProfileDetails = {
+  /** @maxLength 10000 */
+  name?: string;
+  /** @maxLength 10000 */
+  niche?: string;
+  /** @maxLength 10000 */
+  audience?: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  yearsCoaching?: number;
+  /** @maxLength 10000 */
+  currentStage?: string;
+  /**
+     * @maxItems 20
+     * @items.maxLength 10000
+     */
+  coachingTypes?: string[];
+};
+
+export type OnboardingDataExperienceDiscovery = {[key: string]: string | number | boolean | string[]};
+
+export type OnboardingDataSkillRatings = {
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  listening?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  questioning?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  reframing?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  challenging?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  accountability?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  sessionStructure?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  handlingResistance?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  interventionSelection?: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  coachingJudgment?: number;
+};
+
+export type OnboardingDataMiniScenario = {
+  /** @maxLength 10000 */
+  choice?: string;
+  /** @maxLength 10000 */
+  evaluation?: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  score?: number;
+};
+
+export type OnboardingDataPractice = {
+  /** @minimum 1 */
+  sessionId?: number;
+  /** @maxLength 10000 */
+  result?: string;
+  skipped?: boolean;
+};
+
+export type OnboardingDataDevelopment = {
+  /**
+     * @maxItems 10
+     * @items.maxLength 10000
+     */
+  modes?: string[];
+  dailyTimeCommitment?: OnboardingDataDevelopmentDailyTimeCommitment;
+  /**
+     * @minimum 0
+     * @maximum 10080
+     */
+  minutesPerWeek?: number;
+  /** @maxLength 10000 */
+  schedule?: string;
+};
+
+export type OnboardingDataBrandDiscovery = {[key: string]: string};
+
+export type OnboardingDataBrand = {
+  discovery?: OnboardingDataBrandDiscovery;
+  reviewState?: OnboardingDataBrandReviewState;
+};
+
+export type OnboardingDataMethodologyDiscovery = {[key: string]: string};
+
+export type OnboardingDataMethodologyCandidatesItem = {
+  /** @maxLength 10000 */
+  title: string;
+  /** @maxLength 10000 */
+  description?: string;
+};
+
+export type OnboardingDataMethodology = {
+  discovery?: OnboardingDataMethodologyDiscovery;
+  /** @maxItems 20 */
+  candidates?: OnboardingDataMethodologyCandidatesItem[];
+  reviewState?: OnboardingDataMethodologyReviewState;
+};
+
+export type OnboardingDataBuildFirstBuild = {
+  /** @maxLength 10000 */
+  title?: string;
+  /** @maxLength 10000 */
+  type?: string;
+  /** @maxLength 10000 */
+  description?: string;
+};
+
+export type OnboardingDataBuild = {
+  /**
+     * @maxItems 20
+     * @items.maxLength 10000
+     */
+  ambitions?: string[];
+  firstBuild?: OnboardingDataBuildFirstBuild;
+};
+
+export type OnboardingDataFirstExperience = {
+  /** @minimum 1 */
+  experienceId?: number;
+  captureState?: OnboardingDataFirstExperienceCaptureState;
+  /** @maxLength 10000 */
+  whatHappened?: string;
+  /** @maxLength 10000 */
+  whoWasInvolved?: string;
+  /** @maxLength 10000 */
+  whatDidYouDo?: string;
+  /** @maxLength 10000 */
+  whatWereYouThinking?: string;
+  /** @maxLength 10000 */
+  whatWorked?: string;
+  /** @maxLength 10000 */
+  whatDidNotWork?: string;
+  /** @maxLength 10000 */
+  whatDidYouLearn?: string;
+  /** @maxLength 10000 */
+  whatWillYouDoDifferently?: string;
+};
+
+export type OnboardingDataExperienceAnalysis = {
+  /** @maxLength 10000 */
+  experience?: string;
+  /** @maxLength 10000 */
+  lesson?: string;
+  /** @maxLength 10000 */
+  principle?: string;
+  /** @maxLength 10000 */
+  framework?: string;
+  reviewState?: OnboardingDataExperienceAnalysisReviewState;
+  /** @maxLength 10000 */
+  notes?: string;
+};
+
+export type OnboardingDataFirstChallenge = {
+  /** @maxLength 10000 */
+  result?: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  score?: number;
+  completed?: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  overallScore?: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  questioningScore?: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  listeningScore?: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  reframingScore?: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  challengingScore?: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  accountabilityScore?: number;
+  /**
+     * @maxItems 20
+     * @items.maxLength 10000
+     */
+  strengths?: string[];
+  /**
+     * @maxItems 20
+     * @items.maxLength 10000
+     */
+  improvements?: string[];
+};
+
+export type OnboardingDataThirtyDayPlanSections = {
+  /**
+     * @maxItems 31
+     * @items.maxLength 10000
+     */
+  foundation?: string[];
+  /**
+     * @maxItems 31
+     * @items.maxLength 10000
+     */
+  practice?: string[];
+  /**
+     * @maxItems 31
+     * @items.maxLength 10000
+     */
+  reflection?: string[];
+  /**
+     * @maxItems 31
+     * @items.maxLength 10000
+     */
+  building?: string[];
+  /**
+     * @maxItems 31
+     * @items.maxLength 10000
+     */
+  milestones?: string[];
+};
+
+export type OnboardingDataThirtyDayPlan = {
+  /**
+     * @maxItems 31
+     * @items.maxLength 10000
+     */
+  plan?: string[];
+  sections?: OnboardingDataThirtyDayPlanSections;
+  accepted?: boolean;
+  /** @maxLength 10000 */
+  customization?: string;
+};
+
+export type OnboardingDataPassport = {
+  reviewed?: boolean;
+  /** @maxLength 10000 */
+  notes?: string;
+};
+
+/**
+ * Additive, resumable state for the 15-step coach onboarding. Every property is optional so profiles created before onboarding data existed remain valid and each step can be persisted independently.
+ */
+export interface OnboardingData {
+  goals?: OnboardingDataGoals;
+  profileDetails?: OnboardingDataProfileDetails;
+  experienceDiscovery?: OnboardingDataExperienceDiscovery;
+  skillRatings?: OnboardingDataSkillRatings;
+  miniScenario?: OnboardingDataMiniScenario;
+  practice?: OnboardingDataPractice;
+  development?: OnboardingDataDevelopment;
+  brand?: OnboardingDataBrand;
+  methodology?: OnboardingDataMethodology;
+  build?: OnboardingDataBuild;
+  firstExperience?: OnboardingDataFirstExperience;
+  experienceAnalysis?: OnboardingDataExperienceAnalysis;
+  firstChallenge?: OnboardingDataFirstChallenge;
+  thirtyDayPlan?: OnboardingDataThirtyDayPlan;
+  passport?: OnboardingDataPassport;
+}
+
 export interface CoachProfile {
   id: number;
   name: string;
@@ -20,6 +387,7 @@ export interface CoachProfile {
   workingPreferences: string;
   onboardingStep: number;
   onboardingCompleted: boolean;
+  onboardingData: OnboardingData;
   practiceScore: number;
   streak: number;
   updatedAt: string;
@@ -36,10 +404,11 @@ export interface CoachProfileUpdate {
   workingPreferences?: string;
   /**
      * @minimum 1
-     * @maximum 4
+     * @maximum 15
      */
   onboardingStep?: number;
   onboardingCompleted?: boolean;
+  onboardingData?: OnboardingData;
 }
 
 export interface Experience {
