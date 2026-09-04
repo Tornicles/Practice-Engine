@@ -1,0 +1,718 @@
+# Practice Engine — Complete Onboarding Structure
+
+The onboarding should be **structured, fast, and purposeful**. Every screen should clearly tell the user whether they **select, type, choose from a dropdown, or complete an assessment**.
+
+---
+
+## STEP 1 — Welcome
+
+### Purpose
+
+Introduce what the Practice Engine does and establish the core promise.
+
+### User action
+
+**No typing. No form.**
+
+### Screen content
+
+**Build Your Coaching Practice**
+
+Become a better coach. Improve your delivery. Build your methodology. Build your brand. Turn your experience into expertise, IP, courses, and products.
+
+**Button:** `Get Started`
+
+---
+
+# STEP 2 — What Do You Want to Accomplish?
+
+### Purpose
+
+Identify the user's primary goals so the system can personalize the experience.
+
+### User action
+
+**Select cards — multiple selections allowed.**
+
+### Options
+
+☐ Become a better coach
+☐ Improve my coaching delivery
+☐ Practice difficult situations
+☐ Build my coaching brand
+☐ Develop my own methodology
+☐ Turn my experience into IP
+☐ Create courses
+☐ Create content
+☐ Build coaching products
+☐ Grow my coaching business
+
+**Button:** `Continue`
+
+No typing.
+
+---
+
+# STEP 3 — Coach Profile
+
+### Purpose
+
+Establish the basic identity and professional context of the coach.
+
+### User action
+
+Combination of **typing + dropdowns**.
+
+### Fields
+
+**1. Your Name**
+`Text field`
+
+> Enter your name
+
+**2. What is your coaching niche?**
+`Text field`
+
+> Example: Executive Coaching, Career Coaching, Business Coaching
+
+**3. How long have you been coaching?**
+`Dropdown`
+
+* Not yet coaching
+* Less than 1 year
+* 1–3 years
+* 3–5 years
+* 5–10 years
+* 10+ years
+
+**4. Where are you currently?**
+`Dropdown`
+
+* Exploring coaching
+* Starting out
+* Developing
+* Experienced
+* Advanced
+* Expert
+
+**5. Who do you currently coach?**
+`Text field`
+
+**6. What type of coaching do you provide?**
+`Multi-select cards`
+
+* 1:1
+* Group
+* Executive
+* Business
+* Career
+* Leadership
+* Performance
+* Life
+* Other
+
+---
+
+# STEP 4 — Your Coaching Experience
+
+### Purpose
+
+Start discovering the experience that will eventually become the coach's knowledge and IP.
+
+### User action
+
+**Typing into guided text fields.**
+
+This is not a long form. Each question appears individually.
+
+### Question 1
+
+**What problems have you repeatedly helped people solve?**
+
+`Large text box`
+
+### Question 2
+
+**What types of situations have you coached people through?**
+
+`Large text box`
+
+### Question 3
+
+**What are you particularly good at helping people with?**
+
+`Large text box`
+
+### Question 4
+
+**What coaching situations have taught you the most?**
+
+`Large text box`
+
+The system saves these as initial **Experience Records**.
+
+---
+
+# STEP 5 — Coaching Skills Assessment
+
+### Purpose
+
+Establish the coach's starting skill level.
+
+This should **not be a self-rating form alone**.
+
+It should eventually become a combination of **questions + scenarios + AI evaluation**.
+
+### Part A — Quick Self-Assessment
+
+User selects a score from **1–5** for:
+
+* Listening
+* Questioning
+* Reframing
+* Challenging
+* Accountability
+* Session structure
+* Handling resistance
+* Intervention selection
+* Coaching judgment
+
+Example:
+
+**How confident are you at handling a resistant client?**
+
+`1  2  3  4  5`
+
+---
+
+### Part B — Mini Scenario
+
+The system presents a coaching situation.
+
+Example:
+
+> **Client:**
+> “I've already tried everything. Nothing is going to change.”
+
+The user chooses from several possible responses.
+
+**User action:** Select one answer.
+
+The system evaluates the decision.
+
+---
+
+### Part C — Optional Practice
+
+The user can enter a short live simulation.
+
+**User action:** Type response or interact through the simulator.
+
+This creates the first **Practice Performance Record**.
+
+---
+
+# STEP 6 — How Do You Want to Develop?
+
+### Purpose
+
+Understand the coach's preferred development mode.
+
+### User action
+
+**Select cards — multiple selections.**
+
+### Options
+
+* Daily guided development
+* Short lessons
+* Deep learning
+* Scenario simulations
+* Real-client reflection
+* Coaching challenges
+* Assessments
+* Framework building
+* Content creation
+* Course creation
+
+Then:
+
+**How much time can you realistically dedicate each day?**
+
+`Dropdown`
+
+* 10 minutes
+* 15 minutes
+* 30 minutes
+* 45 minutes
+* 60+ minutes
+
+---
+
+# STEP 7 — Brand Discovery
+
+### Purpose
+
+Create the coach's initial Brand Core.
+
+### User action
+
+**Typing into guided fields.**
+
+### Questions
+
+**1. What do you want to be known for?**
+
+`Text area`
+
+**2. Who do you most want to help?**
+
+`Text area`
+
+**3. What problem do you want to become known for solving?**
+
+`Text area`
+
+**4. What makes your approach different?**
+
+`Text area`
+
+**5. What do you believe about coaching that others may not?**
+
+`Text area`
+
+**6. What experience gives you credibility?**
+
+`Text area`
+
+The system uses these answers to create an initial:
+
+**Brand Core**
+
+The coach reviews it and chooses:
+
+`Accept` / `Edit`
+
+---
+
+# STEP 8 — Methodology Discovery
+
+### Purpose
+
+Discover how the coach actually coaches instead of asking them to invent a methodology from scratch.
+
+### User action
+
+Mostly **typing**, with some **selecting**.
+
+### Questions
+
+**1. When someone comes to you with a problem, what do you usually do first?**
+
+`Text area`
+
+**2. What do you look for?**
+
+`Text area`
+
+**3. What questions do you repeatedly ask?**
+
+`Text area`
+
+**4. What principles guide your coaching?**
+
+`Text area`
+
+**5. What approaches have worked particularly well?**
+
+`Text area`
+
+**6. What approaches have failed?**
+
+`Text area`
+
+### System action
+
+AI analyzes the responses and identifies potential:
+
+* Patterns
+* Principles
+* Processes
+* Framework candidates
+
+The user then sees:
+
+> **We found 3 potential principles in your experience.**
+
+Each appears as a card.
+
+User can:
+
+`Keep` | `Edit` | `Discard`
+
+The AI does **not automatically declare these to be the coach's official methodology**.
+
+---
+
+# STEP 9 — What Do You Want to Build?
+
+### Purpose
+
+Determine the coach's IP/product ambitions.
+
+### User action
+
+**Select multiple cards.**
+
+### Options
+
+* Content
+* Frameworks
+* Workshops
+* Courses
+* Masterclasses
+* Assessments
+* Coaching programs
+* Digital products
+* Books
+* Training for other coaches
+* Lead magnets
+* Other
+
+Then:
+
+**What is the first thing you would most like to build?**
+
+`Dropdown`
+
+---
+
+# STEP 10 — First Experience Capture
+
+### Purpose
+
+Demonstrate the core Practice Engine philosophy.
+
+**Experience → Expertise → IP**
+
+### User action
+
+**Guided typing.**
+
+Instead of presenting nine questions at once, show one question at a time.
+
+### Question 1
+
+**Tell us about one coaching experience that changed the way you think about coaching.**
+
+`Large text area`
+
+Continue.
+
+### Question 2
+
+**What was happening?**
+
+`Large text area`
+
+### Question 3
+
+**What did you initially think?**
+
+`Large text area`
+
+### Question 4
+
+**What did you discover?**
+
+`Large text area`
+
+### Question 5
+
+**What did you do?**
+
+`Large text area`
+
+### Question 6
+
+**What happened afterward?**
+
+`Large text area`
+
+### Question 7
+
+**What did this experience teach you?**
+
+`Large text area`
+
+### Question 8
+
+**What could another coach learn from this?**
+
+`Large text area`
+
+---
+
+# STEP 11 — Experience Analysis
+
+### Purpose
+
+Show the coach what the Practice Engine can extract from their experience.
+
+The system analyzes the answers and displays:
+
+### Your Experience
+
+**Client resistance during accountability**
+
+↓
+
+### Your Lesson
+
+**Resistance may indicate a lack of ownership rather than a lack of motivation.**
+
+↓
+
+### Potential Principle
+
+**Diagnose ownership before pushing accountability.**
+
+↓
+
+### Potential Framework
+
+**Ownership → Diagnosis → Alignment → Commitment**
+
+The user chooses:
+
+**Accept**
+**Edit**
+**Reject**
+
+This is important because the coach remains the authority over their own expertise.
+
+---
+
+# STEP 12 — First Practice Challenge
+
+### Purpose
+
+Immediately move from onboarding into actual development.
+
+The system gives the coach a scenario based on their profile.
+
+Example:
+
+> **Your client says:**
+> “I know what I need to do. I just don't understand why you're asking me all these questions.”
+
+### User action
+
+**Live interaction with AI simulator.**
+
+The coach responds.
+
+The system evaluates:
+
+* Listening
+* Questioning
+* Judgment
+* Intervention
+* Response quality
+* Missed opportunities
+
+Then produces:
+
+### Practice Result
+
+**Overall: 74/100**
+
+**Strength:** Listening
+**Develop:** Intervention choice
+**Next practice:** Handling resistance
+
+---
+
+# STEP 13 — Build Your 30-Day Practice Plan
+
+### Purpose
+
+Create the coach's first personalized development path.
+
+### User action
+
+Mostly **review + select**.
+
+The system proposes:
+
+### Coaching Development
+
+* Questioning practice
+* Resistance handling
+* Reframing
+
+### Practice
+
+* 3 simulations/week
+* 1 reflection/week
+
+### Experience
+
+* Capture 2 experiences/week
+
+### Methodology
+
+* Develop 1 framework
+
+### Brand
+
+* Complete positioning
+
+### IP
+
+* Develop first reusable asset
+
+### Course
+
+* Begin experience collection
+
+The coach can select:
+
+`Accept Plan`
+
+or
+
+`Customize`
+
+---
+
+# STEP 14 — Coach Passport
+
+### Purpose
+
+Create the coach's persistent profile inside the Practice Engine.
+
+The system summarizes what it learned.
+
+### Coach Passport
+
+**Identity**
+
+* Name
+* Niche
+* Experience
+* Coaching type
+
+**Development**
+
+* Current skill levels
+* Strengths
+* Development gaps
+
+**Experience**
+
+* Captured experiences
+* Lessons
+* Patterns
+
+**Expertise**
+
+* Emerging principles
+* Areas of authority
+
+**Methodology**
+
+* Framework candidates
+* Coaching principles
+
+**Brand**
+
+* Positioning
+* Audience
+* Promise
+* Voice
+
+**IP**
+
+* Frameworks
+* Content
+* Courses
+* Products
+
+**Proof**
+
+* Outcomes
+* Case studies
+* Testimonials
+
+The coach reviews the information.
+
+**Button:** `Enter Practice Engine`
+
+---
+
+# STEP 15 — Dashboard
+
+The onboarding ends here.
+
+The dashboard is now personalized around what the coach actually told and demonstrated to the system.
+
+The dashboard should show:
+
+### Today's Focus
+
+**Improve your questioning under resistance.**
+
+### Today's 3 Jobs
+
+**1. Practice**
+Complete a resistant-client simulation.
+
+**2. Reflect**
+Capture one experience.
+
+**3. Build**
+Develop one principle into a framework.
+
+### Development
+
+* Coaching Score
+* Skill Graph
+* Current weaknesses
+* Current strengths
+
+### Experience → IP
+
+* Experiences captured
+* Lessons extracted
+* Principles
+* Frameworks
+* Courses
+* Content
+* Proof
+
+### Current Journey
+
+**Learn → Practice → Reflect → Improve → Capture → Build → Teach → Prove**
+
+---
+
+# Important Onboarding Rule
+
+The onboarding should use **four interaction types only**:
+
+| Interaction                | Used For                                                              |
+| -------------------------- | --------------------------------------------------------------------- |
+| **Select cards**           | Goals, coaching type, development preferences, IP ambitions           |
+| **Dropdown**               | Experience level, years coaching, time commitment, structured choices |
+| **Text input**             | Name, niche, audience, positioning                                    |
+| **Text area**              | Experiences, reflections, methodology, lessons                        |
+| **Interactive simulation** | Actual coaching skill assessment                                      |
+
+The system should **avoid unnecessary typing**. The only places requiring substantial writing are where the coach's own experience, knowledge, methodology, or thinking is genuinely valuable.
+
+Most importantly, onboarding isn't just **“tell us about yourself.”**
+
+It should already perform the Practice Engine's core transformation:
+
+**PROFILE → ASSESS → EXPERIENCE → REFLECT → PRACTICE → DISCOVER EXPERTISE → DEFINE DIRECTION → CREATE DEVELOPMENT PLAN → ENTER PRACTICE ENGINE**
