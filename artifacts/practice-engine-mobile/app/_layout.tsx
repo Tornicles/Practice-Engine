@@ -15,19 +15,21 @@ import {
 import { Stack } from 'expo-router';
 import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import * as Notifications from 'expo-notifications';
 import { ClerkLoaded, ClerkProvider } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { setBaseUrl } from '@workspace/api-client-react';
 import { OfflineCaptureProvider } from '@/lib/OfflineCaptureContext';
 import { PracticeReminderProvider } from '@/lib/PracticeReminderContext';
+import { getNotifications } from '@/lib/notifications';
 import { getReminderNavigationTarget } from '@/lib/practice-reminders';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-if (Platform.OS !== 'web') {
-  Notifications.setNotificationHandler({
+const notifications = getNotifications();
+
+if (notifications) {
+  notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowBanner: true,
       shouldShowList: true,
@@ -68,14 +70,14 @@ export default function RootLayout() {
   }, [fontsLoaded, fontError]);
 
   useEffect(() => {
-    if (Platform.OS === 'web') return;
+    if (!notifications) return;
     const openReminderDestination = (data: Record<string, unknown> | undefined) => {
       const target = getReminderNavigationTarget(data);
       if (target) router.replace(target);
     };
-    const lastResponse = Notifications.getLastNotificationResponse();
+    const lastResponse = notifications.getLastNotificationResponse();
     openReminderDestination(lastResponse?.notification.request.content.data);
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    const subscription = notifications.addNotificationResponseReceivedListener((response) => {
       openReminderDestination(response.notification.request.content.data);
     });
     return () => subscription.remove();

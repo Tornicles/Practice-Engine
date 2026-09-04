@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Notifications from 'expo-notifications';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { Linking, Platform } from 'react-native';
+import { getNotifications } from './notifications';
 import {
   DEFAULT_REMINDER_SETTINGS,
   loadReminderSettings,
@@ -44,11 +44,12 @@ type ReminderContextValue = {
 const ReminderContext = createContext<ReminderContextValue | null>(null);
 
 async function schedule(settings: ReminderSettings) {
-  if (Platform.OS === 'web') return;
+  const notifications = getNotifications();
+  if (!notifications) return;
   await syncReminderSchedule(
     settings,
-    Notifications,
-    Notifications.SchedulableTriggerInputTypes.WEEKLY,
+    notifications,
+    notifications.SchedulableTriggerInputTypes.WEEKLY,
   );
 }
 
@@ -69,10 +70,14 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
         if (loaded.storageFailed) {
           setStorageError('Device storage is temporarily unavailable. Using default reminder settings.');
         }
-        if (Platform.OS !== 'web') {
-          const current = await Notifications.getPermissionsAsync();
+        const notifications = getNotifications();
+        if (notifications) {
+          const current = await notifications.getPermissionsAsync();
           setPermission(current.granted ? 'granted' : current.status === 'denied' ? 'denied' : 'unknown');
           setCanAskAgain(current.canAskAgain);
+        } else if (Platform.OS !== 'web') {
+          setPermission('denied');
+          setCanAskAgain(false);
         }
       } finally {
         setIsReady(true);
@@ -104,18 +109,19 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
   };
 
   const enable = async () => {
-    if (Platform.OS === 'web') return false;
+    const notifications = getNotifications();
+    if (!notifications) return false;
     setIsSaving(true);
     try {
       if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('practice-reminders', {
+        await notifications.setNotificationChannelAsync('practice-reminders', {
           name: 'Practice reminders',
-          importance: Notifications.AndroidImportance.DEFAULT,
+          importance: notifications.AndroidImportance.DEFAULT,
         });
       }
       const current = await requestReminderPermissionAfterEnable(
-        Notifications.getPermissionsAsync,
-        Notifications.requestPermissionsAsync,
+        notifications.getPermissionsAsync,
+        notifications.requestPermissionsAsync,
       );
       setPermission(current.granted ? 'granted' : 'denied');
       setCanAskAgain(current.canAskAgain);
