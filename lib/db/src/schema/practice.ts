@@ -143,6 +143,10 @@ export const intelligenceOperationDailyRollupsTable = pgTable(
     latencyTotalMs: bigint("latency_total_ms", { mode: "number" }).notNull(),
     averageLatencyMs: integer("average_latency_ms").notNull(),
     p95LatencyMs: integer("p95_latency_ms").notNull(),
+    latencyValuesMs: integer("latency_values_ms")
+      .array()
+      .notNull()
+      .default([]),
   },
   (table) => [
     primaryKey({

@@ -47,7 +47,8 @@ async function runIntelligenceOperationCompaction(
         operation_count,
         latency_total_ms,
         average_latency_ms,
-        p95_latency_ms
+        p95_latency_ms,
+        latency_values_ms
       )
       select
         (operation.created_at at time zone 'UTC')::date,
@@ -61,7 +62,8 @@ async function runIntelligenceOperationCompaction(
         round(avg(operation.latency_ms))::integer,
         percentile_cont(0.95) within group (
           order by operation.latency_ms
-        )::integer
+        )::integer,
+        array_agg(operation.latency_ms order by operation.latency_ms)
       from intelligence_operations operation
       cross join lateral jsonb_array_elements_text(
         case
@@ -87,7 +89,8 @@ async function runIntelligenceOperationCompaction(
         operation_count = excluded.operation_count,
         latency_total_ms = excluded.latency_total_ms,
         average_latency_ms = excluded.average_latency_ms,
-        p95_latency_ms = excluded.p95_latency_ms
+        p95_latency_ms = excluded.p95_latency_ms,
+        latency_values_ms = excluded.latency_values_ms
   `);
 
   await executor.execute(sql`
@@ -131,9 +134,9 @@ export async function reportIntelligenceOperations(
         operation.failure_class,
         count(*)::integer as operation_count,
         sum(operation.latency_ms)::bigint as latency_total_ms,
-        percentile_cont(0.95) within group (
-          order by operation.latency_ms
-        )::integer as p95_latency_ms
+        array_agg(
+          operation.latency_ms order by operation.latency_ms
+        ) as latency_values_ms
       from intelligence_operations operation
       cross join lateral jsonb_array_elements_text(
         case
@@ -159,7 +162,11 @@ export async function reportIntelligenceOperations(
         nullif(rollup.failure_class, 'none') as failure_class,
         rollup.operation_count,
         rollup.latency_total_ms,
-        rollup.p95_latency_ms
+        case
+          when cardinality(rollup.latency_values_ms) > 0
+            then rollup.latency_values_ms
+          else array_fill(rollup.p95_latency_ms, array[rollup.operation_count])
+        end as latency_values_ms
       from intelligence_operation_daily_rollups rollup
       where ${bucket} = 'day'
         and rollup.day > (
@@ -172,18 +179,31 @@ export async function reportIntelligenceOperations(
         )::date
     )
     select
-      bucket,
-      engine,
-      strategy_version as "strategyVersion",
-      strategy_family as "strategyFamily",
-      outcome,
-      failure_class as "failureClass",
-      sum(operation_count)::integer as count,
+      report.bucket,
+      report.engine,
+      report.strategy_version as "strategyVersion",
+      report.strategy_family as "strategyFamily",
+      report.outcome,
+      report.failure_class as "failureClass",
+      sum(
+        report.operation_count::numeric
+          / cardinality(report.latency_values_ms)
+      )::integer as count,
       round(
-        sum(latency_total_ms)::numeric / sum(operation_count)
+        sum(
+          report.latency_total_ms::numeric
+            / cardinality(report.latency_values_ms)
+        )
+          / sum(
+            report.operation_count::numeric
+              / cardinality(report.latency_values_ms)
+          )
       )::integer as "averageLatencyMs",
-      max(p95_latency_ms)::integer as "p95LatencyMs"
-    from report_rows
+      percentile_cont(0.95) within group (
+        order by latency.value
+      )::integer as "p95LatencyMs"
+    from report_rows report
+    cross join lateral unnest(report.latency_values_ms) latency(value)
     group by 1, 2, 3, 4, 5, 6
     order by 1 asc, 2 asc, 3 asc, 4 asc, 5 asc, 6 asc
   `);

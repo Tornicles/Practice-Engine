@@ -444,6 +444,12 @@ test("UTC retention compaction and long-window reports have no boundary gap or o
     assert.equal(rollups[0]?.latencyTotalMs, 400);
     assert.equal(rollups[0]?.averageLatencyMs, 200);
     assert.equal(rollups[0]?.p95LatencyMs, 290);
+    assert.deepEqual(rollups[0]?.latencyValuesMs, [100, 300]);
+
+    await db
+      .update(intelligenceOperationDailyRollupsTable)
+      .set({ p95LatencyMs: 999_999 })
+      .where(rollupDimensions);
 
     await db.transaction(async (tx) => {
       await tx.execute(sql`set local time zone 'Pacific/Auckland'`);
@@ -472,7 +478,7 @@ test("UTC retention compaction and long-window reports have no boundary gap or o
           { count: 2, averageLatencyMs: 200, p95LatencyMs: 290 },
           { count: 2, averageLatencyMs: 600, p95LatencyMs: 690 },
         ],
-        "average and p95 metrics remain correct in a non-UTC session",
+        "mixed raw and rollup metrics use the mergeable distribution rather than the stored daily p95",
       );
     });
   } finally {
