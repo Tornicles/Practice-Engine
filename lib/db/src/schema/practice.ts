@@ -4,6 +4,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
@@ -112,6 +113,41 @@ export const intelligenceOperationsTable = pgTable(
       table.engine,
       table.strategyVersion,
       table.outcome,
+    ),
+  ],
+);
+
+export const intelligenceAlertStatesTable = pgTable(
+  "intelligence_alert_states",
+  {
+    alertCode: text("alert_code").notNull(),
+    engine: text("engine").notNull(),
+    strategyVersion: text("strategy_version").notNull(),
+    strategyFamily: text("strategy_family").notNull(),
+    active: boolean("active").notNull().default(false),
+    notifiedActive: boolean("notified_active").notNull().default(false),
+    notificationActive: boolean("notification_active"),
+    notificationClaimedAt: timestamp("notification_claimed_at", {
+      withTimezone: true,
+    }),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    primaryKey({
+      columns: [
+        table.alertCode,
+        table.engine,
+        table.strategyVersion,
+        table.strategyFamily,
+      ],
+    }),
+    index("intelligence_alert_states_dimensions_idx").on(
+      table.engine,
+      table.strategyVersion,
+      table.strategyFamily,
     ),
   ],
 );

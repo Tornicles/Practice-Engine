@@ -4,6 +4,43 @@ export interface IntelligenceAlert {
   message: string;
 }
 
+export interface IntelligenceAlertMetadata {
+  engine: string;
+  strategyVersion: string;
+  strategyFamily: string;
+  outcomeCounts: Record<string, number>;
+  latency: {
+    averageMs: number;
+    p95Ms: number;
+  };
+}
+
+export interface IntelligenceAlertNotification
+  extends IntelligenceAlertMetadata {
+  event: "triggered" | "recovered";
+  alert: Pick<IntelligenceAlert, "code" | "severity" | "message">;
+}
+
+export function buildIntelligenceAlertNotification(
+  alert: IntelligenceAlert,
+  active: boolean,
+  metadata: IntelligenceAlertMetadata,
+): IntelligenceAlertNotification {
+  return {
+    event: active ? "triggered" : "recovered",
+    alert: {
+      code: alert.code,
+      severity: alert.severity,
+      message: alert.message,
+    },
+    engine: metadata.engine,
+    strategyVersion: metadata.strategyVersion,
+    strategyFamily: metadata.strategyFamily,
+    outcomeCounts: { ...metadata.outcomeCounts },
+    latency: { ...metadata.latency },
+  };
+}
+
 export type IntelligenceOutcome =
   | "success"
   | "safety-block"
