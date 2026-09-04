@@ -64,7 +64,7 @@ const groups: NavGroup[] = [
 
 const titleForPath = (path: string) => {
   const item = groups.flatMap((group) => group.items).find((nav) => path === nav.href);
-  return item?.name ?? (path === "/settings" ? "Settings" : "Practice Engine");
+  return item?.name ?? (path === "/settings" ? "Settings" : "Startup Man");
 };
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -94,7 +94,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link href="/dashboard" className="group flex min-w-0 items-center gap-2.5" data-testid="link-shell-logo">
             <span className="engine-logo-mark grid h-7 w-7 shrink-0 place-items-center rounded-sm text-xs font-bold">P</span>
             <span className="engine-logo-copy truncate text-[13px] font-semibold uppercase tracking-[.16em] text-foreground">
-              Practice<span className="text-primary">Engine</span>
+              Startup <span className="text-primary">Man</span>
             </span>
           </Link>
         </div>

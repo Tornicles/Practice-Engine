@@ -107,7 +107,7 @@ export default function Onboarding() {
           <CardHeader>
             <AlertCircle className="h-10 w-10 text-destructive mx-auto mb-4" />
             <CardTitle>Unable to load profile</CardTitle>
-            <CardDescription>We could not load your practice engine profile.</CardDescription>
+            <CardDescription>We could not load your Startup Man profile.</CardDescription>
           </CardHeader>
           <CardFooter className="flex justify-center">
             <Button onClick={() => window.location.reload()} variant="outline">Retry</Button>
@@ -123,7 +123,7 @@ export default function Onboarding() {
         <div className="flex items-center gap-3">
           <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary">P</span>
           <span className="text-[13px] font-semibold uppercase tracking-[.16em] text-foreground hidden sm:inline-block">
-            Practice<span className="text-primary">Engine</span>
+            Startup <span className="text-primary">Man</span>
           </span>
         </div>
         <button 

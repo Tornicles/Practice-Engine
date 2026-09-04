@@ -235,7 +235,7 @@ function ClerkProviderWithRoutes() {
         signIn: {
           start: {
             title: "Enter the Studio",
-            subtitle: "Sign in to Practice Engine",
+            subtitle: "Sign in to Startup Man",
           },
         },
         signUp: {

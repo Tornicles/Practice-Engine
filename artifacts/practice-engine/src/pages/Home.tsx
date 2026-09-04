@@ -8,9 +8,9 @@ export default function Home() {
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary">P</span>
+            <span className="engine-logo-mark grid h-7 w-7 place-items-center rounded-sm text-xs font-bold border border-primary/50 text-primary">S</span>
             <span className="text-[13px] font-semibold uppercase tracking-[.16em]">
-              Practice<span className="text-primary">Engine</span>
+              Startup <span className="text-primary">Man</span>
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -40,7 +40,7 @@ export default function Home() {
             </h1>
             
             <p className="mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-              Practice Engine is a serious mastery studio for coaches. Where every client interaction, moment of resistance, and hard-won lesson is systematically extracted into your proprietary methodology, proof, and authority.
+              Startup Man is a serious mastery studio for coaches. Every client interaction, moment of resistance, and hard-won lesson is systematically extracted into your proprietary methodology, proof, and authority.
             </p>
             
             <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -132,7 +132,7 @@ export default function Home() {
               </div>
               <h2 className="engine-section-title mb-6 leading-tight">Evidence precedes authority.</h2>
               <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
-                The internet is saturated with generic coaching advice. The Practice Engine enforces a strict lineage: you cannot generate a framework without linking it to a documented lived experience. You cannot claim an outcome without logging the proof.
+                The internet is saturated with generic coaching advice. Startup Man enforces a strict lineage: you cannot generate a framework without linking it to a documented lived experience. You cannot claim an outcome without logging the proof.
               </p>
               
               <ul className="space-y-4">
@@ -195,7 +195,7 @@ export default function Home() {
 
       <footer className="border-t border-border bg-background py-10 text-center">
         <div className="text-xs font-medium uppercase tracking-[.15em] text-muted-foreground/60">
-          © {new Date().getFullYear()} Practice Engine. All rights reserved.
+          © {new Date().getFullYear()} Startup Man. All rights reserved.
         </div>
       </footer>
     </div>

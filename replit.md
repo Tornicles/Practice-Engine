@@ -1,11 +1,11 @@
-# Practice Engine
+# Startup Man
 
 A connected coach-development workspace that turns learning, simulation, real delivery, reflection, and evidence into stronger coaching ability, distinctive methodology, and reusable intellectual property.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm --filter @workspace/practice-engine run dev` — run the Practice Engine web app
+- `pnpm --filter @workspace/practice-engine run dev` — run the Startup Man web app
 - `pnpm --filter @workspace/practice-engine-mobile run dev` — run the iOS/Android Expo app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
@@ -28,7 +28,7 @@ A connected coach-development workspace that turns learning, simulation, real de
 
 - `artifacts/practice-engine/` — React frontend
 - `artifacts/practice-engine-mobile/` — primary mobile experience for iOS and Android
-- `artifacts/api-server/src/routes/practice.ts` — Practice Engine API routes
+- `artifacts/api-server/src/routes/practice.ts` — Startup Man API routes
 - `artifacts/api-server/src/routes/intelligence.ts` — grounded AI simulation, extraction, asset generation, and orchestration
 - `artifacts/api-server/src/lib/practice-intelligence.ts` — shared AI client, prompt governance, and strategy routing
 - `lib/api-spec/openapi.yaml` — API contract and generated-client source of truth
@@ -36,7 +36,7 @@ A connected coach-development workspace that turns learning, simulation, real de
 
 ## Authentication deployment
 
-- Practice Engine uses Replit-managed Clerk. `VITE_CLERK_PROXY_URL` is intentionally empty in development and is injected by Replit for published builds.
+- Startup Man uses Replit-managed Clerk. `VITE_CLERK_PROXY_URL` is intentionally empty in development and is injected by Replit for published builds.
 - Keep `proxyUrl={clerkProxyUrl}` unconditional. Do not hardcode `/api/__clerk`, add production gates, or manually configure Clerk proxy secrets; those changes break Replit's automatic development/production switching.
 
 ## Architecture decisions

@@ -123,7 +123,7 @@
   }
 }
 
-/* Practice Engine visual system: dense, quiet, instrument-panel dark. */
+/* Startup Man visual system: dense, quiet, instrument-panel dark. */
 button, input, textarea, select { font-family: var(--app-font-sans); }
 h1, h2, h3, h4 { font-family: var(--app-font-sans); letter-spacing: -0.035em; }
 .font-serif { font-family: var(--app-font-sans) !important; }
