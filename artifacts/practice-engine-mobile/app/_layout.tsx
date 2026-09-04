@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,14 +13,28 @@ import {
   useFonts,
 } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
+import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Notifications from 'expo-notifications';
 import { ClerkLoaded, ClerkProvider } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { setBaseUrl } from '@workspace/api-client-react';
 import { OfflineCaptureProvider } from '@/lib/OfflineCaptureContext';
+import { PracticeReminderProvider } from '@/lib/PracticeReminderContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 const queryClient = new QueryClient();
 const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -51,6 +66,17 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const openToday = () => router.replace({ pathname: '/(tabs)', params: { reminder: Date.now().toString() } });
+    const lastResponse = Notifications.getLastNotificationResponse();
+    if (lastResponse?.notification.request.content.data?.destination === 'today') openToday();
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      if (response.notification.request.content.data?.destination === 'today') openToday();
+    });
+    return () => subscription.remove();
+  }, []);
+
   if (!fontsLoaded && !fontError) return null;
 
   return (
@@ -60,11 +86,13 @@ export default function RootLayout() {
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <OfflineCaptureProvider>
+            <PracticeReminderProvider>
             <GestureHandlerRootView>
               <KeyboardProvider>
                 <RootLayoutNav />
               </KeyboardProvider>
             </GestureHandlerRootView>
+            </PracticeReminderProvider>
           </OfflineCaptureProvider>
         </QueryClientProvider>
       </ErrorBoundary>
