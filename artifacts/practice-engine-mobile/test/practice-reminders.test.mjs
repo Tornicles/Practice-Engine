@@ -3,7 +3,9 @@ import test from 'node:test';
 import {
   DEFAULT_REMINDER_SETTINGS,
   getReminderNavigationTarget,
+  loadReminderSettings,
   parseReminderSettings,
+  persistReminderSettings,
   refreshRecommendationFromReminder,
   requestReminderPermissionAfterEnable,
   syncReminderSchedule,
@@ -33,6 +35,26 @@ function notificationRecorder() {
 test('malformed saved reminder settings fall back to defaults', () => {
   assert.deepEqual(parseReminderSettings('{not-json'), DEFAULT_REMINDER_SETTINGS);
   assert.deepEqual(parseReminderSettings('[]'), DEFAULT_REMINDER_SETTINGS);
+});
+
+test('rejected reminder storage reads fall back to usable defaults', async () => {
+  const loaded = await loadReminderSettings(async () => {
+    throw new Error('storage unavailable');
+  });
+
+  assert.deepEqual(loaded.settings, DEFAULT_REMINDER_SETTINGS);
+  assert.equal(loaded.storageFailed, true);
+});
+
+test('rejected reminder storage writes report failure without changing the confirmed settings', async () => {
+  const confirmed = { ...activeSettings };
+  const attempted = { ...activeSettings, hour: 18 };
+  const persisted = await persistReminderSettings(attempted, async () => {
+    throw new Error('storage unavailable');
+  });
+
+  assert.equal(persisted, false);
+  assert.deepEqual(confirmed, activeSettings);
 });
 
 test('older saved settings preserve valid fields and repair invalid weekdays and time', () => {

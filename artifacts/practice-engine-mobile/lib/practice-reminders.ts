@@ -57,6 +57,34 @@ export function parseReminderSettings(saved: string | null): ReminderSettings {
   };
 }
 
+export async function loadReminderSettings(
+  read: () => Promise<string | null>,
+): Promise<{ settings: ReminderSettings; storageFailed: boolean }> {
+  try {
+    return {
+      settings: parseReminderSettings(await read()),
+      storageFailed: false,
+    };
+  } catch {
+    return {
+      settings: parseReminderSettings(null),
+      storageFailed: true,
+    };
+  }
+}
+
+export async function persistReminderSettings(
+  settings: ReminderSettings,
+  write: (value: string) => Promise<void>,
+): Promise<boolean> {
+  try {
+    await write(JSON.stringify(settings));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export type ReminderPermission = {
   granted: boolean;
   status: string;

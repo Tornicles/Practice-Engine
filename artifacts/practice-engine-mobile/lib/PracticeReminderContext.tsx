@@ -4,7 +4,8 @@ import React, { createContext, ReactNode, useContext, useEffect, useMemo, useSta
 import { Linking, Platform } from 'react-native';
 import {
   DEFAULT_REMINDER_SETTINGS,
-  parseReminderSettings,
+  loadReminderSettings,
+  persistReminderSettings,
   type ReminderSettings,
   requestReminderPermissionAfterEnable,
   syncReminderSchedule,
@@ -30,6 +31,8 @@ type ReminderContextValue = {
   canAskAgain: boolean;
   isReady: boolean;
   isSaving: boolean;
+  storageError: string | null;
+  retryStorage: () => Promise<void>;
   setWeekday: (weekday: number) => Promise<void>;
   setTime: (hour: number, minute: number) => Promise<void>;
   enable: () => Promise<boolean>;
@@ -55,17 +58,25 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
   const [canAskAgain, setCanAskAgain] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
+  const [pendingSettings, setPendingSettings] = useState<ReminderSettings | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      const saved = await AsyncStorage.getItem(STORAGE_KEY);
-      setSettings(parseReminderSettings(saved));
-      if (Platform.OS !== 'web') {
-        const current = await Notifications.getPermissionsAsync();
-        setPermission(current.granted ? 'granted' : current.status === 'denied' ? 'denied' : 'unknown');
-        setCanAskAgain(current.canAskAgain);
+      try {
+        const loaded = await loadReminderSettings(() => AsyncStorage.getItem(STORAGE_KEY));
+        setSettings(loaded.settings);
+        if (loaded.storageFailed) {
+          setStorageError('Device storage is temporarily unavailable. Using default reminder settings.');
+        }
+        if (Platform.OS !== 'web') {
+          const current = await Notifications.getPermissionsAsync();
+          setPermission(current.granted ? 'granted' : current.status === 'denied' ? 'denied' : 'unknown');
+          setCanAskAgain(current.canAskAgain);
+        }
+      } finally {
+        setIsReady(true);
       }
-      setIsReady(true);
     };
     void load();
   }, []);
@@ -73,9 +84,20 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
   const save = async (next: ReminderSettings) => {
     setIsSaving(true);
     try {
+      const persisted = await persistReminderSettings(
+        next,
+        (value) => AsyncStorage.setItem(STORAGE_KEY, value),
+      );
+      if (!persisted) {
+        setPendingSettings(next);
+        setStorageError('Could not save reminder changes. Check device storage and try again.');
+        return false;
+      }
       setSettings(next);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setPendingSettings(null);
+      setStorageError(null);
       await schedule(next);
+      return true;
     } finally {
       setIsSaving(false);
     }
@@ -99,10 +121,7 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
       setCanAskAgain(current.canAskAgain);
       if (!current.granted) return false;
       const next = { ...settings, enabled: true, paused: false };
-      setSettings(next);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      await schedule(next);
-      return true;
+      return await save(next);
     } finally {
       setIsSaving(false);
     }
@@ -123,13 +142,30 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
     canAskAgain,
     isReady,
     isSaving,
+    storageError,
+    retryStorage: async () => {
+      if (pendingSettings) {
+        await save(pendingSettings);
+        return;
+      }
+      setIsSaving(true);
+      try {
+        const loaded = await loadReminderSettings(() => AsyncStorage.getItem(STORAGE_KEY));
+        setSettings(loaded.settings);
+        setStorageError(loaded.storageFailed
+          ? 'Device storage is still unavailable. Check your device and try again.'
+          : null);
+      } finally {
+        setIsSaving(false);
+      }
+    },
     setWeekday,
-    setTime: async (hour, minute) => save({ ...settings, hour, minute }),
+    setTime: async (hour, minute) => { await save({ ...settings, hour, minute }); },
     enable,
-    togglePaused: async () => save({ ...settings, paused: !settings.paused }),
-    disable: async () => save({ ...settings, enabled: false, paused: false }),
+    togglePaused: async () => { await save({ ...settings, paused: !settings.paused }); },
+    disable: async () => { await save({ ...settings, enabled: false, paused: false }); },
     openSettings: async () => { await Linking.openSettings(); },
-  }), [settings, permission, canAskAgain, isReady, isSaving]);
+  }), [settings, permission, canAskAgain, isReady, isSaving, storageError, pendingSettings]);
 
   return <ReminderContext.Provider value={value}>{children}</ReminderContext.Provider>;
 }

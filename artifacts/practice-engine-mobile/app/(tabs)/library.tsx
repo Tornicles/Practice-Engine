@@ -12,6 +12,7 @@ function ReminderSettings() {
   const c = useColors();
   const {
     settings, permission, canAskAgain, isReady, isSaving,
+    storageError, retryStorage,
     setWeekday, setTime, enable, togglePaused, disable, openSettings,
   } = usePracticeReminder();
 
@@ -40,6 +41,9 @@ function ReminderSettings() {
           ? settings.paused ? 'Paused' : `Active at ${time}`
           : 'Choose a routine that fits your week. Notifications stay off until you enable them.'}
       </Text>
+      {storageError ? (
+        <State error={storageError} retry={() => void retryStorage()} />
+      ) : null}
       <View style={styles.days}>
         {WEEKDAYS.map((day) => {
           const selected = settings.weekdays.includes(day.value);
