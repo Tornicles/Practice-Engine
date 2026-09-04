@@ -10,6 +10,7 @@ A connected coach-development workspace that turns learning, simulation, real de
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `scripts/post-merge.sh` runs the non-interactive Drizzle schema push after task merges; Replit Publish diffs development against production and applies the reviewed production schema change
 - Required env: `DATABASE_URL` — Postgres connection string
 - AI access uses Replit AI Integrations for OpenAI through the managed `AI_INTEGRATIONS_OPENAI_*` environment variables.
 
@@ -30,6 +31,11 @@ A connected coach-development workspace that turns learning, simulation, real de
 - `artifacts/api-server/src/lib/practice-intelligence.ts` — shared AI client, prompt governance, and strategy routing
 - `lib/api-spec/openapi.yaml` — API contract and generated-client source of truth
 - `lib/db/src/schema/practice.ts` — coach profile, experience, practice-session, IP asset, and prompt-run data
+
+## Authentication deployment
+
+- Practice Engine uses Replit-managed Clerk. `VITE_CLERK_PROXY_URL` is intentionally empty in development and is injected by Replit for published builds.
+- Keep `proxyUrl={clerkProxyUrl}` unconditional. Do not hardcode `/api/__clerk`, add production gates, or manually configure Clerk proxy secrets; those changes break Replit's automatic development/production switching.
 
 ## Architecture decisions
 

@@ -14,6 +14,9 @@ export interface CoachProfile {
   audience: string;
   goal: string;
   developmentFocus: string;
+  workingPreferences: string;
+  onboardingStep: number;
+  onboardingCompleted: boolean;
   practiceScore: number;
   streak: number;
   updatedAt: Date;

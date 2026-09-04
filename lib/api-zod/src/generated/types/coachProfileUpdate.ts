@@ -8,10 +8,17 @@
 
 export interface CoachProfileUpdate {
   /** @minLength 1 */
-  name: string;
+  name?: string;
   niche?: string;
   experienceLevel?: string;
   audience?: string;
   goal?: string;
   developmentFocus?: string;
+  workingPreferences?: string;
+  /**
+     * @minimum 1
+     * @maximum 4
+     */
+  onboardingStep?: number;
+  onboardingCompleted?: boolean;
 }

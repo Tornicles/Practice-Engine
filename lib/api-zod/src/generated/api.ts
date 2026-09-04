@@ -29,6 +29,9 @@ export const GetPracticeOverviewResponse = zod.object({
   "audience": zod.string(),
   "goal": zod.string(),
   "developmentFocus": zod.string(),
+  "workingPreferences": zod.string(),
+  "onboardingStep": zod.number(),
+  "onboardingCompleted": zod.boolean(),
   "practiceScore": zod.number(),
   "streak": zod.number(),
   "updatedAt": zod.coerce.date()
@@ -72,6 +75,9 @@ export const GetPracticeProfileResponse = zod.object({
   "audience": zod.string(),
   "goal": zod.string(),
   "developmentFocus": zod.string(),
+  "workingPreferences": zod.string(),
+  "onboardingStep": zod.number(),
+  "onboardingCompleted": zod.boolean(),
   "practiceScore": zod.number(),
   "streak": zod.number(),
   "updatedAt": zod.coerce.date()
@@ -82,15 +88,20 @@ export const GetPracticeProfileResponse = zod.object({
  * @summary Update the coach profile
  */
 
+export const updatePracticeProfileBodyOnboardingStepMax = 4;
+
 
 
 export const UpdatePracticeProfileBody = zod.object({
-  "name": zod.string().min(1),
+  "name": zod.string().min(1).optional(),
   "niche": zod.string().optional(),
   "experienceLevel": zod.string().optional(),
   "audience": zod.string().optional(),
   "goal": zod.string().optional(),
-  "developmentFocus": zod.string().optional()
+  "developmentFocus": zod.string().optional(),
+  "workingPreferences": zod.string().optional(),
+  "onboardingStep": zod.number().min(1).max(updatePracticeProfileBodyOnboardingStepMax).optional(),
+  "onboardingCompleted": zod.boolean().optional()
 })
 
 export const UpdatePracticeProfileResponse = zod.object({
@@ -101,6 +112,9 @@ export const UpdatePracticeProfileResponse = zod.object({
   "audience": zod.string(),
   "goal": zod.string(),
   "developmentFocus": zod.string(),
+  "workingPreferences": zod.string(),
+  "onboardingStep": zod.number(),
+  "onboardingCompleted": zod.boolean(),
   "practiceScore": zod.number(),
   "streak": zod.number(),
   "updatedAt": zod.coerce.date()

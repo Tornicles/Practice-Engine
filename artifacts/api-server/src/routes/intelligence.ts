@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import {
   db,
   coachProfilesTable,
@@ -23,11 +23,17 @@ import {
   assetStrategies,
   generateStructured,
 } from "../lib/practice-intelligence";
+import { authenticatedUserId, requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
+router.use("/practice", requireAuth);
 
-async function getProfile() {
-  const [profile] = await db.select().from(coachProfilesTable).limit(1);
+async function getProfile(userId: string) {
+  const [profile] = await db
+    .select()
+    .from(coachProfilesTable)
+    .where(eq(coachProfilesTable.userId, userId))
+    .limit(1);
   return profile;
 }
 
@@ -36,8 +42,10 @@ async function recordPromptRun(
   strategy: string,
   inputSummary: string,
   outputSummary: string,
+  userId: string,
 ) {
   await db.insert(promptRunsTable).values({
+    userId,
     engine,
     strategy,
     inputSummary: inputSummary.slice(0, 800),
@@ -45,15 +53,18 @@ async function recordPromptRun(
   });
 }
 
-router.get("/practice/assets", async (_req, res): Promise<void> => {
+router.get("/practice/assets", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const assets = await db
     .select()
     .from(knowledgeAssetsTable)
+    .where(eq(knowledgeAssetsTable.userId, userId))
     .orderBy(desc(knowledgeAssetsTable.createdAt));
   res.json(ListKnowledgeAssetsResponse.parse(assets));
 });
 
 router.post("/practice/ai/simulate", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const parsed = SimulateClientTurnBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -61,7 +72,7 @@ router.post("/practice/ai/simulate", async (req, res): Promise<void> => {
   }
 
   try {
-    const profile = await getProfile();
+    const profile = await getProfile(userId);
     const result = await generateStructured<{
       clientReply: string;
       observation: string;
@@ -89,6 +100,7 @@ Return JSON only with clientReply, observation, skill, score, sessionComplete.`,
       `Adaptive ${parsed.data.difficulty} client simulation`,
       `${parsed.data.scenario}: ${parsed.data.coachMessage}`,
       `${output.skill} ${output.score}: ${output.observation}`,
+      userId,
     );
     res.json(output);
   } catch (error) {
@@ -98,6 +110,7 @@ Return JSON only with clientReply, observation, skill, score, sessionComplete.`,
 });
 
 router.post("/practice/ai/extract", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const parsed = ExtractExperienceKnowledgeBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -105,7 +118,7 @@ router.post("/practice/ai/extract", async (req, res): Promise<void> => {
   }
 
   try {
-    const profile = await getProfile();
+    const profile = await getProfile(userId);
     const result = await generateStructured<{
       title: string;
       lesson: string;
@@ -129,6 +142,7 @@ Return JSON only with title, lesson, principle, insight, frameworkCandidate, evi
       "Experience-to-principle extraction",
       parsed.data.situation,
       `${output.principle} Evidence gap: ${output.evidenceGap}`,
+      userId,
     );
     res.json(output);
   } catch (error) {
@@ -138,6 +152,7 @@ Return JSON only with title, lesson, principle, insight, frameworkCandidate, evi
 });
 
 router.post("/practice/ai/generate", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const parsed = GenerateKnowledgeAssetBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -147,7 +162,7 @@ router.post("/practice/ai/generate", async (req, res): Promise<void> => {
   const [experience] = await db
     .select()
     .from(experiencesTable)
-    .where(eq(experiencesTable.id, parsed.data.sourceExperienceId))
+    .where(and(eq(experiencesTable.id, parsed.data.sourceExperienceId), eq(experiencesTable.userId, userId)))
     .limit(1);
   if (!experience) {
     res.status(404).json({ error: "Source experience not found." });
@@ -155,7 +170,7 @@ router.post("/practice/ai/generate", async (req, res): Promise<void> => {
   }
 
   try {
-    const profile = await getProfile();
+    const profile = await getProfile(userId);
     const strategy =
       assetStrategies[parsed.data.assetType as keyof typeof assetStrategies];
     const result = await generateStructured<{ title: string; content: string }>(
@@ -175,6 +190,7 @@ Return JSON only with title and content. Content should be polished markdown.`,
     const [asset] = await db
       .insert(knowledgeAssetsTable)
       .values({
+        userId,
         sourceExperienceId: experience.id,
         type: parsed.data.assetType,
         title: result.title,
@@ -189,6 +205,7 @@ Return JSON only with title and content. Content should be polished markdown.`,
       strategy,
       `${experience.title}: ${parsed.data.objective}`,
       output.title,
+      userId,
     );
     res.status(201).json(output);
   } catch (error) {
@@ -198,6 +215,7 @@ Return JSON only with title and content. Content should be polished markdown.`,
 });
 
 router.post("/practice/ai/next-action", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const parsed = RecommendNextActionBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -206,10 +224,10 @@ router.post("/practice/ai/next-action", async (req, res): Promise<void> => {
 
   try {
     const [profile, experiences, sessions, assets] = await Promise.all([
-      getProfile(),
-      db.select().from(experiencesTable).orderBy(desc(experiencesTable.createdAt)).limit(5),
-      db.select().from(practiceSessionsTable).orderBy(desc(practiceSessionsTable.createdAt)).limit(5),
-      db.select().from(knowledgeAssetsTable).orderBy(desc(knowledgeAssetsTable.createdAt)).limit(5),
+      getProfile(userId),
+      db.select().from(experiencesTable).where(eq(experiencesTable.userId, userId)).orderBy(desc(experiencesTable.createdAt)).limit(5),
+      db.select().from(practiceSessionsTable).where(eq(practiceSessionsTable.userId, userId)).orderBy(desc(practiceSessionsTable.createdAt)).limit(5),
+      db.select().from(knowledgeAssetsTable).where(eq(knowledgeAssetsTable.userId, userId)).orderBy(desc(knowledgeAssetsTable.createdAt)).limit(5),
     ]);
 
     const result = await generateStructured<{
@@ -242,6 +260,7 @@ reason, engine, duration, successCriteria (2-4 measurable strings).`,
       "Contextual next-best action",
       parsed.data.currentObjective,
       `${output.engine}: ${output.action}`,
+      userId,
     );
     res.json(output);
   } catch (error) {

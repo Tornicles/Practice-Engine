@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { desc, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import {
   db,
   coachProfilesTable,
@@ -19,16 +19,23 @@ import {
   UpdatePracticeProfileBody,
   UpdatePracticeProfileResponse,
 } from "@workspace/api-zod";
+import { authenticatedUserId, requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
+router.use("/practice", requireAuth);
 
-async function getOrCreateProfile() {
-  const [existing] = await db.select().from(coachProfilesTable).limit(1);
+async function getOrCreateProfile(userId: string) {
+  const [existing] = await db
+    .select()
+    .from(coachProfilesTable)
+    .where(eq(coachProfilesTable.userId, userId))
+    .limit(1);
   if (existing) return existing;
 
   const [created] = await db
     .insert(coachProfilesTable)
     .values({
+      userId,
       name: "Coach",
       niche: "Leadership & Business Coaching",
       experienceLevel: "Developing coach",
@@ -36,12 +43,25 @@ async function getOrCreateProfile() {
       goal: "Become a better coach",
       developmentFocus: "Questioning under resistance",
     })
+    .onConflictDoNothing({ target: coachProfilesTable.userId })
     .returning();
-  return created;
+  if (created) return created;
+
+  const [concurrentProfile] = await db
+    .select()
+    .from(coachProfilesTable)
+    .where(eq(coachProfilesTable.userId, userId))
+    .limit(1);
+
+  if (!concurrentProfile) {
+    throw new Error("Unable to provision the coach profile.");
+  }
+
+  return concurrentProfile;
 }
 
-router.get("/practice/profile", async (_req, res): Promise<void> => {
-  const profile = await getOrCreateProfile();
+router.get("/practice/profile", async (req, res): Promise<void> => {
+  const profile = await getOrCreateProfile(authenticatedUserId(req));
   res.json(GetPracticeProfileResponse.parse(profile));
 });
 
@@ -53,25 +73,29 @@ router.patch("/practice/profile", async (req, res): Promise<void> => {
     return;
   }
 
-  const profile = await getOrCreateProfile();
+  const userId = authenticatedUserId(req);
+  const profile = await getOrCreateProfile(userId);
   const [updated] = await db
     .update(coachProfilesTable)
     .set(parsed.data)
-    .where(sql`${coachProfilesTable.id} = ${profile.id}`)
+    .where(and(eq(coachProfilesTable.id, profile.id), eq(coachProfilesTable.userId, userId)))
     .returning();
 
   res.json(UpdatePracticeProfileResponse.parse(updated));
 });
 
-router.get("/practice/experiences", async (_req, res): Promise<void> => {
+router.get("/practice/experiences", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const experiences = await db
     .select()
     .from(experiencesTable)
+    .where(eq(experiencesTable.userId, userId))
     .orderBy(desc(experiencesTable.createdAt));
   res.json(ListExperiencesResponse.parse(experiences));
 });
 
 router.post("/practice/experiences", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const parsed = CreateExperienceBody.safeParse(req.body);
   if (!parsed.success) {
     req.log.warn({ errors: parsed.error.message }, "Invalid experience");
@@ -81,20 +105,23 @@ router.post("/practice/experiences", async (req, res): Promise<void> => {
 
   const [experience] = await db
     .insert(experiencesTable)
-    .values(parsed.data)
+    .values({ ...parsed.data, userId })
     .returning();
   res.status(201).json(CreateExperienceResponse.parse(experience));
 });
 
-router.get("/practice/sessions", async (_req, res): Promise<void> => {
+router.get("/practice/sessions", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const sessions = await db
     .select()
     .from(practiceSessionsTable)
+    .where(eq(practiceSessionsTable.userId, userId))
     .orderBy(desc(practiceSessionsTable.createdAt));
   res.json(ListPracticeSessionsResponse.parse(sessions));
 });
 
 router.post("/practice/sessions", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
   const parsed = CreatePracticeSessionBody.safeParse(req.body);
   if (!parsed.success) {
     req.log.warn({ errors: parsed.error.message }, "Invalid practice session");
@@ -106,21 +133,24 @@ router.post("/practice/sessions", async (req, res): Promise<void> => {
     .insert(practiceSessionsTable)
     .values({
       ...parsed.data,
+      userId,
       completedAt: new Date(),
     })
     .returning();
   res.status(201).json(CreatePracticeSessionResponse.parse(session));
 });
 
-router.get("/practice/overview", async (_req, res): Promise<void> => {
-  const profile = await getOrCreateProfile();
+router.get("/practice/overview", async (req, res): Promise<void> => {
+  const userId = authenticatedUserId(req);
+  const profile = await getOrCreateProfile(userId);
   const [experiences, sessions, assets] = await Promise.all([
-    db.select().from(experiencesTable).orderBy(desc(experiencesTable.createdAt)),
+    db.select().from(experiencesTable).where(eq(experiencesTable.userId, userId)).orderBy(desc(experiencesTable.createdAt)),
     db
       .select()
       .from(practiceSessionsTable)
+      .where(eq(practiceSessionsTable.userId, userId))
       .orderBy(desc(practiceSessionsTable.createdAt)),
-    db.select().from(knowledgeAssetsTable).orderBy(desc(knowledgeAssetsTable.createdAt)),
+    db.select().from(knowledgeAssetsTable).where(eq(knowledgeAssetsTable.userId, userId)).orderBy(desc(knowledgeAssetsTable.createdAt)),
   ]);
 
   const activity = [

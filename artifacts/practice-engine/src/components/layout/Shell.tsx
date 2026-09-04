@@ -16,9 +16,11 @@ import {
   Sparkles,
   Target,
   Zap,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import { useGetPracticeProfile } from "@workspace/api-client-react";
+import { useClerk } from "@clerk/react";
 import { cn } from "@/lib/utils";
 
 type NavItem = { name: string; href: string; icon: LucideIcon };
@@ -68,6 +70,7 @@ const titleForPath = (path: string) => {
 export function Shell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { data: profile } = useGetPracticeProfile();
+  const { signOut } = useClerk();
 
   if (location === "/onboarding") {
     return <main className="flex min-h-[100dvh] flex-1 flex-col">{children}</main>;
@@ -79,6 +82,10 @@ export function Shell({ children }: { children: ReactNode }) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const handleSignOut = () => {
+    signOut({ redirectUrl: import.meta.env.BASE_URL.replace(/\/$/, "") || "/" });
+  };
 
   return (
     <div className="engine-shell flex overflow-hidden">
@@ -121,7 +128,7 @@ export function Shell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border p-3">
+        <div className="border-t border-sidebar-border p-3 space-y-0.5">
           <Link
             href="/settings"
             data-active={location === "/settings"}
@@ -131,6 +138,14 @@ export function Shell({ children }: { children: ReactNode }) {
             <Settings className="h-[15px] w-[15px] shrink-0" strokeWidth={1.7} />
             <span className="engine-nav-text">Settings</span>
           </Link>
+          <button
+            onClick={handleSignOut}
+            className="engine-nav-link flex items-center gap-2.5 px-2.5 py-2 text-[12px] transition-colors w-full text-left"
+          >
+            <LogOut className="h-[15px] w-[15px] shrink-0" strokeWidth={1.7} />
+            <span className="engine-nav-text">Sign out</span>
+          </button>
+          
           <div className="mt-3 flex items-center gap-2 border-t border-sidebar-border px-2.5 pt-3">
             <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary" data-testid="avatar-coach">
               {initials}

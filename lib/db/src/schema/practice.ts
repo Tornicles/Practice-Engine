@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgTable,
   serial,
@@ -10,12 +11,16 @@ import { z } from "zod/v4";
 
 export const coachProfilesTable = pgTable("coach_profiles", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().unique().default("legacy"),
   name: text("name").notNull(),
   niche: text("niche").notNull().default("Leadership & Business Coaching"),
   experienceLevel: text("experience_level").notNull().default("Developing coach"),
   audience: text("audience").notNull().default("Growth-stage leaders"),
   goal: text("goal").notNull().default("Become a better coach"),
   developmentFocus: text("development_focus").notNull().default("Questioning under resistance"),
+  workingPreferences: text("working_preferences").notNull().default("Challenge me; require evidence; preserve my voice"),
+  onboardingStep: integer("onboarding_step").notNull().default(1),
+  onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
   practiceScore: integer("practice_score").notNull().default(74),
   streak: integer("streak").notNull().default(17),
   updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -26,6 +31,7 @@ export const coachProfilesTable = pgTable("coach_profiles", {
 
 export const experiencesTable = pgTable("experiences", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().default("legacy"),
   title: text("title").notNull(),
   situation: text("situation").notNull(),
   learning: text("learning").notNull(),
@@ -38,6 +44,7 @@ export const experiencesTable = pgTable("experiences", {
 
 export const practiceSessionsTable = pgTable("practice_sessions", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().default("legacy"),
   scenario: text("scenario").notNull(),
   category: text("category").notNull(),
   score: integer("score"),
@@ -50,6 +57,7 @@ export const practiceSessionsTable = pgTable("practice_sessions", {
 
 export const knowledgeAssetsTable = pgTable("knowledge_assets", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().default("legacy"),
   sourceExperienceId: integer("source_experience_id")
     .notNull()
     .references(() => experiencesTable.id, { onDelete: "cascade" }),
@@ -65,6 +73,7 @@ export const knowledgeAssetsTable = pgTable("knowledge_assets", {
 
 export const promptRunsTable = pgTable("prompt_runs", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().default("legacy"),
   engine: text("engine").notNull(),
   strategy: text("strategy").notNull(),
   inputSummary: text("input_summary").notNull(),
@@ -76,10 +85,12 @@ export const promptRunsTable = pgTable("prompt_runs", {
 
 export const insertCoachProfileSchema = createInsertSchema(coachProfilesTable).omit({
   id: true,
+  userId: true,
   updatedAt: true,
 });
 export const insertExperienceSchema = createInsertSchema(experiencesTable).omit({
   id: true,
+  userId: true,
   status: true,
   createdAt: true,
 });
@@ -87,6 +98,7 @@ export const insertPracticeSessionSchema = createInsertSchema(
   practiceSessionsTable,
 ).omit({
   id: true,
+  userId: true,
   completedAt: true,
   createdAt: true,
 });
@@ -94,11 +106,13 @@ export const insertKnowledgeAssetSchema = createInsertSchema(
   knowledgeAssetsTable,
 ).omit({
   id: true,
+  userId: true,
   status: true,
   createdAt: true,
 });
 export const insertPromptRunSchema = createInsertSchema(promptRunsTable).omit({
   id: true,
+  userId: true,
   createdAt: true,
 });
 
