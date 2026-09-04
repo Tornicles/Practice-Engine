@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, Loader2, Zap, ArrowLeft, LogOut, AlertCircle } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function Onboarding() {
   const [, setLocation] = useLocation();
@@ -76,8 +77,16 @@ export default function Onboarding() {
       queryClient.setQueryData(getGetPracticeProfileQueryKey(), updatedProfile);
 
       if (complete) {
+        trackEvent("onboarding_step_completed", { step: 4 });
+        trackEvent("onboarding_completed");
+        try {
+          window.localStorage.setItem("onboarding_completed", "true");
+        } catch {
+          // Product flow must work even when browser storage is unavailable.
+        }
         setLocation('/dashboard');
       } else {
+        trackEvent("onboarding_step_completed", { step });
         setStep(nextStep);
       }
     } catch (err: any) {

@@ -2,13 +2,13 @@ import express, { type Express } from "express";
 import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
-import router from "./routes";
-import { logger } from "./lib/logger";
+import router from "./routes/index.ts";
+import { logger } from "./lib/logger.ts";
 import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
   getClerkProxyHost,
-} from "./middlewares/clerkProxyMiddleware";
+} from "./middlewares/clerkProxyMiddleware.ts";
 
 const app: Express = express();
 

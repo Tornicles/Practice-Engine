@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Play, CheckCircle2, History, Bot, Loader2, ArrowLeft, Send, User } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { trackEvent } from "@/lib/analytics"
 
 const SCENARIOS = [
   {
@@ -116,6 +117,14 @@ export default function Practice() {
       }
     }, {
       onSuccess: () => {
+        try {
+          if (window.localStorage.getItem("onboarding_completed") === "true") {
+            trackEvent("first_product_action_completed", { action: "practice_session_saved" })
+            window.localStorage.removeItem("onboarding_completed")
+          }
+        } catch {
+          // Analytics state must not interfere with saving a practice session.
+        }
         toast({
           title: "Session Saved",
           description: "Your practice score has been updated.",

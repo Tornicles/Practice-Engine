@@ -1,6 +1,6 @@
-import app from "./app";
-import { scheduleIntelligenceOperationCompaction } from "./lib/intelligence-operations";
-import { logger } from "./lib/logger";
+import app from "./app.ts";
+import { scheduleIntelligenceOperationCompaction } from "./lib/intelligence-operations.ts";
+import { logger } from "./lib/logger.ts";
 
 const rawPort = process.env["PORT"];
 

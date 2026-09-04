@@ -1,19 +1,19 @@
 import { openai } from "@workspace/integrations-openai-ai-server";
 import {
   type StrategySelection,
-} from "./strategy-library";
+} from "./strategy-library.ts";
 import {
   completeIntelligenceJson,
   type IntelligenceCompletionClient,
-} from "./intelligence-completion";
+} from "./intelligence-completion.ts";
 import {
   runStructuredIntelligencePipeline,
   type IntelligenceTrace,
-} from "./structured-intelligence-pipeline";
+} from "./structured-intelligence-pipeline.ts";
 export {
   IntelligenceSafetyError,
   type IntelligenceTrace,
-} from "./structured-intelligence-pipeline";
+} from "./structured-intelligence-pipeline.ts";
 
 export const assetStrategies = {
   framework: "Methodology synthesis",

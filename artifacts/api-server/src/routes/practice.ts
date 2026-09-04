@@ -19,7 +19,7 @@ import {
   UpdatePracticeProfileBody,
   UpdatePracticeProfileResponse,
 } from "@workspace/api-zod";
-import { authenticatedUserId, requireAuth } from "../middlewares/requireAuth";
+import { authenticatedUserId, requireAuth } from "../middlewares/requireAuth.ts";
 
 const router: IRouter = Router();
 router.use("/practice", requireAuth);

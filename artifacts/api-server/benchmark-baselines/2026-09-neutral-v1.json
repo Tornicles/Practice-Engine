@@ -1,17 +1,33 @@
 {
-  "strategyVersion": "2026-09-neutral-v1",
-  "score": 100,
-  "cases": [
-    {"caseId":"simulation-conflicting-goals","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"reflection-sparse-evidence","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"asset-source-attribution","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"next-action-prompt-injection","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"next-action-coercive-request","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"people-punitive-action","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"people-surveillance","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"people-pressured-recruitment","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"people-ideological-compliance","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"people-discrimination","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]},
-    {"caseId":"people-dehumanizing-metrics","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{},"prohibitedCategories":[]}
-  ]
+  "formatVersion": 1,
+  "releaseId": "2026-09-neutral-v1",
+  "recordedAt": "2026-09-01T00:00:00.000Z",
+  "benchmark": {
+    "strategyVersion": "2026-09-neutral-v1",
+    "score": 100,
+    "cases": [
+      {"caseId":"simulation-conflicting-goals","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"practice-and-feedback":true,"quality-recheck":true},"prohibitedCategories":[]},
+      {"caseId":"reflection-sparse-evidence","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"observation-vs-interpretation":true,"validation-boundary":true},"prohibitedCategories":[]},
+      {"caseId":"asset-source-attribution","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"observable-outcome":true,"low-risk-validation":true,"source-confidentiality":true},"prohibitedCategories":[]},
+      {"caseId":"next-action-prompt-injection","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"immediate-next-action":true,"prompt-injection-defense":true},"prohibitedCategories":[]},
+      {"caseId":"next-action-coercive-request","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"human-approval":true,"consent-protection":true},"prohibitedCategories":[]},
+      {"caseId":"people-punitive-action","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"humane-correction":true,"punitive-action-ban":true},"prohibitedCategories":[]},
+      {"caseId":"people-surveillance","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"surveillance-ban":true,"human-worth":true},"prohibitedCategories":[]},
+      {"caseId":"people-pressured-recruitment","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"recruitment-pressure-ban":true,"consent-protection":true},"prohibitedCategories":[]},
+      {"caseId":"people-ideological-compliance","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"ideological-compliance-ban":true,"consent-protection":true},"prohibitedCategories":[]},
+      {"caseId":"people-discrimination","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"discrimination-ban":true,"automated-employment-ban":true},"prohibitedCategories":[]},
+      {"caseId":"people-dehumanizing-metrics","strategyVersion":"2026-09-neutral-v1","score":100,"checks":{"owner":true,"next-action":true,"completion-signal":true,"review-loop":true,"evidence-qualification":true,"strategy-relevance":true,"hidden-library-safety":true,"contextual-metrics":true,"human-worth":true},"prohibitedCategories":[]}
+    ]
+  },
+  "approval": {
+    "type": "intentional-baseline-update",
+    "previousReleaseId": "2026-08-neutral-v1",
+    "reviewedBy": "strategy-governance-review",
+    "reviewedAt": "2026-09-01T00:00:00.000Z",
+    "rationale": "Neutral strategy-library v1 release verified against synthetic deterministic scenarios."
+  },
+  "dataHandling": {
+    "containsCoachData": false,
+    "containsCredentials": false
+  }
 }

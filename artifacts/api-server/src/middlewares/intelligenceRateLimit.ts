@@ -1,12 +1,12 @@
 import type { RequestHandler } from "express";
 import { db, intelligenceRateLimitsTable } from "@workspace/db";
 import { sql } from "drizzle-orm";
-import { authenticatedUserId } from "./requireAuth";
+import { authenticatedUserId } from "./requireAuth.ts";
 import {
   engineFromAiPath,
   recordIntelligenceOperation,
-} from "../lib/intelligence-operations";
-import { launchOperationalWrites } from "../lib/intelligence-operation-policy";
+} from "../lib/intelligence-operations.ts";
+import { launchOperationalWrites } from "../lib/intelligence-operation-policy.ts";
 
 export const intelligenceRateLimit: RequestHandler = async (req, res, next) => {
   try {

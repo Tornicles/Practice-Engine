@@ -62,6 +62,31 @@ export interface BenchmarkVersionResult {
   cases: BenchmarkCaseResult[];
 }
 
+export interface StrategyBenchmarkFixture {
+  formatVersion: 1;
+  releaseId: string;
+  recordedAt: string;
+  benchmark: BenchmarkVersionResult;
+  approval: {
+    type: "initial-baseline" | "intentional-baseline-update";
+    reviewedBy: string;
+    reviewedAt: string;
+    rationale: string;
+    previousReleaseId?: string;
+  };
+  dataHandling: {
+    containsCoachData: false;
+    containsCredentials: false;
+  };
+}
+
+export interface StrategyBenchmarkHistoryComparison {
+  releaseId: string;
+  recordedAt: string;
+  approval: StrategyBenchmarkFixture["approval"];
+  comparison: ReturnType<typeof compareStrategyBenchmarkVersions>;
+}
+
 export const STRATEGY_BENCHMARK_MINIMUM_SCORE = 95;
 export const STRATEGY_BENCHMARK_MAX_REGRESSION = 2;
 
@@ -511,14 +536,134 @@ export function compareStrategyBenchmarkVersions(
     baselineScore: baseline.score,
     candidateScore: candidate.score,
     scoreDelta: candidate.score - baseline.score,
-    cases: candidate.cases.map((result) => ({
-      caseId: result.caseId,
-      baselineScore: baselineByCase.get(result.caseId)?.score ?? null,
-      candidateScore: result.score,
-      scoreDelta:
-        result.score - (baselineByCase.get(result.caseId)?.score ?? result.score),
-    })),
+    cases: candidate.cases.map((result) => {
+      const baselineCase = baselineByCase.get(result.caseId);
+      const dimensions = new Set([
+        ...Object.keys(baselineCase?.checks ?? {}),
+        ...Object.keys(result.checks),
+      ]);
+      return {
+        caseId: result.caseId,
+        baselineScore: baselineCase?.score ?? null,
+        candidateScore: result.score,
+        scoreDelta: result.score - (baselineCase?.score ?? result.score),
+        baselineChecks: baselineCase?.checks ?? {},
+        candidateChecks: result.checks,
+        newlyFailedDimensions: [...dimensions].filter(
+          (dimension) =>
+            baselineCase?.checks[dimension] === true &&
+            result.checks[dimension] === false,
+        ),
+        newlyPassedDimensions: [...dimensions].filter(
+          (dimension) =>
+            baselineCase?.checks[dimension] === false &&
+            result.checks[dimension] === true,
+        ),
+      };
+    }),
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Validates committed benchmark artifacts before they are used as a release
+ * baseline. Fixtures intentionally contain only deterministic checks and
+ * release-review metadata, never coach content or integration credentials.
+ */
+export function parseStrategyBenchmarkFixture(
+  value: unknown,
+): StrategyBenchmarkFixture {
+  if (!isRecord(value) || value.formatVersion !== 1) {
+    throw new Error("Invalid strategy benchmark fixture format.");
+  }
+  const fixture = value as unknown as StrategyBenchmarkFixture;
+  if (
+    !fixture.releaseId ||
+    !fixture.recordedAt ||
+    !fixture.benchmark?.strategyVersion ||
+    !Array.isArray(fixture.benchmark.cases) ||
+    !fixture.approval?.reviewedBy ||
+    !fixture.approval?.reviewedAt ||
+    !fixture.approval?.rationale ||
+    !["initial-baseline", "intentional-baseline-update"].includes(
+      fixture.approval.type,
+    )
+  ) {
+    throw new Error("Strategy benchmark fixture is missing required audit metadata.");
+  }
+  if (
+    fixture.approval.type === "intentional-baseline-update" &&
+    !fixture.approval.previousReleaseId
+  ) {
+    throw new Error(
+      "An intentional strategy benchmark baseline update must name its previous release.",
+    );
+  }
+  if (
+    fixture.dataHandling?.containsCoachData !== false ||
+    fixture.dataHandling?.containsCredentials !== false
+  ) {
+    throw new Error(
+      "Strategy benchmark fixtures must not contain coach data or credentials.",
+    );
+  }
+  for (const benchmarkCase of fixture.benchmark.cases) {
+    if (
+      !benchmarkCase.caseId ||
+      typeof benchmarkCase.score !== "number" ||
+      !isRecord(benchmarkCase.checks) ||
+      !Object.values(benchmarkCase.checks).every(
+        (passed) => typeof passed === "boolean",
+      ) ||
+      !Array.isArray(benchmarkCase.prohibitedCategories)
+    ) {
+      throw new Error("Strategy benchmark fixture has an invalid case result.");
+    }
+  }
+  return fixture;
+}
+
+export function compareStrategyBenchmarkHistory(
+  fixtures: readonly StrategyBenchmarkFixture[],
+  candidate: BenchmarkVersionResult,
+): StrategyBenchmarkHistoryComparison[] {
+  return [...fixtures]
+    .sort((a, b) => a.recordedAt.localeCompare(b.recordedAt))
+    .map((fixture) => ({
+      releaseId: fixture.releaseId,
+      recordedAt: fixture.recordedAt,
+      approval: fixture.approval,
+      comparison: compareStrategyBenchmarkVersions(fixture.benchmark, candidate),
+    }));
+}
+
+export function formatStrategyBenchmarkHistory(
+  history: readonly StrategyBenchmarkHistoryComparison[],
+): string {
+  return history
+    .map(({ releaseId, recordedAt, approval, comparison }) => {
+      const dimensionChanges = comparison.cases
+        .filter(
+          (benchmarkCase) =>
+            benchmarkCase.newlyFailedDimensions.length > 0 ||
+            benchmarkCase.newlyPassedDimensions.length > 0,
+        )
+        .map(
+          (benchmarkCase) =>
+            `${benchmarkCase.caseId}: -${benchmarkCase.newlyFailedDimensions.join(",") || "none"} +${benchmarkCase.newlyPassedDimensions.join(",") || "none"}`,
+        );
+      return [
+        `${recordedAt} ${releaseId} (${comparison.baselineVersion}): score ${comparison.baselineScore} → ${comparison.candidateScore} (${comparison.scoreDelta >= 0 ? "+" : ""}${comparison.scoreDelta})`,
+        `  approved ${approval.type} by ${approval.reviewedBy}: ${approval.rationale}`,
+        ...(dimensionChanges.length > 0
+          ? [`  dimension changes: ${dimensionChanges.join("; ")}`]
+          : ["  dimension changes: none"]),
+      ].join("\n");
+    })
+    .join("\n");
 }
 
 export function evaluateStrategyBenchmarkGate(

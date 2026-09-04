@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronRight, Gauge, Layers3, Library, Target, Sparkles, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
+import { trackEvent } from "@/lib/analytics";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -47,7 +48,7 @@ export default function Home() {
           </motion.p>
 
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-start gap-5">
-            <Link href="/sign-up" className="inline-flex h-14 items-center justify-center gap-2 rounded-sm bg-primary px-8 text-xs font-bold uppercase tracking-[.15em] text-primary-foreground hover:bg-primary/90 transition-all hover:scale-[1.02] shadow-[0_0_25px_rgba(201,168,78,0.2)] w-full sm:w-auto" data-testid="button-hero-cta">
+            <Link href="/sign-up" className="inline-flex h-14 items-center justify-center gap-2 rounded-sm bg-primary px-8 text-xs font-bold uppercase tracking-[.15em] text-primary-foreground hover:bg-primary/90 transition-all hover:scale-[1.02] shadow-[0_0_25px_rgba(201,168,78,0.2)] w-full sm:w-auto" onClick={() => trackEvent("landing_cta_clicked", { location: "hero" })} data-testid="button-hero-cta">
               Enter the Studio <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/how-it-works" className="inline-flex h-14 items-center justify-center gap-2 rounded-sm border border-border/80 bg-background/50 backdrop-blur-sm px-8 text-xs font-semibold uppercase tracking-[.15em] text-foreground hover:border-primary/50 hover:bg-card transition-colors w-full sm:w-auto" data-testid="button-hero-secondary">
@@ -236,7 +237,7 @@ export default function Home() {
           <p className="mb-12 text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
             Your proprietary methodology is waiting to be built. Begin documenting your practice, extracting principles, and scaling your authority today.
           </p>
-          <Link href="/sign-up" className="inline-flex h-16 items-center justify-center gap-3 rounded-sm bg-primary px-12 text-sm font-bold uppercase tracking-[.15em] text-primary-foreground hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(201,168,78,0.25)]" data-testid="button-bottom-cta">
+          <Link href="/sign-up" className="inline-flex h-16 items-center justify-center gap-3 rounded-sm bg-primary px-12 text-sm font-bold uppercase tracking-[.15em] text-primary-foreground hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(201,168,78,0.25)]" onClick={() => trackEvent("landing_cta_clicked", { location: "footer" })} data-testid="button-bottom-cta">
             Start Your Engine <ArrowRight className="h-5 w-5" />
           </Link>
         </motion.div>

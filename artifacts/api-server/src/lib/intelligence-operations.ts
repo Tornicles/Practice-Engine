@@ -4,8 +4,8 @@ import {
   intelligenceOperationsTable,
 } from "@workspace/db";
 import { and, eq, isNull, lt, ne, or, sql } from "drizzle-orm";
-import type { IntelligenceTrace } from "./practice-intelligence";
-import type { StrategySelection } from "./strategy-library";
+import type { IntelligenceTrace } from "./practice-intelligence.ts";
+import type { StrategySelection } from "./strategy-library.ts";
 import {
   buildIntelligenceAlertNotification,
   buildIntelligenceAlerts,

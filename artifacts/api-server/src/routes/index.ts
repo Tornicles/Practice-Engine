@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import practiceRouter from "./practice";
-import intelligenceRouter from "./intelligence";
+import healthRouter from "./health.ts";
+import practiceRouter from "./practice.ts";
+import intelligenceRouter from "./intelligence.ts";
 
 const router: IRouter = Router();
 

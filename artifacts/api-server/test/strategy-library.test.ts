@@ -8,9 +8,12 @@ import {
 } from "../src/lib/strategy-library.ts";
 import {
   compareStrategyBenchmarkVersions,
+  compareStrategyBenchmarkHistory,
   createProductionBenchmarkCandidates,
   evaluateStrategyBenchmarkGate,
   formatStrategyBenchmarkGate,
+  formatStrategyBenchmarkHistory,
+  parseStrategyBenchmarkFixture,
   runDeterministicProductionStrategyBenchmark,
   runStrategyBenchmark,
   scoreStrategyBenchmarkCase,
@@ -232,6 +235,58 @@ test("benchmark runs without coach data or credentials and compares versions", (
   assert.equal(comparison.scoreDelta, 5);
   assert.equal(comparison.candidateVersion, current.strategyVersion);
   assert.equal(comparison.baselineVersion, "baseline-fixture");
+});
+
+test("release fixtures preserve reviewed historical dimensions without coach data", () => {
+  const benchmark = runStrategyBenchmark(createProductionBenchmarkCandidates());
+  const initial = parseStrategyBenchmarkFixture({
+    formatVersion: 1,
+    releaseId: "2026-08-neutral-v1",
+    recordedAt: "2026-08-01T00:00:00.000Z",
+    benchmark: { ...benchmark, strategyVersion: "2026-08-neutral-v1" },
+    approval: {
+      type: "initial-baseline",
+      reviewedBy: "strategy-governance-review",
+      reviewedAt: "2026-08-01T00:00:00.000Z",
+      rationale: "Initial deterministic release fixture.",
+    },
+    dataHandling: { containsCoachData: false, containsCredentials: false },
+  });
+  const current = {
+    ...benchmark,
+    cases: benchmark.cases.map((result, index) =>
+      index === 0
+        ? { ...result, checks: { ...result.checks, owner: false }, score: 89 }
+        : result,
+    ),
+  };
+  const history = compareStrategyBenchmarkHistory([initial], current);
+
+  assert.deepEqual(history[0]?.comparison.cases[0]?.newlyFailedDimensions, [
+    "owner",
+  ]);
+  assert.match(formatStrategyBenchmarkHistory(history), /2026-08-neutral-v1/);
+  assert.match(formatStrategyBenchmarkHistory(history), /owner/);
+  assert.throws(
+    () =>
+      parseStrategyBenchmarkFixture({
+        ...initial,
+        dataHandling: { containsCoachData: true, containsCredentials: false },
+      }),
+    /must not contain coach data or credentials/,
+  );
+  assert.throws(
+    () =>
+      parseStrategyBenchmarkFixture({
+        ...initial,
+        approval: {
+          ...initial.approval,
+          type: "intentional-baseline-update",
+          previousReleaseId: undefined,
+        },
+      }),
+    /must name its previous release/,
+  );
 });
 
 test("quality gate rejects regressions with scenario and dimension diagnostics", () => {

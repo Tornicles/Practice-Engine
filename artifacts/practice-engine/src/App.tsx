@@ -36,6 +36,7 @@ import Delivery from "@/pages/Delivery";
 import Settings from "@/pages/Settings";
 import Onboarding from "@/pages/Onboarding";
 import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -122,6 +123,10 @@ function SignInPage() {
 }
 
 function SignUpPage() {
+  useEffect(() => {
+    trackEvent("account_flow_entered", { entry_point: "sign_up" });
+  }, []);
+
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 bg-noisy">
       <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />

@@ -24,28 +24,28 @@ import {
   generateStructured,
   IntelligenceSafetyError,
   type IntelligenceTrace,
-} from "../lib/practice-intelligence";
+} from "../lib/practice-intelligence.ts";
 import {
   compactIntelligenceOperations,
   recordIntelligenceOperation,
   reportIntelligenceOperations,
-} from "../lib/intelligence-operations";
+} from "../lib/intelligence-operations.ts";
 import {
   buildIntelligenceAlerts,
   classifyIntelligenceFailure,
   launchOperationalWrites,
-} from "../lib/intelligence-operation-policy";
-import { logger } from "../lib/logger";
+} from "../lib/intelligence-operation-policy.ts";
+import { logger } from "../lib/logger.ts";
 import {
   selectStrategies,
   type StrategySelection,
-} from "../lib/strategy-library";
+} from "../lib/strategy-library.ts";
 import {
   authenticatedUserId,
   requireAuth,
   requireOperator,
-} from "../middlewares/requireAuth";
-import { intelligenceRateLimit } from "../middlewares/intelligenceRateLimit";
+} from "../middlewares/requireAuth.ts";
+import { intelligenceRateLimit } from "../middlewares/intelligenceRateLimit.ts";
 
 const router: IRouter = Router();
 router.use("/practice", requireAuth);
