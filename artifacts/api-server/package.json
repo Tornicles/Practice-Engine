@@ -8,7 +8,9 @@
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "strategy:quality-gate": "node src/scripts/strategy-benchmark-gate.ts",
-    "test": "node --test test/*.test.ts",
+    "test": "pnpm run test:intelligence-operations && pnpm run test:parallel",
+    "test:intelligence-operations": "node --test --test-concurrency=1 test/intelligence-operations.test.ts",
+    "test:parallel": "node --test $(find test -name '*.test.ts' ! -name 'intelligence-operations.test.ts' -print)",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
