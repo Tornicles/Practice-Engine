@@ -1,12 +1,12 @@
-import { useListPracticeSessions, useCreatePracticeSession, getListPracticeSessionsQueryKey } from "@workspace/api-client-react"
+import { useListPracticeSessions, useCreatePracticeSession, useSimulateClientTurn, getListPracticeSessionsQueryKey, ConversationMessage } from "@workspace/api-client-react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Play, CheckCircle2, History, Bot, Loader2, ArrowLeft } from "lucide-react"
+import { Play, CheckCircle2, History, Bot, Loader2, ArrowLeft, Send, User } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 const SCENARIOS = [
@@ -38,19 +38,71 @@ export default function Practice() {
   const { toast } = useToast()
   const { data: sessions, isLoading: sessionsLoading } = useListPracticeSessions()
   const createSession = useCreatePracticeSession()
+  const simulateTurn = useSimulateClientTurn()
 
   const [activeScenario, setActiveScenario] = useState<typeof SCENARIOS[0] | null>(null)
   const [sessionState, setSessionState] = useState<"brief" | "simulating" | "feedback">("brief")
+  
+  const [history, setHistory] = useState<ConversationMessage[]>([])
+  const [coachInput, setCoachInput] = useState("")
+  const [latestObservation, setLatestObservation] = useState("")
+  const [latestSkill, setLatestSkill] = useState("")
+  const [currentScore, setCurrentScore] = useState(0)
+  
   const [reflection, setReflection] = useState("")
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [history])
 
   const handleStart = (s: typeof SCENARIOS[0]) => {
     setActiveScenario(s)
+    setHistory([])
+    setCoachInput("")
+    setLatestObservation("")
+    setLatestSkill("")
+    setCurrentScore(0)
     setSessionState("brief")
   }
 
   const handleBeginSim = () => setSessionState("simulating")
 
-  const handleEndSim = () => setSessionState("feedback")
+  const handleSendTurn = () => {
+    if (!coachInput.trim() || !activeScenario) return;
+
+    const newMessage: ConversationMessage = { role: "coach", content: coachInput };
+    const currentHistory = [...history];
+    setHistory(prev => [...prev, newMessage]);
+    setCoachInput("");
+
+    simulateTurn.mutate({
+      data: {
+        scenario: activeScenario.title,
+        category: activeScenario.category,
+        difficulty: activeScenario.difficulty,
+        coachMessage: newMessage.content,
+        history: currentHistory
+      }
+    }, {
+      onSuccess: (res) => {
+        setHistory(prev => [...prev, { role: "client", content: res.clientReply }]);
+        setLatestObservation(res.observation);
+        setLatestSkill(res.skill);
+        setCurrentScore(res.score);
+        
+        if (res.sessionComplete) {
+          toast({
+            title: "Session Completed",
+            description: "The AI has concluded the scenario. Proceed to reflection.",
+          })
+          setTimeout(() => setSessionState("feedback"), 2000);
+        }
+      }
+    })
+  }
 
   const handleSave = () => {
     if (!activeScenario) return
@@ -59,8 +111,8 @@ export default function Practice() {
       data: {
         scenario: activeScenario.title,
         category: activeScenario.category,
-        score: Math.floor(Math.random() * 20) + 70, // Mock score generation
-        feedback: reflection || "Completed practice scenario successfully."
+        score: currentScore || 85,
+        feedback: reflection
       }
     }, {
       onSuccess: () => {
@@ -77,7 +129,7 @@ export default function Practice() {
 
   if (activeScenario) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+      <div className="max-w-4xl mx-auto space-y-6 animate-in slide-in-from-bottom-4 duration-500 pb-12">
         <Button variant="ghost" onClick={() => setActiveScenario(null)} className="-ml-4 text-muted-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Library
         </Button>
@@ -117,43 +169,160 @@ export default function Practice() {
         )}
 
         {sessionState === "simulating" && (
-          <Card className="border-border">
-            <CardHeader className="flex flex-row items-center gap-4 border-b border-border/50 pb-4">
-              <div className="h-10 w-10 bg-secondary rounded-full flex items-center justify-center">
-                <Bot className="h-5 w-5" />
-              </div>
-              <div>
-                <CardTitle className="text-base">AI Client Simulator</CardTitle>
-                <CardDescription>Respond as you would in a real session.</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="py-8 min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-              <Bot className="h-12 w-12 text-muted-foreground opacity-50" />
-              <p className="text-muted-foreground max-w-md">
-                (Imagine an interactive chat interface here where the coach talks to the AI client and gets real-time evaluation.)
-              </p>
-              <Button variant="outline" onClick={handleEndSim}>Complete Simulation</Button>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <Card className="border-border shadow-sm flex flex-col h-[600px]">
+                <CardHeader className="flex flex-row items-center gap-4 border-b border-border/50 py-4 bg-muted/20">
+                  <div className="h-10 w-10 bg-secondary rounded-full flex items-center justify-center">
+                    <Bot className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">Client Simulator</CardTitle>
+                    <CardDescription>Respond as you would in a real session.</CardDescription>
+                  </div>
+                  <div className="ml-auto">
+                    <Button variant="outline" size="sm" onClick={() => setSessionState("feedback")}>
+                      End Session
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent 
+                  className="flex-1 overflow-y-auto p-6 space-y-6 bg-card"
+                  ref={scrollRef}
+                >
+                  {history.length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground space-y-4 opacity-50">
+                      <Bot className="h-12 w-12" />
+                      <p>You enter the session. Speak to the client to begin.</p>
+                    </div>
+                  )}
+                  {history.map((msg, i) => (
+                    <div key={i} className={`flex gap-4 ${msg.role === 'coach' ? 'justify-end' : ''}`}>
+                      {msg.role === 'client' && (
+                        <div className="h-8 w-8 rounded-full bg-secondary shrink-0 flex items-center justify-center">
+                          <Bot className="h-4 w-4" />
+                        </div>
+                      )}
+                      <div className={`p-4 rounded-xl max-w-[80%] ${
+                        msg.role === 'coach' 
+                          ? 'bg-primary text-primary-foreground rounded-br-sm' 
+                          : 'bg-muted rounded-bl-sm'
+                      }`}>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                      {msg.role === 'coach' && (
+                        <div className="h-8 w-8 rounded-full bg-primary/20 shrink-0 flex items-center justify-center">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {simulateTurn.isPending && (
+                    <div className="flex gap-4">
+                      <div className="h-8 w-8 rounded-full bg-secondary shrink-0 flex items-center justify-center">
+                        <Bot className="h-4 w-4" />
+                      </div>
+                      <div className="p-4 rounded-xl bg-muted rounded-bl-sm flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Client is typing...</span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+                <div className="p-4 border-t border-border/50 bg-background">
+                  <form 
+                    className="flex gap-2"
+                    onSubmit={(e) => { e.preventDefault(); handleSendTurn(); }}
+                  >
+                    <Textarea 
+                      value={coachInput}
+                      onChange={(e) => setCoachInput(e.target.value)}
+                      placeholder="What do you say to the client?"
+                      className="min-h-[60px] resize-none"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendTurn();
+                        }
+                      }}
+                    />
+                    <Button 
+                      type="submit" 
+                      className="h-auto px-6"
+                      disabled={simulateTurn.isPending || !coachInput.trim()}
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </form>
+                </div>
+              </Card>
+            </div>
+            
+            <div className="space-y-6">
+              <Card className="border-border">
+                <CardHeader className="bg-primary/5 border-b border-border/50 py-4">
+                  <CardTitle className="text-sm uppercase tracking-wider text-primary">Private Observation</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 space-y-6">
+                  {latestObservation ? (
+                    <div className="space-y-4 animate-in fade-in">
+                      <div>
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Live Feedback</h4>
+                        <p className="text-sm text-foreground leading-relaxed">{latestObservation}</p>
+                      </div>
+                      <div className="pt-4 border-t border-border/50 flex items-center justify-between">
+                        <div>
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Skill Focus</h4>
+                          <p className="text-sm font-medium mt-1">{latestSkill}</p>
+                        </div>
+                        <div className="text-right">
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Current Score</h4>
+                          <p className="text-2xl font-mono text-primary font-bold mt-1">{currentScore}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground text-center py-8 opacity-60">
+                      Interact with the client to receive live coaching observations.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         )}
 
         {sessionState === "feedback" && (
           <Card>
             <CardHeader>
-              <CardTitle>Session Review</CardTitle>
-              <CardDescription>Reflect on your performance.</CardDescription>
+              <CardTitle>Session Reflection</CardTitle>
+              <CardDescription>Consolidate your learning to finalize the score.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-secondary/50 rounded-lg p-4 mb-6">
-                <h4 className="text-sm font-semibold mb-2">AI Feedback</h4>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-secondary/30 rounded-lg p-4 border border-border/50">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Final Score</h4>
+                  <p className="text-3xl font-mono text-primary">{currentScore || 85}</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-4 border border-border/50">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Skill Focus</h4>
+                  <p className="text-sm font-medium">{latestSkill || "Active Listening & Redirect"}</p>
+                </div>
+              </div>
+              
+              <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                  <Bot className="h-4 w-4" /> AI Supervisor Notes
+                </h4>
                 <p className="text-sm text-muted-foreground">
-                  You successfully redirected the client after their initial defensive reaction. However, you jumped into problem-solving slightly too early. Next time, try holding silence for 3-5 seconds after they finish speaking to see if they solve it themselves.
+                  {latestObservation || "You handled the resistance well, but ensure you give the client enough silence to solve their own problem before jumping in with frameworks."}
                 </p>
               </div>
+              
               <div className="space-y-2">
                 <label className="text-sm font-medium">Your Reflection</label>
                 <Textarea 
-                  placeholder="What did you learn? What principle can you extract?" 
+                  placeholder="What did you learn? What principle can you extract from this?" 
                   className="min-h-[120px]"
                   value={reflection}
                   onChange={(e) => setReflection(e.target.value)}
@@ -161,9 +330,9 @@ export default function Practice() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleSave} disabled={createSession.isPending} className="w-full sm:w-auto">
+              <Button onClick={handleSave} disabled={createSession.isPending || !reflection.trim()} className="w-full sm:w-auto">
                 {createSession.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                Save & Analyze
+                Save & Update Passport
               </Button>
             </CardFooter>
           </Card>
@@ -174,7 +343,7 @@ export default function Practice() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div>
         <h1 className="font-serif text-3xl font-medium tracking-tight mb-2">Practice Simulator</h1>
         <p className="text-muted-foreground">Hone your skills in a safe environment before facing real clients.</p>

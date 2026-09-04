@@ -20,14 +20,22 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AssetGenerationInput,
   CoachProfile,
   CoachProfileUpdate,
   Experience,
+  ExperienceExtractionInput,
+  ExperienceExtractionResult,
   ExperienceInput,
   HealthStatus,
+  KnowledgeAsset,
+  NextActionInput,
+  NextActionResult,
   PracticeOverview,
   PracticeSession,
-  PracticeSessionInput
+  PracticeSessionInput,
+  SimulationTurnInput,
+  SimulationTurnResult
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -654,5 +662,366 @@ export const useCreatePracticeSession = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCreatePracticeSessionMutationOptions(options));
+    }
+
+export const getListKnowledgeAssetsUrl = () => {
+
+
+
+
+  return `/api/practice/assets`
+}
+
+/**
+ * @summary List generated knowledge and IP assets
+ */
+export const listKnowledgeAssets = async ( options?: Parameters<typeof customFetch>[1]): Promise<KnowledgeAsset[]> => {
+
+  return customFetch<KnowledgeAsset[]>(getListKnowledgeAssetsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListKnowledgeAssetsQueryKey = () => {
+    return [
+    `/api/practice/assets`
+    ] as const;
+    }
+
+
+export const getListKnowledgeAssetsQueryOptions = <TData = Awaited<ReturnType<typeof listKnowledgeAssets>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeAssets>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListKnowledgeAssetsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listKnowledgeAssets>>> = ({ signal }) => listKnowledgeAssets({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeAssets>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListKnowledgeAssetsQueryResult = NonNullable<Awaited<ReturnType<typeof listKnowledgeAssets>>>
+export type ListKnowledgeAssetsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List generated knowledge and IP assets
+ */
+
+export function useListKnowledgeAssets<TData = Awaited<ReturnType<typeof listKnowledgeAssets>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeAssets>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListKnowledgeAssetsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSimulateClientTurnUrl = () => {
+
+
+
+
+  return `/api/practice/ai/simulate`
+}
+
+/**
+ * @summary Run one turn of an AI client simulation
+ */
+export const simulateClientTurn = async (simulationTurnInput: SimulationTurnInput, options?: Parameters<typeof customFetch>[1]): Promise<SimulationTurnResult> => {
+
+  return customFetch<SimulationTurnResult>(getSimulateClientTurnUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(simulationTurnInput)
+  }
+);}
+
+
+
+
+
+export const getSimulateClientTurnMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simulateClientTurn>>, TError,{data: BodyType<SimulationTurnInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof simulateClientTurn>>, TError,{data: BodyType<SimulationTurnInput>}, TContext> => {
+
+const mutationKey = ['simulateClientTurn'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof simulateClientTurn>>, {data: BodyType<SimulationTurnInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  simulateClientTurn(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SimulateClientTurnMutationResult = NonNullable<Awaited<ReturnType<typeof simulateClientTurn>>>
+    export type SimulateClientTurnMutationBody = BodyType<SimulationTurnInput>
+    export type SimulateClientTurnMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Run one turn of an AI client simulation
+ */
+export const useSimulateClientTurn = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simulateClientTurn>>, TError,{data: BodyType<SimulationTurnInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof simulateClientTurn>>,
+        TError,
+        {data: BodyType<SimulationTurnInput>},
+        TContext
+      > => {
+      return useMutation(getSimulateClientTurnMutationOptions(options));
+    }
+
+export const getExtractExperienceKnowledgeUrl = () => {
+
+
+
+
+  return `/api/practice/ai/extract`
+}
+
+/**
+ * @summary Extract a lesson, principle, and insight from lived experience
+ */
+export const extractExperienceKnowledge = async (experienceExtractionInput: ExperienceExtractionInput, options?: Parameters<typeof customFetch>[1]): Promise<ExperienceExtractionResult> => {
+
+  return customFetch<ExperienceExtractionResult>(getExtractExperienceKnowledgeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(experienceExtractionInput)
+  }
+);}
+
+
+
+
+
+export const getExtractExperienceKnowledgeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof extractExperienceKnowledge>>, TError,{data: BodyType<ExperienceExtractionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof extractExperienceKnowledge>>, TError,{data: BodyType<ExperienceExtractionInput>}, TContext> => {
+
+const mutationKey = ['extractExperienceKnowledge'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof extractExperienceKnowledge>>, {data: BodyType<ExperienceExtractionInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  extractExperienceKnowledge(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ExtractExperienceKnowledgeMutationResult = NonNullable<Awaited<ReturnType<typeof extractExperienceKnowledge>>>
+    export type ExtractExperienceKnowledgeMutationBody = BodyType<ExperienceExtractionInput>
+    export type ExtractExperienceKnowledgeMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Extract a lesson, principle, and insight from lived experience
+ */
+export const useExtractExperienceKnowledge = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof extractExperienceKnowledge>>, TError,{data: BodyType<ExperienceExtractionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof extractExperienceKnowledge>>,
+        TError,
+        {data: BodyType<ExperienceExtractionInput>},
+        TContext
+      > => {
+      return useMutation(getExtractExperienceKnowledgeMutationOptions(options));
+    }
+
+export const getGenerateKnowledgeAssetUrl = () => {
+
+
+
+
+  return `/api/practice/ai/generate`
+}
+
+/**
+ * @summary Generate a traceable asset from coach knowledge
+ */
+export const generateKnowledgeAsset = async (assetGenerationInput: AssetGenerationInput, options?: Parameters<typeof customFetch>[1]): Promise<KnowledgeAsset> => {
+
+  return customFetch<KnowledgeAsset>(getGenerateKnowledgeAssetUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(assetGenerationInput)
+  }
+);}
+
+
+
+
+
+export const getGenerateKnowledgeAssetMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateKnowledgeAsset>>, TError,{data: BodyType<AssetGenerationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateKnowledgeAsset>>, TError,{data: BodyType<AssetGenerationInput>}, TContext> => {
+
+const mutationKey = ['generateKnowledgeAsset'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateKnowledgeAsset>>, {data: BodyType<AssetGenerationInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateKnowledgeAsset(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateKnowledgeAssetMutationResult = NonNullable<Awaited<ReturnType<typeof generateKnowledgeAsset>>>
+    export type GenerateKnowledgeAssetMutationBody = BodyType<AssetGenerationInput>
+    export type GenerateKnowledgeAssetMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Generate a traceable asset from coach knowledge
+ */
+export const useGenerateKnowledgeAsset = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateKnowledgeAsset>>, TError,{data: BodyType<AssetGenerationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof generateKnowledgeAsset>>,
+        TError,
+        {data: BodyType<AssetGenerationInput>},
+        TContext
+      > => {
+      return useMutation(getGenerateKnowledgeAssetMutationOptions(options));
+    }
+
+export const getRecommendNextActionUrl = () => {
+
+
+
+
+  return `/api/practice/ai/next-action`
+}
+
+/**
+ * @summary Recommend the coach's highest-value next action
+ */
+export const recommendNextAction = async (nextActionInput: NextActionInput, options?: Parameters<typeof customFetch>[1]): Promise<NextActionResult> => {
+
+  return customFetch<NextActionResult>(getRecommendNextActionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(nextActionInput)
+  }
+);}
+
+
+
+
+
+export const getRecommendNextActionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recommendNextAction>>, TError,{data: BodyType<NextActionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recommendNextAction>>, TError,{data: BodyType<NextActionInput>}, TContext> => {
+
+const mutationKey = ['recommendNextAction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recommendNextAction>>, {data: BodyType<NextActionInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  recommendNextAction(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecommendNextActionMutationResult = NonNullable<Awaited<ReturnType<typeof recommendNextAction>>>
+    export type RecommendNextActionMutationBody = BodyType<NextActionInput>
+    export type RecommendNextActionMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Recommend the coach's highest-value next action
+ */
+export const useRecommendNextAction = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recommendNextAction>>, TError,{data: BodyType<NextActionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof recommendNextAction>>,
+        TError,
+        {data: BodyType<NextActionInput>},
+        TContext
+      > => {
+      return useMutation(getRecommendNextActionMutationOptions(options));
     }
 

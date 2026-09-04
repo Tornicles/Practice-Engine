@@ -4,6 +4,7 @@ import {
   db,
   coachProfilesTable,
   experiencesTable,
+  knowledgeAssetsTable,
   practiceSessionsTable,
 } from "@workspace/db";
 import {
@@ -113,12 +114,13 @@ router.post("/practice/sessions", async (req, res): Promise<void> => {
 
 router.get("/practice/overview", async (_req, res): Promise<void> => {
   const profile = await getOrCreateProfile();
-  const [experiences, sessions] = await Promise.all([
+  const [experiences, sessions, assets] = await Promise.all([
     db.select().from(experiencesTable).orderBy(desc(experiencesTable.createdAt)),
     db
       .select()
       .from(practiceSessionsTable)
       .orderBy(desc(practiceSessionsTable.createdAt)),
+    db.select().from(knowledgeAssetsTable).orderBy(desc(knowledgeAssetsTable.createdAt)),
   ]);
 
   const activity = [
@@ -146,8 +148,8 @@ router.get("/practice/overview", async (_req, res): Promise<void> => {
       experienceCount: experiences.length,
       lessonCount: experiences.length,
       principleCount: experiences.filter((item) => item.principle.length > 0).length,
-      frameworkCount: Math.max(1, Math.floor(experiences.length / 2)),
-      ipAssetCount: experiences.length * 2 + sessions.length,
+      frameworkCount: assets.filter((asset) => asset.type === "framework").length,
+      ipAssetCount: assets.length,
       practiceSessionCount: sessions.length,
       skills: [
         { name: "Questioning", score: 82, trend: "Improving" },

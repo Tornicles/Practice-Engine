@@ -48,6 +48,32 @@ export const practiceSessionsTable = pgTable("practice_sessions", {
     .defaultNow(),
 });
 
+export const knowledgeAssetsTable = pgTable("knowledge_assets", {
+  id: serial("id").primaryKey(),
+  sourceExperienceId: integer("source_experience_id")
+    .notNull()
+    .references(() => experiencesTable.id, { onDelete: "cascade" }),
+  type: text("type").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  status: text("status").notNull().default("Draft — needs validation"),
+  promptStrategy: text("prompt_strategy").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const promptRunsTable = pgTable("prompt_runs", {
+  id: serial("id").primaryKey(),
+  engine: text("engine").notNull(),
+  strategy: text("strategy").notNull(),
+  inputSummary: text("input_summary").notNull(),
+  outputSummary: text("output_summary").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const insertCoachProfileSchema = createInsertSchema(coachProfilesTable).omit({
   id: true,
   updatedAt: true,
@@ -64,6 +90,17 @@ export const insertPracticeSessionSchema = createInsertSchema(
   completedAt: true,
   createdAt: true,
 });
+export const insertKnowledgeAssetSchema = createInsertSchema(
+  knowledgeAssetsTable,
+).omit({
+  id: true,
+  status: true,
+  createdAt: true,
+});
+export const insertPromptRunSchema = createInsertSchema(promptRunsTable).omit({
+  id: true,
+  createdAt: true,
+});
 
 export type InsertCoachProfile = z.infer<typeof insertCoachProfileSchema>;
 export type CoachProfile = typeof coachProfilesTable.$inferSelect;
@@ -71,3 +108,7 @@ export type InsertExperience = z.infer<typeof insertExperienceSchema>;
 export type Experience = typeof experiencesTable.$inferSelect;
 export type InsertPracticeSession = z.infer<typeof insertPracticeSessionSchema>;
 export type PracticeSession = typeof practiceSessionsTable.$inferSelect;
+export type InsertKnowledgeAsset = z.infer<typeof insertKnowledgeAssetSchema>;
+export type KnowledgeAsset = typeof knowledgeAssetsTable.$inferSelect;
+export type InsertPromptRun = z.infer<typeof insertPromptRunSchema>;
+export type PromptRun = typeof promptRunsTable.$inferSelect;

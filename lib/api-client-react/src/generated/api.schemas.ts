@@ -115,3 +115,101 @@ export interface PracticeOverview {
   recentActivity: RecentActivity[];
 }
 
+export type ConversationMessageRole = typeof ConversationMessageRole[keyof typeof ConversationMessageRole];
+
+
+export const ConversationMessageRole = {
+  coach: 'coach',
+  client: 'client',
+} as const;
+
+export interface ConversationMessage {
+  role: ConversationMessageRole;
+  content: string;
+}
+
+export interface SimulationTurnInput {
+  /** @minLength 1 */
+  scenario: string;
+  /** @minLength 1 */
+  category: string;
+  /** @minLength 1 */
+  difficulty: string;
+  /** @minLength 1 */
+  coachMessage: string;
+  history: ConversationMessage[];
+}
+
+export interface SimulationTurnResult {
+  clientReply: string;
+  observation: string;
+  skill: string;
+  score: number;
+  sessionComplete: boolean;
+}
+
+export interface ExperienceExtractionInput {
+  title: string;
+  /** @minLength 1 */
+  situation: string;
+  coachReflection: string;
+}
+
+export interface ExperienceExtractionResult {
+  title: string;
+  lesson: string;
+  principle: string;
+  insight: string;
+  frameworkCandidate: string;
+  evidenceGap: string;
+}
+
+export type AssetGenerationInputAssetType = typeof AssetGenerationInputAssetType[keyof typeof AssetGenerationInputAssetType];
+
+
+export const AssetGenerationInputAssetType = {
+  framework: 'framework',
+  exercise: 'exercise',
+  'case-study': 'case-study',
+  content: 'content',
+  workshop: 'workshop',
+  course: 'course',
+  offer: 'offer',
+  brand: 'brand',
+} as const;
+
+export interface AssetGenerationInput {
+  sourceExperienceId: number;
+  assetType: AssetGenerationInputAssetType;
+  /** @minLength 1 */
+  objective: string;
+}
+
+export interface KnowledgeAsset {
+  id: number;
+  sourceExperienceId: number;
+  type: string;
+  title: string;
+  content: string;
+  status: string;
+  promptStrategy: string;
+  createdAt: string;
+}
+
+export interface NextActionInput {
+  currentObjective: string;
+  /**
+     * @minimum 5
+     * @maximum 120
+     */
+  availableMinutes: number;
+}
+
+export interface NextActionResult {
+  action: string;
+  reason: string;
+  engine: string;
+  duration: string;
+  successCriteria: string[];
+}
+

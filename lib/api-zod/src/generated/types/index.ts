@@ -6,14 +6,25 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './assetGenerationInput';
+export * from './assetGenerationInputAssetType';
 export * from './coachProfile';
 export * from './coachProfileUpdate';
+export * from './conversationMessage';
+export * from './conversationMessageRole';
 export * from './experience';
+export * from './experienceExtractionInput';
+export * from './experienceExtractionResult';
 export * from './experienceInput';
 export * from './healthStatus';
+export * from './knowledgeAsset';
+export * from './nextActionInput';
+export * from './nextActionResult';
 export * from './practiceJob';
 export * from './practiceOverview';
 export * from './practiceSession';
 export * from './practiceSessionInput';
 export * from './recentActivity';
+export * from './simulationTurnInput';
+export * from './simulationTurnResult';
 export * from './skillProgress';

@@ -1,10 +1,12 @@
-import GenericPage from "@/components/ui/generic-page"
-import { Globe } from "lucide-react"
+import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Products() {
-  return <GenericPage 
-    title="Products & Offers" 
-    description="Convert your expertise into things people can buy."
-    icon={Globe}
-  />
+  return (
+    <AssetWorkspace 
+      title="Product & Offers"
+      description="Package your expertise into scalable products and irresistible coaching offers."
+      allowedTypes={["offer"]}
+      emptyMessage="No offers defined. Synthesize your expertise and target audience into a compelling product offering."
+    />
+  );
 }

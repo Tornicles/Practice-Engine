@@ -129,6 +129,92 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PracticeSession"
+  /practice/assets:
+    get:
+      operationId: listKnowledgeAssets
+      tags: [practice]
+      summary: List generated knowledge and IP assets
+      responses:
+        "200":
+          description: Knowledge assets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeAsset"
+  /practice/ai/simulate:
+    post:
+      operationId: simulateClientTurn
+      tags: [practice]
+      summary: Run one turn of an AI client simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationTurnInput"
+      responses:
+        "200":
+          description: AI client reply and live coaching observation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationTurnResult"
+  /practice/ai/extract:
+    post:
+      operationId: extractExperienceKnowledge
+      tags: [practice]
+      summary: Extract a lesson, principle, and insight from lived experience
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExperienceExtractionInput"
+      responses:
+        "200":
+          description: Structured experience analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExperienceExtractionResult"
+  /practice/ai/generate:
+    post:
+      operationId: generateKnowledgeAsset
+      tags: [practice]
+      summary: Generate a traceable asset from coach knowledge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetGenerationInput"
+      responses:
+        "201":
+          description: Generated and saved knowledge asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeAsset"
+  /practice/ai/next-action:
+    post:
+      operationId: recommendNextAction
+      tags: [practice]
+      summary: Recommend the coach's highest-value next action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NextActionInput"
+      responses:
+        "200":
+          description: Contextual recommendation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NextActionResult"
 components:
   schemas:
     HealthStatus:
@@ -377,3 +463,171 @@ components:
         - skills
         - jobs
         - recentActivity
+    ConversationMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [coach, client]
+        content:
+          type: string
+      required:
+        - role
+        - content
+    SimulationTurnInput:
+      type: object
+      properties:
+        scenario:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        difficulty:
+          type: string
+          minLength: 1
+        coachMessage:
+          type: string
+          minLength: 1
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationMessage"
+      required:
+        - scenario
+        - category
+        - difficulty
+        - coachMessage
+        - history
+    SimulationTurnResult:
+      type: object
+      properties:
+        clientReply:
+          type: string
+        observation:
+          type: string
+        skill:
+          type: string
+        score:
+          type: number
+        sessionComplete:
+          type: boolean
+      required:
+        - clientReply
+        - observation
+        - skill
+        - score
+        - sessionComplete
+    ExperienceExtractionInput:
+      type: object
+      properties:
+        title:
+          type: string
+        situation:
+          type: string
+          minLength: 1
+        coachReflection:
+          type: string
+      required:
+        - title
+        - situation
+        - coachReflection
+    ExperienceExtractionResult:
+      type: object
+      properties:
+        title:
+          type: string
+        lesson:
+          type: string
+        principle:
+          type: string
+        insight:
+          type: string
+        frameworkCandidate:
+          type: string
+        evidenceGap:
+          type: string
+      required:
+        - title
+        - lesson
+        - principle
+        - insight
+        - frameworkCandidate
+        - evidenceGap
+    AssetGenerationInput:
+      type: object
+      properties:
+        sourceExperienceId:
+          type: number
+        assetType:
+          type: string
+          enum: [framework, exercise, case-study, content, workshop, course, offer, brand]
+        objective:
+          type: string
+          minLength: 1
+      required:
+        - sourceExperienceId
+        - assetType
+        - objective
+    KnowledgeAsset:
+      type: object
+      properties:
+        id:
+          type: number
+        sourceExperienceId:
+          type: number
+        type:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+        promptStrategy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - sourceExperienceId
+        - type
+        - title
+        - content
+        - status
+        - promptStrategy
+        - createdAt
+    NextActionInput:
+      type: object
+      properties:
+        currentObjective:
+          type: string
+        availableMinutes:
+          type: number
+          minimum: 5
+          maximum: 120
+      required:
+        - currentObjective
+        - availableMinutes
+    NextActionResult:
+      type: object
+      properties:
+        action:
+          type: string
+        reason:
+          type: string
+        engine:
+          type: string
+        duration:
+          type: string
+        successCriteria:
+          type: array
+          items:
+            type: string
+      required:
+        - action
+        - reason
+        - engine
+        - duration
+        - successCriteria

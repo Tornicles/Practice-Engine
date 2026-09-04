@@ -1,10 +1,12 @@
-import GenericPage from "@/components/ui/generic-page"
-import { Award } from "lucide-react"
+import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Proof() {
-  return <GenericPage 
-    title="Proof Bank" 
-    description="Outcomes and evidence bank to back up your claims."
-    icon={Award}
-  />
+  return (
+    <AssetWorkspace 
+      title="Proof Bank"
+      description="Convert client outcomes and interactions into validated case studies and testimonials."
+      allowedTypes={["case-study"]}
+      emptyMessage="No case studies exist. Transform a successful client experience into a structured case study to prove your capabilities."
+    />
+  );
 }

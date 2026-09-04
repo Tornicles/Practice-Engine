@@ -14,8 +14,6 @@ import {
 import { Shell } from '@/components/layout/Shell';
 
 // Pages
-import Home from '@/pages/Home';
-import Onboarding from '@/pages/Onboarding';
 import Dashboard from '@/pages/Dashboard';
 import Today from '@/pages/Today';
 import Practice from '@/pages/Practice';
@@ -44,8 +42,7 @@ function Router() {
     <RoutedErrorBoundary>
       <Shell>
         <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/onboarding" component={Onboarding} />
+          <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/today" component={Today} />
           <Route path="/practice" component={Practice} />

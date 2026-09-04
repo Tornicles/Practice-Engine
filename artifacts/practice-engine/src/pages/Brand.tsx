@@ -1,11 +1,12 @@
-import GenericPage from "@/components/ui/generic-page"
-import { Star } from "lucide-react"
+import { AssetWorkspace } from "@/components/AssetWorkspace";
 
 export default function Brand() {
-  return <GenericPage 
-    title="Brand Lab" 
-    description="Positioning and authority workspace grounded in your actual profile."
-    icon={Star}
-    actions={true}
-  />
+  return (
+    <AssetWorkspace 
+      title="Brand Lab"
+      description="Develop your unique positioning, messaging, and authority derived from actual client work."
+      allowedTypes={["brand"]}
+      emptyMessage="Your brand identity is currently undefined. Use an experience to generate core positioning statements or brand guidelines."
+    />
+  );
 }

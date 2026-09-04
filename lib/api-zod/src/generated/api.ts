@@ -193,3 +193,116 @@ export const CreatePracticeSessionResponse = zod.object({
 })
 
 
+/**
+ * @summary List generated knowledge and IP assets
+ */
+export const ListKnowledgeAssetsResponseItem = zod.object({
+  "id": zod.number(),
+  "sourceExperienceId": zod.number(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "status": zod.string(),
+  "promptStrategy": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListKnowledgeAssetsResponse = zod.array(ListKnowledgeAssetsResponseItem)
+
+
+/**
+ * @summary Run one turn of an AI client simulation
+ */
+
+
+
+
+
+
+export const SimulateClientTurnBody = zod.object({
+  "scenario": zod.string().min(1),
+  "category": zod.string().min(1),
+  "difficulty": zod.string().min(1),
+  "coachMessage": zod.string().min(1),
+  "history": zod.array(zod.object({
+  "role": zod.enum(['coach', 'client']),
+  "content": zod.string()
+}))
+})
+
+export const SimulateClientTurnResponse = zod.object({
+  "clientReply": zod.string(),
+  "observation": zod.string(),
+  "skill": zod.string(),
+  "score": zod.number(),
+  "sessionComplete": zod.boolean()
+})
+
+
+/**
+ * @summary Extract a lesson, principle, and insight from lived experience
+ */
+
+
+
+export const ExtractExperienceKnowledgeBody = zod.object({
+  "title": zod.string(),
+  "situation": zod.string().min(1),
+  "coachReflection": zod.string()
+})
+
+export const ExtractExperienceKnowledgeResponse = zod.object({
+  "title": zod.string(),
+  "lesson": zod.string(),
+  "principle": zod.string(),
+  "insight": zod.string(),
+  "frameworkCandidate": zod.string(),
+  "evidenceGap": zod.string()
+})
+
+
+/**
+ * @summary Generate a traceable asset from coach knowledge
+ */
+
+
+
+export const GenerateKnowledgeAssetBody = zod.object({
+  "sourceExperienceId": zod.number(),
+  "assetType": zod.enum(['framework', 'exercise', 'case-study', 'content', 'workshop', 'course', 'offer', 'brand']),
+  "objective": zod.string().min(1)
+})
+
+export const GenerateKnowledgeAssetResponse = zod.object({
+  "id": zod.number(),
+  "sourceExperienceId": zod.number(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "status": zod.string(),
+  "promptStrategy": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Recommend the coach's highest-value next action
+ */
+export const recommendNextActionBodyAvailableMinutesMin = 5;
+export const recommendNextActionBodyAvailableMinutesMax = 120;
+
+
+
+export const RecommendNextActionBody = zod.object({
+  "currentObjective": zod.string(),
+  "availableMinutes": zod.number().min(recommendNextActionBodyAvailableMinutesMin).max(recommendNextActionBodyAvailableMinutesMax)
+})
+
+export const RecommendNextActionResponse = zod.object({
+  "action": zod.string(),
+  "reason": zod.string(),
+  "engine": zod.string(),
+  "duration": zod.string(),
+  "successCriteria": zod.array(zod.string())
+})
+
+
