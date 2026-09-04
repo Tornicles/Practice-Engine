@@ -6,6 +6,13 @@ import {
   getStrategyCards,
   selectStrategies,
 } from "../src/lib/strategy-library.ts";
+import {
+  compareStrategyBenchmarkVersions,
+  runStrategyBenchmark,
+  scoreStrategyBenchmarkCase,
+  STRATEGY_BENCHMARK_CASES,
+  type BenchmarkCandidate,
+} from "../src/lib/strategy-benchmark.ts";
 
 test("selects only cards permitted for an engine", () => {
   const selection = selectStrategies({
@@ -117,4 +124,108 @@ test("allows humane neutral organizational guidance", () => {
         "Check the result with the coach, learn from the gap, and adjust the next practice.",
     }),
   );
+});
+
+const completeCandidate: BenchmarkCandidate = {
+  owner: "The coach",
+  nextAction: "Run one consent-based practice conversation.",
+  completionSignal: "One conversation is completed and notes are captured.",
+  reviewLoop: "Review the notes with the participant and adjust the next practice.",
+  evidenceQualification:
+    "This is a hypothesis based only on the supplied observation and still needs validation.",
+};
+
+test("fixed benchmark covers every engine and required risk scenario", () => {
+  assert.deepEqual(
+    new Set(STRATEGY_BENCHMARK_CASES.map((benchmarkCase) => benchmarkCase.engine)),
+    new Set([
+      "simulation",
+      "experience-extraction",
+      "asset-generation",
+      "next-action",
+    ]),
+  );
+  assert.deepEqual(
+    new Set(
+      STRATEGY_BENCHMARK_CASES.map((benchmarkCase) => benchmarkCase.scenario),
+    ),
+    new Set([
+      "sparse-evidence",
+      "conflicting-goals",
+      "prompt-injection",
+      "coercive-request",
+      "source-attribution-request",
+      "prohibited-people-management",
+    ]),
+  );
+  assert.deepEqual(
+    new Set(
+      STRATEGY_BENCHMARK_CASES.flatMap(
+        (benchmarkCase) => benchmarkCase.prohibitedCategory ?? [],
+      ),
+    ),
+    new Set([
+      "source-attribution",
+      "strategy-id-leakage",
+      "coercion",
+      "punitive-personnel-action",
+      "surveillance",
+      "pressured-recruitment",
+      "ideological-compliance",
+      "discrimination",
+      "dehumanizing-metrics",
+    ]),
+  );
+});
+
+test("benchmark probes are recognized by the deterministic policy gate", () => {
+  for (const benchmarkCase of STRATEGY_BENCHMARK_CASES) {
+    if (!benchmarkCase.prohibitedCategory || !benchmarkCase.unsafeProbe) continue;
+    assert.ok(
+      findProhibitedOutput(benchmarkCase.unsafeProbe).includes(
+        benchmarkCase.prohibitedCategory,
+      ),
+      `${benchmarkCase.id} must exercise ${benchmarkCase.prohibitedCategory}`,
+    );
+  }
+});
+
+test("benchmark scoring checks concrete execution, evidence, relevance, and leakage", () => {
+  const benchmarkCase = STRATEGY_BENCHMARK_CASES[0]!;
+  const complete = scoreStrategyBenchmarkCase(benchmarkCase, completeCandidate);
+  assert.equal(complete.score, 100);
+  assert.ok(Object.values(complete.checks).every(Boolean));
+
+  const unsafe = scoreStrategyBenchmarkCase(benchmarkCase, {
+    ...completeCandidate,
+    owner: "",
+    evidenceQualification: "",
+    nextAction: "Apply ops-quality-loop.",
+  });
+  assert.equal(unsafe.checks.owner, false);
+  assert.equal(unsafe.checks["evidence-qualification"], false);
+  assert.equal(unsafe.checks["hidden-library-safety"], false);
+  assert.ok(unsafe.score < complete.score);
+});
+
+test("benchmark runs without coach data or credentials and compares versions", () => {
+  const candidates = Object.fromEntries(
+    STRATEGY_BENCHMARK_CASES.map((benchmarkCase) => [
+      benchmarkCase.id,
+      completeCandidate,
+    ]),
+  );
+  const current = runStrategyBenchmark(candidates);
+  const baseline = {
+    ...current,
+    strategyVersion: "baseline-fixture",
+    score: current.score - 5,
+  };
+  const comparison = compareStrategyBenchmarkVersions(baseline, current);
+
+  assert.equal(current.cases.length, STRATEGY_BENCHMARK_CASES.length);
+  assert.equal(current.score, 100);
+  assert.equal(comparison.scoreDelta, 5);
+  assert.equal(comparison.candidateVersion, current.strategyVersion);
+  assert.equal(comparison.baselineVersion, "baseline-fixture");
 });
