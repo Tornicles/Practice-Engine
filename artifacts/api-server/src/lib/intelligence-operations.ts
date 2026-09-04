@@ -26,15 +26,18 @@ const ALERT_CODES = [
 export const INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS = 7;
 const INTELLIGENCE_OPERATION_COMPACTION_INTERVAL_MS = 6 * 60 * 60 * 1_000;
 
-export async function compactIntelligenceOperations(): Promise<void> {
-  await db.transaction(async (tx) => {
-    const lock = await tx.execute(sql`
-      select pg_try_advisory_xact_lock(824771109) as acquired
-    `);
-    if (lock.rows[0]?.acquired !== true) return;
+type SqlExecutor = Pick<typeof db, "execute">;
 
-    await tx.execute(sql`
-      insert into intelligence_operation_daily_rollups (
+async function runIntelligenceOperationCompaction(
+  executor: SqlExecutor,
+): Promise<void> {
+  const lock = await executor.execute(sql`
+    select pg_try_advisory_xact_lock(824771109) as acquired
+  `);
+  if (lock.rows[0]?.acquired !== true) return;
+
+  await executor.execute(sql`
+    insert into intelligence_operation_daily_rollups (
         day,
         engine,
         strategy_version,
@@ -85,17 +88,105 @@ export async function compactIntelligenceOperations(): Promise<void> {
         latency_total_ms = excluded.latency_total_ms,
         average_latency_ms = excluded.average_latency_ms,
         p95_latency_ms = excluded.p95_latency_ms
-    `);
+  `);
 
-    await tx.execute(sql`
-      delete from intelligence_operations
+  await executor.execute(sql`
+    delete from intelligence_operations
       where created_at < date_trunc(
         'day',
         (now() at time zone 'UTC')
           - (${INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS} * interval '1 day')
       ) at time zone 'UTC'
-    `);
+  `);
+}
+
+export async function compactIntelligenceOperations(
+  executor?: SqlExecutor,
+): Promise<void> {
+  if (executor) {
+    await runIntelligenceOperationCompaction(executor);
+    return;
+  }
+  await db.transaction(async (tx) => {
+    await runIntelligenceOperationCompaction(tx);
   });
+}
+
+export async function reportIntelligenceOperations(
+  hours: number,
+  executor: SqlExecutor = db,
+) {
+  const bucket = hours <= 72 ? "hour" : "day";
+  return executor.execute(sql`
+    with raw_rows as (
+      select
+        date_trunc(
+          ${bucket},
+          operation.created_at at time zone 'UTC'
+        ) at time zone 'UTC' as bucket,
+        operation.engine,
+        operation.strategy_version,
+        family.value as strategy_family,
+        operation.outcome,
+        operation.failure_class,
+        count(*)::integer as operation_count,
+        sum(operation.latency_ms)::bigint as latency_total_ms,
+        percentile_cont(0.95) within group (
+          order by operation.latency_ms
+        )::integer as p95_latency_ms
+      from intelligence_operations operation
+      cross join lateral jsonb_array_elements_text(
+        case
+          when jsonb_array_length(operation.strategy_families) = 0
+            then '["unselected"]'::jsonb
+          else operation.strategy_families
+        end
+      ) family(value)
+      where operation.created_at >= now() - (${hours} * interval '1 hour')
+      group by 1, 2, 3, 4, 5, 6
+    ),
+    report_rows as (
+      select * from raw_rows
+
+      union all
+
+      select
+        rollup.day::timestamp at time zone 'UTC' as bucket,
+        rollup.engine,
+        rollup.strategy_version,
+        rollup.strategy_family,
+        rollup.outcome,
+        nullif(rollup.failure_class, 'none') as failure_class,
+        rollup.operation_count,
+        rollup.latency_total_ms,
+        rollup.p95_latency_ms
+      from intelligence_operation_daily_rollups rollup
+      where ${bucket} = 'day'
+        and rollup.day > (
+          (now() at time zone 'UTC') - (${hours} * interval '1 hour')
+        )::date
+        and rollup.day < date_trunc(
+          'day',
+          (now() at time zone 'UTC')
+            - (${INTELLIGENCE_OPERATION_RAW_RETENTION_DAYS} * interval '1 day')
+        )::date
+    )
+    select
+      bucket,
+      engine,
+      strategy_version as "strategyVersion",
+      strategy_family as "strategyFamily",
+      outcome,
+      failure_class as "failureClass",
+      sum(operation_count)::integer as count,
+      round(
+        sum(latency_total_ms)::numeric / sum(operation_count)
+      )::integer as "averageLatencyMs",
+      max(p95_latency_ms)::integer as "p95LatencyMs"
+    from report_rows
+    group by 1, 2, 3, 4, 5, 6
+    order by 1 asc, 2 asc, 3 asc, 4 asc, 5 asc, 6 asc
+  `);
 }
 
 export function scheduleIntelligenceOperationCompaction(

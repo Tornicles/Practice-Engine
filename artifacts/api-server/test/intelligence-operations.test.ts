@@ -4,16 +4,21 @@ import test from "node:test";
 import {
   db,
   intelligenceAlertStatesTable,
+  intelligenceOperationDailyRollupsTable,
   intelligenceOperationsTable,
 } from "@workspace/db";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   buildIntelligenceAlerts,
   buildIntelligenceAlertNotification,
   classifyIntelligenceFailure,
   launchOperationalWrites,
 } from "../src/lib/intelligence-operation-policy.ts";
-import { recordIntelligenceOperation } from "../src/lib/intelligence-operations.ts";
+import {
+  compactIntelligenceOperations,
+  recordIntelligenceOperation,
+  reportIntelligenceOperations,
+} from "../src/lib/intelligence-operations.ts";
 
 test("persistence failures remain best-effort after successful generation", async () => {
   const attempted: string[] = [];
@@ -252,5 +257,127 @@ test("database claims deduplicate concurrent alerts and lease interrupted delive
     }
     await db.delete(intelligenceOperationsTable).where(operationDimensions);
     await db.delete(intelligenceAlertStatesTable).where(dimensions);
+  }
+});
+
+
+test("UTC retention compaction and long-window reports have no boundary gap or overlap", async () => {
+  const testId = randomUUID();
+  const engine = `retention-test-${testId}`;
+  const strategyVersion = `version-${testId}`;
+  const strategyFamily = `family-${testId}`;
+  const operationDimensions = and(
+    eq(intelligenceOperationsTable.engine, engine),
+    eq(intelligenceOperationsTable.strategyVersion, strategyVersion),
+  );
+  const rollupDimensions = and(
+    eq(intelligenceOperationDailyRollupsTable.engine, engine),
+    eq(
+      intelligenceOperationDailyRollupsTable.strategyVersion,
+      strategyVersion,
+    ),
+  );
+
+  try {
+    await db.execute(sql`
+      insert into intelligence_operations (
+        engine,
+        strategy_version,
+        strategy_families,
+        outcome,
+        failure_class,
+        latency_ms,
+        chain_stages,
+        created_at
+      )
+      values
+        (
+          ${engine}, ${strategyVersion}, ${JSON.stringify([strategyFamily])}::jsonb,
+          'success', null, 100, '[]'::jsonb,
+          date_trunc('day', (now() at time zone 'UTC') - interval '7 days')
+            at time zone 'UTC' - interval '2 hours'
+        ),
+        (
+          ${engine}, ${strategyVersion}, ${JSON.stringify([strategyFamily])}::jsonb,
+          'success', null, 300, '[]'::jsonb,
+          date_trunc('day', (now() at time zone 'UTC') - interval '7 days')
+            at time zone 'UTC' - interval '1 hour'
+        ),
+        (
+          ${engine}, ${strategyVersion}, ${JSON.stringify([strategyFamily])}::jsonb,
+          'success', null, 500, '[]'::jsonb,
+          date_trunc('day', (now() at time zone 'UTC') - interval '7 days')
+            at time zone 'UTC'
+        ),
+        (
+          ${engine}, ${strategyVersion}, ${JSON.stringify([strategyFamily])}::jsonb,
+          'success', null, 700, '[]'::jsonb,
+          date_trunc('day', (now() at time zone 'UTC') - interval '7 days')
+            at time zone 'UTC' + interval '1 hour'
+        )
+    `);
+
+    await Promise.all([
+      compactIntelligenceOperations(),
+      compactIntelligenceOperations(),
+    ]);
+
+    const raw = await db
+      .select({
+        latencyMs: intelligenceOperationsTable.latencyMs,
+      })
+      .from(intelligenceOperationsTable)
+      .where(operationDimensions);
+    assert.deepEqual(
+      raw.map((row) => row.latencyMs).sort((a, b) => a - b),
+      [500, 700],
+      "the exact UTC cutoff belongs to raw retention",
+    );
+
+    const rollups = await db
+      .select()
+      .from(intelligenceOperationDailyRollupsTable)
+      .where(rollupDimensions);
+    assert.equal(rollups.length, 1, "concurrent compaction creates one rollup");
+    assert.equal(rollups[0]?.operationCount, 2);
+    assert.equal(rollups[0]?.latencyTotalMs, 400);
+    assert.equal(rollups[0]?.averageLatencyMs, 200);
+    assert.equal(rollups[0]?.p95LatencyMs, 290);
+
+    await db.transaction(async (tx) => {
+      await tx.execute(sql`set local time zone 'Pacific/Auckland'`);
+      await compactIntelligenceOperations(tx);
+      const report = await reportIntelligenceOperations(240, tx);
+      const rows = report.rows.filter((row) => row.engine === engine) as Array<{
+        count: number;
+        averageLatencyMs: number;
+        p95LatencyMs: number;
+      }>;
+
+      assert.equal(
+        rows.reduce((sum, row) => sum + row.count, 0),
+        4,
+        "long reports combine compacted and raw rows exactly once",
+      );
+      assert.deepEqual(
+        rows
+          .map((row) => ({
+            count: row.count,
+            averageLatencyMs: row.averageLatencyMs,
+            p95LatencyMs: row.p95LatencyMs,
+          }))
+          .sort((a, b) => a.averageLatencyMs - b.averageLatencyMs),
+        [
+          { count: 2, averageLatencyMs: 200, p95LatencyMs: 290 },
+          { count: 2, averageLatencyMs: 600, p95LatencyMs: 690 },
+        ],
+        "average and p95 metrics remain correct in a non-UTC session",
+      );
+    });
+  } finally {
+    await db.delete(intelligenceOperationsTable).where(operationDimensions);
+    await db
+      .delete(intelligenceOperationDailyRollupsTable)
+      .where(rollupDimensions);
   }
 });
