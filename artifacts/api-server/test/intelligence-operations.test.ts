@@ -260,6 +260,107 @@ test("database claims deduplicate concurrent alerts and lease interrupted delive
   }
 });
 
+test("failed alert delivery releases its claim and retries once on later telemetry", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalWebhookUrl = process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
+  const testId = randomUUID();
+  const engine = `failed-delivery-test-${testId}`;
+  const strategyVersion = `version-${testId}`;
+  const strategyFamily = `family-${testId}`;
+  const dimensions = and(
+    eq(
+      intelligenceAlertStatesTable.alertCode,
+      "sustained-upstream-failures",
+    ),
+    eq(intelligenceAlertStatesTable.engine, engine),
+    eq(intelligenceAlertStatesTable.strategyVersion, strategyVersion),
+    eq(intelligenceAlertStatesTable.strategyFamily, strategyFamily),
+  );
+  const operationDimensions = and(
+    eq(intelligenceOperationsTable.engine, engine),
+    eq(intelligenceOperationsTable.strategyVersion, strategyVersion),
+  );
+  const notifications: Array<{ event: string }> = [];
+  let attempts = 0;
+  const record = () =>
+    recordIntelligenceOperation({
+      engine,
+      outcome: "upstream-error",
+      startedAt: Date.now(),
+      selection: {
+        version: strategyVersion,
+        engine: "simulation",
+        cards: [],
+        strategyIds: [],
+        families: [strategyFamily],
+        sourceClasses: [],
+        promptContext: "",
+      },
+    });
+
+  process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = "https://alerts.test/webhook";
+  globalThis.fetch = async (_input, init) => {
+    attempts += 1;
+    if (attempts === 1) {
+      return new Response(null, { status: 503 });
+    }
+    notifications.push(JSON.parse(String(init?.body)));
+    return new Response(null, { status: 204 });
+  };
+
+  try {
+    await db.insert(intelligenceOperationsTable).values(
+      Array.from({ length: 3 }, () => ({
+        engine,
+        strategyVersion,
+        strategyFamilies: [strategyFamily],
+        outcome: "upstream-error",
+        failureClass: "upstream",
+        latencyMs: 1,
+        chainStages: [],
+      })),
+    );
+
+    await assert.rejects(record(), /Operational alert channel returned HTTP 503/);
+
+    let [state] = await db
+      .select()
+      .from(intelligenceAlertStatesTable)
+      .where(dimensions);
+    assert.equal(state?.active, true);
+    assert.equal(state?.notifiedActive, false);
+    assert.equal(state?.notificationActive, null);
+    assert.equal(state?.notificationClaimedAt, null);
+
+    await record();
+
+    assert.equal(attempts, 2);
+    assert.deepEqual(
+      notifications.map((notification) => notification.event),
+      ["triggered"],
+      "the retry must deliver the pending transition exactly once",
+    );
+
+    [state] = await db
+      .select()
+      .from(intelligenceAlertStatesTable)
+      .where(dimensions);
+    assert.equal(state?.active, true);
+    assert.equal(state?.notifiedActive, true);
+    assert.equal(state?.notificationActive, null);
+    assert.equal(state?.notificationClaimedAt, null);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalWebhookUrl === undefined) {
+      delete process.env.INTELLIGENCE_ALERT_WEBHOOK_URL;
+    } else {
+      process.env.INTELLIGENCE_ALERT_WEBHOOK_URL = originalWebhookUrl;
+    }
+    await db.delete(intelligenceOperationsTable).where(operationDimensions);
+    await db.delete(intelligenceAlertStatesTable).where(dimensions);
+  }
+});
+
 
 test("UTC retention compaction and long-window reports have no boundary gap or overlap", async () => {
   const testId = randomUUID();
