@@ -2,9 +2,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { Linking, Platform } from 'react-native';
+import {
+  type ReminderSettings,
+  requestReminderPermissionAfterEnable,
+  syncReminderSchedule,
+} from './practice-reminders';
 
 const STORAGE_KEY = 'practice-reminder-settings-v1';
-const REMINDER_DATA = { destination: 'today', refreshRecommendation: true };
 
 export const WEEKDAYS = [
   { label: 'Sun', value: 1 },
@@ -15,14 +19,6 @@ export const WEEKDAYS = [
   { label: 'Fri', value: 6 },
   { label: 'Sat', value: 7 },
 ] as const;
-
-type ReminderSettings = {
-  enabled: boolean;
-  paused: boolean;
-  weekdays: number[];
-  hour: number;
-  minute: number;
-};
 
 type PermissionState = 'unknown' | 'granted' | 'denied';
 
@@ -52,23 +48,11 @@ const ReminderContext = createContext<ReminderContextValue | null>(null);
 
 async function schedule(settings: ReminderSettings) {
   if (Platform.OS === 'web') return;
-  await Notifications.cancelAllScheduledNotificationsAsync();
-  if (!settings.enabled || settings.paused) return;
-  for (const weekday of settings.weekdays) {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Your practice is ready',
-        body: 'Open Today for a focused next action.',
-        data: REMINDER_DATA,
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday,
-        hour: settings.hour,
-        minute: settings.minute,
-      },
-    });
-  }
+  await syncReminderSchedule(
+    settings,
+    Notifications,
+    Notifications.SchedulableTriggerInputTypes.WEEKLY,
+  );
 }
 
 export function PracticeReminderProvider({ children }: { children: ReactNode }) {
@@ -116,8 +100,10 @@ export function PracticeReminderProvider({ children }: { children: ReactNode }) 
           importance: Notifications.AndroidImportance.DEFAULT,
         });
       }
-      let current = await Notifications.getPermissionsAsync();
-      if (!current.granted && current.canAskAgain) current = await Notifications.requestPermissionsAsync();
+      const current = await requestReminderPermissionAfterEnable(
+        Notifications.getPermissionsAsync,
+        Notifications.requestPermissionsAsync,
+      );
       setPermission(current.granted ? 'granted' : 'denied');
       setCanAskAgain(current.canAskAgain);
       if (!current.granted) return false;

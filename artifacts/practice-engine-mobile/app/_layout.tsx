@@ -21,6 +21,7 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import { setBaseUrl } from '@workspace/api-client-react';
 import { OfflineCaptureProvider } from '@/lib/OfflineCaptureContext';
 import { PracticeReminderProvider } from '@/lib/PracticeReminderContext';
+import { getReminderNavigationTarget } from '@/lib/practice-reminders';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -68,11 +69,14 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    const openToday = () => router.replace({ pathname: '/(tabs)', params: { reminder: Date.now().toString() } });
+    const openReminderDestination = (data: Record<string, unknown> | undefined) => {
+      const target = getReminderNavigationTarget(data);
+      if (target) router.replace(target);
+    };
     const lastResponse = Notifications.getLastNotificationResponse();
-    if (lastResponse?.notification.request.content.data?.destination === 'today') openToday();
+    openReminderDestination(lastResponse?.notification.request.content.data);
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      if (response.notification.request.content.data?.destination === 'today') openToday();
+      openReminderDestination(response.notification.request.content.data);
     });
     return () => subscription.remove();
   }, []);
