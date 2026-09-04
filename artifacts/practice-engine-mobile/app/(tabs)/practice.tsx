@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { FlatList, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,12 +7,10 @@ import {
   useCreatePracticeSession,
   useSimulateClientTurn,
 } from '@workspace/api-client-react';
-import type { ConversationMessage } from '@workspace/api-client-react';
 import { Button, Card, ScreenTitle, State } from '@/components/UI';
 import { useColors } from '@/hooks/useColors';
+import { usePracticeSession } from '@/lib/use-practice-session';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-type Feedback = { observation: string; skill: string; score: number; sessionComplete: boolean };
 
 export default function Practice() {
   const c = useColors();
@@ -22,40 +20,10 @@ export default function Practice() {
   const save = useCreatePracticeSession({
     mutation: { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListPracticeSessionsQueryKey() }) },
   });
-  const [scenario, setScenario] = useState('A client is avoiding a difficult decision');
-  const [category, setCategory] = useState('Decision-making');
-  const [difficulty, setDifficulty] = useState('Moderate');
-  const [text, setText] = useState('');
-  const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [saved, setSaved] = useState(false);
-
-  const send = useCallback(() => {
-    const coachMessage = text.trim();
-    if (!coachMessage || simulate.isPending) return;
-    // Capture the exact history for this request before adding its new turn.
-    const history = messages;
-    setSaved(false);
-    setMessages((current) => [...current, { role: 'coach', content: coachMessage }]);
-    setText('');
-    setFeedback(null);
-    simulate.mutate(
-      { data: { scenario, category, difficulty, coachMessage, history } },
-      {
-        onSuccess: (result) => {
-          setMessages((current) => [...current, { role: 'client', content: result.clientReply }]);
-          setFeedback(result);
-        },
-      },
-    );
-  }, [category, difficulty, messages, scenario, simulate, text]);
-
-  const complete = useCallback(() => {
-    if (!feedback || save.isPending || saved) return;
-    save.mutate({
-      data: { scenario, category, score: feedback.score, feedback: feedback.observation },
-    }, { onSuccess: () => setSaved(true) });
-  }, [category, feedback, save, saved, scenario]);
+  const {
+    category, complete, difficulty, feedback, messages, saved, scenario, send,
+    setCategory, setDifficulty, setScenario, setText, text,
+  } = usePracticeSession(simulate, save);
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.background }} behavior="padding" keyboardVerticalOffset={0}>
