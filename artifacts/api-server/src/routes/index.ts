@@ -4,6 +4,7 @@ import meRouter from "./me.ts";
 import strategyRouter from "./strategy.ts";
 import objectivesRouter from "./objectives.ts";
 import programsRouter from "./programs.ts";
+import developmentRouter from "./development.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -14,6 +15,7 @@ router.use(meRouter);
 router.use(strategyRouter);
 router.use(objectivesRouter);
 router.use(programsRouter);
+router.use(developmentRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
