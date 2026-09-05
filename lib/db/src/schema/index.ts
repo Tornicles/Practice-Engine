@@ -7,3 +7,4 @@ export * from "./evidence.ts";
 export * from "./methodology.ts";
 export * from "./conditions.ts";
 export * from "./investigations.ts";
+export * from "./workflows.ts";
