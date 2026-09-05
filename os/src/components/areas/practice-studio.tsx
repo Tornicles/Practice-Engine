@@ -2,53 +2,35 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
-import { Panel, StatusBadge } from "@/components/engine";
+import { Panel } from "@/components/engine";
+import { PRACTICE_CATALOG } from "@/lib/catalog";
 import { evaluatePractice, simulateClientTurn } from "@/lib/ai";
 import { heuristicScore } from "@/lib/compute";
 import { useEngine } from "@/lib/store";
 import { fmtDate } from "@/lib/utils";
-import type { SkillKey } from "@/lib/types";
-
-const scenarios = [
-  {
-    id: "res",
-    title: "The Resistant Executive",
-    tag: "Resistance",
-    prompt: "I've heard all of this before. I don't think coaching is going to change anything.",
-    skill: "challenge" as SkillKey,
-  },
-  {
-    id: "stuck",
-    title: "The Stuck Client",
-    tag: "Avoidance",
-    prompt: "I know what I need to do. I just don't understand why you're asking me all these questions.",
-    skill: "questioning" as SkillKey,
-  },
-  {
-    id: "buy",
-    title: "The Skeptical Buyer",
-    tag: "Discovery",
-    prompt: "Explain why your methodology is worth this price. We've tried coaches.",
-    skill: "listening" as SkillKey,
-  },
-];
+import type { PracticeScenario } from "@/lib/catalog";
+import type { RubricMark } from "@/lib/types";
 
 export function PracticeStudio() {
   const practices = useEngine((s) => s.practices);
   const addPractice = useEngine((s) => s.addPractice);
   const logAi = useEngine((s) => s.logAi);
   const drills = useEngine((s) => s.drills);
-  const [active, setActive] = useState<(typeof scenarios)[0] | null>(null);
+  const [active, setActive] = useState<PracticeScenario | null>(null);
   const [history, setHistory] = useState<{ role: "coach" | "client"; text: string }[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<(ReturnType<typeof heuristicScore> & { strengths: string; weaknesses: string }) | null>(
     null,
   );
+  const [marks, setMarks] = useState<RubricMark[]>([]);
+  const [saved, setSaved] = useState(false);
 
-  async function start(s: (typeof scenarios)[0]) {
+  async function start(s: PracticeScenario) {
     setActive(s);
     setResult(null);
+    setSaved(false);
+    setMarks(s.rubric.map((item) => ({ item, hit: false })));
     setHistory([{ role: "client", text: s.prompt }]);
     setDraft("");
   }
@@ -94,14 +76,27 @@ export function PracticeStudio() {
       : h;
     const strengths = evalRes.ok ? evalRes.strengths : "You stayed in the conversation.";
     const weaknesses = evalRes.ok ? evalRes.weaknesses : "Diagnosis may still be arriving after advice.";
+    setResult({ ...scores, strengths, weaknesses });
+    setBusy(false);
+  }
+
+  function saveEvidence() {
+    if (!active || !result) return;
     addPractice({
       scenario: active.title,
       skill: active.skill,
-      difficulty: 3,
+      difficulty: active.difficulty,
       turns: history,
-      scores,
-      strengths,
-      weaknesses,
+      scores: {
+        overall: result.overall,
+        listening: result.listening,
+        questioning: result.questioning,
+        reframing: result.reframing,
+        challenge: result.challenge,
+      },
+      strengths: result.strengths,
+      weaknesses: result.weaknesses,
+      rubricMarks: marks,
     });
     logAi({
       actionType: "evaluate",
@@ -109,9 +104,8 @@ export function PracticeStudio() {
       strategy: "Evaluate",
       evidenceStatus: "testing",
     });
-    setResult({ ...scores, strengths, weaknesses });
-    setBusy(false);
     toast.success("Practice saved as evidence — not as mastery.");
+    setSaved(true);
   }
 
   if (active) {
@@ -127,6 +121,11 @@ export function PracticeStudio() {
               Exit
             </Button>
           </div>
+          <ul className="mb-3 list-disc pl-4 text-xs text-muted-foreground">
+            {active.rubric.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
           <div className="max-h-[50vh] space-y-3 overflow-y-auto">
             {history.map((turn, i) => (
               <div
@@ -147,6 +146,24 @@ export function PracticeStudio() {
               <div className="font-mono text-primary">Overall {result.overall}</div>
               <p className="mt-2 text-muted-foreground">{result.strengths}</p>
               <p className="mt-1 text-muted-foreground">{result.weaknesses}</p>
+              <div className="engine-kicker mt-4 mb-2">Rubric</div>
+              <div className="space-y-2">
+                {marks.map((m, i) => (
+                  <label key={m.item} className="flex min-h-11 items-start gap-3 border border-border p-2">
+                    <input
+                      type="checkbox"
+                      checked={m.hit}
+                      onChange={() =>
+                        setMarks((prev) => prev.map((x, idx) => (idx === i ? { ...x, hit: !x.hit } : x)))
+                      }
+                    />
+                    <span>{m.item}</span>
+                  </label>
+                ))}
+              </div>
+              <Button className="mt-3" onClick={saveEvidence} disabled={saved}>
+                {saved ? "Saved" : "Save evidence"}
+              </Button>
             </div>
           ) : (
             <div className="mt-4 space-y-2">
@@ -162,14 +179,17 @@ export function PracticeStudio() {
             </div>
           )}
         </div>
-        <Panel title="What this scores">
+        <Panel title="Scorecard">
           <p className="text-sm text-muted-foreground">
-            Listening, questioning, reframing, challenge. Recency-weighted into your skill picture. One good session is
-            not mastery.
+            {active.minutes} min · {active.skill} · difficulty {active.difficulty}/5
           </p>
-          <div className="mt-3">
-            <StatusBadge status="testing" />
-          </div>
+          <ul className="mt-3 space-y-2 text-sm">
+            {active.rubric.map((r) => (
+              <li key={r} className="border border-border p-2">
+                {r}
+              </li>
+            ))}
+          </ul>
         </Panel>
       </div>
     );
@@ -177,22 +197,32 @@ export function PracticeStudio() {
 
   return (
     <>
-      {drills[0] ? (
-        <p className="mb-4 text-sm text-muted-foreground">
-          Prescribed: {drills[0].name} — from your current diagnostic protocol, not a random lesson.
-        </p>
-      ) : null}
-      <div className="grid gap-4 md:grid-cols-3">
-        {scenarios.map((s) => (
-          <div key={s.id} className="engine-card p-5">
-            <div className="engine-kicker text-primary">{s.tag}</div>
-            <h2 className="mt-2 text-base font-semibold">{s.title}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">“{s.prompt}”</p>
-            <Button className="mt-4" onClick={() => void start(s)}>
-              Enter simulation
-            </Button>
-          </div>
-        ))}
+      <p className="mb-4 text-sm text-muted-foreground">
+        Eight scenarios. Four skills. Last score is evidence, not mastery.
+        {drills[0] ? ` Prescribed today: ${drills[0].name}.` : ""}
+      </p>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {PRACTICE_CATALOG.map((s) => {
+          const last = practices.find((p) => p.scenario === s.title);
+          const hits = last?.rubricMarks?.filter((m) => m.hit).length;
+          return (
+            <div key={s.id} className="engine-card flex flex-col p-5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="engine-kicker text-primary">{s.tag}</div>
+                {last ? <span className="font-mono text-xs text-primary">{last.scores.overall}</span> : null}
+              </div>
+              <h2 className="mt-2 text-base font-semibold">{s.title}</h2>
+              <p className="mt-2 flex-1 text-sm text-muted-foreground">“{s.prompt}”</p>
+              <p className="mt-2 font-mono text-[0.625rem] text-muted-foreground">
+                {s.minutes} min · {s.skill}
+                {hits != null ? ` · rubric ${hits}/${last?.rubricMarks?.length ?? 3}` : ""}
+              </p>
+              <Button className="mt-4 min-h-11" onClick={() => void start(s)}>
+                {last ? "Repeat drill" : "Enter simulation"}
+              </Button>
+            </div>
+          );
+        })}
       </div>
       <Panel title="Practice history" className="mt-6">
         <div className="overflow-x-auto">

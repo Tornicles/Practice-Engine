@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 import { PageHeader, Panel, StatusBadge, TabBar } from "@/components/engine";
 import { draftReply } from "@/lib/ai";
+import { dueCheckIns } from "@/lib/compute";
 import { MESSAGE_TABS, parseTabSearch } from "@/lib/nav";
 import { useEngine } from "@/lib/store";
 import { fmtDate } from "@/lib/utils";
@@ -24,6 +25,7 @@ function Messages() {
   const markThreadRead = useEngine((s) => s.markThreadRead);
   const convertThreadToFollowUp = useEngine((s) => s.convertThreadToFollowUp);
   const style = useEngine((s) => s.settings.generationStyle);
+  const checkIns = useMemo(() => dueCheckIns(threads), [threads]);
   const [activeId, setActiveId] = useState(threads[0]?.id ?? "");
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -113,6 +115,24 @@ function Messages() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-[.38fr_1fr]">
           <Panel title={tab === "inbox" ? "Inbox" : tab}>
+            {tab === "inbox" && checkIns.length > 0 ? (
+              <div className="mb-3 border border-primary/40 p-3">
+                <div className="engine-kicker text-primary">Due check-ins</div>
+                {checkIns.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className="mt-2 block w-full text-left text-sm hover:text-primary"
+                    onClick={() => {
+                      setActiveId(t.id);
+                      markThreadRead(t.id);
+                    }}
+                  >
+                    {t.withName} · {t.subject}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             <div className="space-y-2">
               {filtered.map((t) => (
                 <button
@@ -127,6 +147,7 @@ function Messages() {
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">{t.withName}</span>
                     <div className="flex items-center gap-1">
+                      {t.kind === "checkin" ? <StatusBadge status="check-in" /> : null}
                       {t.priority ? <StatusBadge status="high" /> : null}
                       {t.unread > 0 ? (
                         <span className="font-mono text-[0.625rem] text-primary">{t.unread}</span>
@@ -145,6 +166,7 @@ function Messages() {
                   <h2 className="text-base font-semibold">{active.withName}</h2>
                   <p className="text-xs text-muted-foreground">
                     {active.withRole} · {channelLabel(active.channel)}
+                    {active.kind === "checkin" ? " · check-in" : ""}
                   </p>
                   <p className="mt-1 text-sm">{active.subject}</p>
                 </div>

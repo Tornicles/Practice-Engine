@@ -54,7 +54,23 @@ export function OffersWork() {
                   <dt className="text-muted-foreground">Price</dt>
                   <dd>{offer.price}</dd>
                 </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Package</dt>
+                  <dd>{offer.sessionCount ?? "—"} sessions</dd>
+                </div>
               </dl>
+              {(offer.program ?? []).length ? (
+                <div className="mt-3">
+                  <div className="engine-kicker mb-1">8-week program</div>
+                  <ol className="space-y-1 text-xs text-muted-foreground">
+                    {offer.program!.map((w) => (
+                      <li key={w.week}>
+                        Week {w.week} · {w.title} — {w.activity}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ) : null}
               <div className="mt-3">
                 <div className="engine-kicker">Problem</div>
                 <p className="text-sm">{offer.problem}</p>

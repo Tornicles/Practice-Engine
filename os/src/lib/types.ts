@@ -65,6 +65,11 @@ export interface Observation {
   createdAt: string;
 }
 
+export interface RubricMark {
+  item: string;
+  hit: boolean;
+}
+
 export interface PracticeSession {
   id: string;
   scenario: string;
@@ -74,7 +79,31 @@ export interface PracticeSession {
   scores: Partial<Record<SkillKey, number>> & { overall: number };
   strengths: string;
   weaknesses: string;
+  rubricMarks?: RubricMark[];
   createdAt: string;
+}
+
+export interface ClientMetric {
+  id: string;
+  label: string;
+  value: number;
+  target: number;
+  unit: string;
+}
+
+export interface ClientAction {
+  id: string;
+  text: string;
+  due: string;
+  done: boolean;
+  sourceSessionId?: string;
+}
+
+export interface ProgramWeek {
+  week: number;
+  title: string;
+  activity: string;
+  skill: SkillKey;
 }
 
 export interface Client {
@@ -86,6 +115,14 @@ export interface Client {
   currentState: string;
   source?: "manual" | "sale";
   relatedOpportunityId?: string;
+  offerId?: string;
+  remainingSessions?: number;
+  packageSessions?: number;
+  metrics?: ClientMetric[];
+  actions?: ClientAction[];
+  nextSessionAt?: string;
+  currentWeek?: number;
+  packagePaid?: boolean;
 }
 
 export interface DeliverySession {
@@ -98,6 +135,12 @@ export interface DeliverySession {
   clientResponse: string;
   outcome: string;
   followUp: string;
+  questionsAsked?: number;
+  challengeTiming?: "early" | "on_time" | "late" | "none";
+  clientCommitment?: string;
+  worksheet?: string;
+  coachSpeakPercent?: number;
+  moments?: string[];
 }
 
 export interface Experience {
@@ -263,6 +306,8 @@ export interface Offer {
   duration: string;
   price: string;
   status: "idea" | "draft" | "testing" | "validated" | "needs_revision" | "paused";
+  sessionCount?: number;
+  program?: ProgramWeek[];
 }
 
 export interface Opportunity {
@@ -338,6 +383,7 @@ export interface MessageThread {
   relatedOpportunityId?: string;
   subject: string;
   messages: ChatMessage[];
+  kind?: "checkin" | "conversation";
 }
 
 export interface AppSettings {
@@ -393,6 +439,7 @@ export interface EngineState {
   events: PracticeEvent[];
   todayJobs: TodayJob[];
   todayStamp: string;
+  weekClosedAt?: string;
   aiAudits: AiAudit[];
   threads: MessageThread[];
   settings: AppSettings;

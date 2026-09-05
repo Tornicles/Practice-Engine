@@ -1,22 +1,27 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { DEFAULT_PROGRAM } from "./catalog";
 import { createSeed, todayStamp } from "./seed";
 import type {
   AppSettings,
+  Client,
+  ClientAction,
   Coach,
   ContentItem,
   DeliverySession,
   EngineState,
   Experience,
   Investigation,
+  MessageThread,
   MethodologyTest,
   Opportunity,
   PracticeSession,
   ReuseDest,
   ValidationStatus,
 } from "./types";
-import { uid } from "./utils";
+import { daysFromNow, uid } from "./utils";
 import { WIP_CAP } from "./engine-loop";
+import { clientProgramWeek, planNextWeek } from "./compute";
 import type { PracticeEvent } from "./types";
 
 function pushEvent(
@@ -35,6 +40,43 @@ function pushEvent(
     },
     ...(events ?? []),
   ].slice(0, 80);
+}
+
+function upsertCheckIn(
+  threads: MessageThread[],
+  client: Client,
+  text: string,
+): MessageThread[] {
+  const existing = threads.find((t) => t.relatedClientId === client.id && t.kind === "checkin");
+  const msg = { id: uid("m"), from: "coach" as const, text, at: new Date().toISOString() };
+  const week = client.currentWeek ?? 1;
+  if (existing) {
+    return threads.map((t) =>
+      t.id === existing.id
+        ? {
+            ...t,
+            subject: `Check-in · week ${week}`,
+            unread: 0,
+            messages: [...t.messages, msg],
+          }
+        : t,
+    );
+  }
+  return [
+    {
+      id: uid("th"),
+      channel: "client",
+      kind: "checkin",
+      withName: client.name,
+      withRole: client.role,
+      unread: 0,
+      priority: true,
+      relatedClientId: client.id,
+      subject: `Check-in · week ${week}`,
+      messages: [msg],
+    },
+    ...threads,
+  ];
 }
 
 type Actions = {
@@ -70,6 +112,15 @@ type Actions = {
   convertThreadToFollowUp: (threadId: string) => boolean;
   updateCoach: (patch: Partial<Coach>) => void;
   updateSettings: (patch: Partial<AppSettings>) => void;
+  completeIntake: (clientId: string, patch: { objective: string; currentState: string }) => void;
+  addClientAction: (clientId: string, text: string, due?: string, sourceSessionId?: string) => void;
+  toggleClientAction: (clientId: string, actionId: string) => void;
+  recordClientMetric: (clientId: string, metricId: string, value: number) => void;
+  bookNextSession: (clientId: string, iso: string) => void;
+  markPackagePaid: (clientId: string, paid: boolean) => void;
+  sendCheckIn: (clientId: string, text?: string) => void;
+  captureLessonFromSession: (sessionId: string) => string | null;
+  closeWeek: () => boolean;
 };
 
 export const useEngine = create<EngineState & Actions>()(
@@ -96,8 +147,70 @@ export const useEngine = create<EngineState & Actions>()(
         if (!cur.threads?.length) patch.threads = seed.threads;
         if (!cur.settings) patch.settings = seed.settings;
         if (!cur.events) patch.events = seed.events;
+        if (
+          cur.clients?.some(
+            (c) =>
+              c.metrics === undefined ||
+              c.actions === undefined ||
+              c.nextSessionAt === undefined ||
+              c.currentWeek === undefined ||
+              c.packagePaid === undefined,
+          )
+        ) {
+          patch.clients = cur.clients.map((c) => {
+            const seeded = seed.clients.find((s) => s.id === c.id);
+            return {
+              ...c,
+              metrics: c.metrics ?? seeded?.metrics ?? [],
+              actions: c.actions ?? seeded?.actions ?? [],
+              remainingSessions: c.remainingSessions ?? seeded?.remainingSessions ?? 8,
+              packageSessions: c.packageSessions ?? seeded?.packageSessions ?? 8,
+              offerId: c.offerId ?? seeded?.offerId,
+              nextSessionAt: c.nextSessionAt ?? seeded?.nextSessionAt,
+              currentWeek: c.currentWeek ?? seeded?.currentWeek ?? 1,
+              packagePaid: c.packagePaid ?? seeded?.packagePaid ?? false,
+            };
+          });
+        }
+        if (cur.offers?.some((o) => !o.program?.length)) {
+          patch.offers = cur.offers.map((o) => {
+            const seeded = seed.offers.find((s) => s.id === o.id);
+            return { ...o, program: o.program?.length ? o.program : (seeded?.program ?? DEFAULT_PROGRAM) };
+          });
+        }
+        if (cur.threads?.some((t) => t.kind === undefined)) {
+          patch.threads = cur.threads.map((t) => ({
+            ...t,
+            kind: t.kind ?? (t.channel === "client" ? "checkin" : "conversation"),
+          }));
+        }
+        if (cur.sessions?.some((s) => s.moments === undefined || s.coachSpeakPercent === undefined)) {
+          patch.sessions = cur.sessions.map((s) => {
+            const seeded = seed.sessions.find((x) => x.id === s.id);
+            return {
+              ...s,
+              moments: s.moments ?? seeded?.moments ?? [],
+              coachSpeakPercent: s.coachSpeakPercent ?? seeded?.coachSpeakPercent,
+            };
+          });
+        }
         if (!cur.brand?.tagline) {
           patch.brand = { ...seed.brand, ...cur.brand, tagline: cur.brand?.tagline || seed.brand.tagline };
+        }
+        const clientsForWeek = patch.clients ?? cur.clients;
+        if (clientsForWeek?.length) {
+          const view = { ...cur, ...patch, clients: clientsForWeek, offers: patch.offers ?? cur.offers } as EngineState;
+          const assigned = clientsForWeek.map((c) => {
+            if (c.status !== "active") return c;
+            const week = clientProgramWeek(view, c);
+            if (!week) return c;
+            if ((c.actions ?? []).some((a) => a.text === week.activity)) return c;
+            return {
+              ...c,
+              actions: [{ id: uid("ca"), text: week.activity, due: `Week ${week.week}`, done: false }, ...(c.actions ?? [])],
+            };
+          });
+          if (assigned.some((c, i) => c !== clientsForWeek[i])) patch.clients = assigned;
         }
         set(patch);
       },
@@ -105,6 +218,7 @@ export const useEngine = create<EngineState & Actions>()(
       completeJob: (id) =>
         set({
           todayJobs: get().todayJobs.map((j) => (j.id === id ? { ...j, done: true } : j)),
+          events: pushEvent(get().events, "JOB_COMPLETED", "job", id),
         }),
       addPractice: (session) => {
         const id = uid("pr");
@@ -129,8 +243,38 @@ export const useEngine = create<EngineState & Actions>()(
       },
       addDelivery: (session) => {
         const id = uid("ds");
+        let threads = get().threads;
+        const clients = get().clients.map((c) => {
+          if (c.id !== session.clientId) return c;
+          const remaining = Math.max(0, (c.remainingSessions ?? 8) - 1);
+          const week = Math.min(c.packageSessions ?? 8, (c.currentWeek ?? 1) + 1);
+          const action: ClientAction | null = session.followUp
+            ? {
+                id: uid("ca"),
+                text: session.worksheet || session.followUp,
+                due: "Before next session",
+                done: false,
+                sourceSessionId: id,
+              }
+            : null;
+          const next: Client = {
+            ...c,
+            remainingSessions: remaining,
+            currentWeek: week,
+            nextSessionAt: c.nextSessionAt && new Date(c.nextSessionAt) > new Date() ? c.nextSessionAt : daysFromNow(7),
+            actions: action ? [action, ...(c.actions ?? [])] : c.actions,
+          };
+          const checkInText = `After today's session: ${session.worksheet || session.followUp}. Reply before the next session.`;
+          threads = upsertCheckIn(threads, next, checkInText);
+          return next;
+        });
         set({
           sessions: [{ ...session, id }, ...get().sessions],
+          clients,
+          threads,
+          todayJobs: get().todayJobs.map((j) =>
+            j.href === "/clients" && !j.done ? { ...j, done: true } : j,
+          ),
           events: pushEvent(get().events, "SESSION_COMPLETED", "session", id),
         });
       },
@@ -254,6 +398,8 @@ export const useEngine = create<EngineState & Actions>()(
                 duration: "8 weeks",
                 price: "TBD",
                 status,
+                sessionCount: 8,
+                program: DEFAULT_PROGRAM,
               },
               ...get().offers,
             ],
@@ -302,6 +448,8 @@ export const useEngine = create<EngineState & Actions>()(
         if (stage === "won") {
           const existing = get().clients.find((c) => c.relatedOpportunityId === id || c.name === opp.prospect);
           const clientId = existing?.id ?? uid("cl");
+          const offer = get().offers.find((o) => o.id === opp.offerId);
+          const sessions = offer?.sessionCount ?? 8;
           const client = existing ?? {
             id: clientId,
             name: opp.prospect,
@@ -311,6 +459,14 @@ export const useEngine = create<EngineState & Actions>()(
             currentState: "Won — starts as new, not active.",
             source: "sale" as const,
             relatedOpportunityId: id,
+            offerId: opp.offerId,
+            remainingSessions: sessions,
+            packageSessions: sessions,
+            metrics: [],
+            actions: [],
+            currentWeek: 1,
+            packagePaid: true,
+            nextSessionAt: daysFromNow(7),
           };
           let events = pushEvent(get().events, "SALE_WON", "opportunity", id);
           if (!existing) events = pushEvent(events, "CLIENT_CREATED", "client", clientId);
@@ -356,6 +512,8 @@ export const useEngine = create<EngineState & Actions>()(
               duration: "8 weeks",
               price: "TBD",
               status,
+              sessionCount: 8,
+              program: DEFAULT_PROGRAM,
             },
             ...get().offers,
           ],
@@ -489,9 +647,175 @@ export const useEngine = create<EngineState & Actions>()(
       },
       updateCoach: (patch) => set({ coach: { ...get().coach, ...patch } }),
       updateSettings: (patch) => set({ settings: { ...get().settings, ...patch } }),
+      completeIntake: (clientId, patch) =>
+        set({
+          clients: get().clients.map((c) =>
+            c.id === clientId
+              ? {
+                  ...c,
+                  ...patch,
+                  status: "active",
+                  currentWeek: c.currentWeek ?? 1,
+                  packagePaid: c.packagePaid ?? true,
+                  nextSessionAt: c.nextSessionAt ?? daysFromNow(7),
+                  metrics: c.metrics?.length
+                    ? c.metrics
+                    : [{ id: uid("m"), label: "Progress to goal", value: 0, target: 100, unit: "%" }],
+                  actions: c.actions ?? [],
+                }
+              : c,
+          ),
+          events: pushEvent(get().events, "CLIENT_INTAKE", "client", clientId),
+        }),
+      addClientAction: (clientId, text, due = "This week", sourceSessionId) =>
+        set({
+          clients: get().clients.map((c) =>
+            c.id === clientId
+              ? {
+                  ...c,
+                  actions: [
+                    { id: uid("ca"), text, due, done: false, sourceSessionId },
+                    ...(c.actions ?? []),
+                  ],
+                }
+              : c,
+          ),
+        }),
+      toggleClientAction: (clientId, actionId) =>
+        set({
+          clients: get().clients.map((c) =>
+            c.id === clientId
+              ? {
+                  ...c,
+                  actions: (c.actions ?? []).map((a) => (a.id === actionId ? { ...a, done: !a.done } : a)),
+                }
+              : c,
+          ),
+        }),
+      recordClientMetric: (clientId, metricId, value) =>
+        set({
+          clients: get().clients.map((c) =>
+            c.id === clientId
+              ? {
+                  ...c,
+                  metrics: (c.metrics ?? []).map((m) => (m.id === metricId ? { ...m, value } : m)),
+                }
+              : c,
+          ),
+        }),
+      bookNextSession: (clientId, iso) =>
+        set({
+          clients: get().clients.map((c) => (c.id === clientId ? { ...c, nextSessionAt: iso } : c)),
+          events: pushEvent(get().events, "SESSION_BOOKED", "client", clientId),
+        }),
+      markPackagePaid: (clientId, paid) =>
+        set({
+          clients: get().clients.map((c) => (c.id === clientId ? { ...c, packagePaid: paid } : c)),
+        }),
+      sendCheckIn: (clientId, text) => {
+        const client = get().clients.find((c) => c.id === clientId);
+        if (!client) return;
+        const open = (client.actions ?? []).find((a) => !a.done);
+        const body =
+          text?.trim() ||
+          `Week ${client.currentWeek ?? 1} check-in: ${open?.text ?? "What moved since last session?"}`;
+        set({
+          threads: upsertCheckIn(get().threads, client, body),
+          events: pushEvent(get().events, "CHECKIN_SENT", "client", clientId),
+        });
+      },
+      captureLessonFromSession: (sessionId) => {
+        const session = get().sessions.find((s) => s.id === sessionId);
+        if (!session) return null;
+        const client = get().clients.find((c) => c.id === session.clientId);
+        let experienceId = get().experiences.find(
+          (e) =>
+            e.sourceId === sessionId ||
+            (e.sourceType === "session" && e.action === session.intervention && e.result === session.outcome),
+        )?.id;
+        let experiences = get().experiences;
+        if (!experienceId) {
+          experienceId = uid("ex");
+          experiences = [
+            {
+              id: experienceId,
+              title: `Session: ${session.objective.slice(0, 48)}`,
+              sourceType: "session",
+              sourceId: sessionId,
+              situation: session.notes || session.objective,
+              action: session.intervention,
+              result: session.outcome,
+              reflection: session.clientResponse,
+              lesson: session.worksheet || session.outcome || session.objective,
+              insight: (session.moments ?? []).join("; "),
+              validationStatus: "raw",
+              createdAt: new Date().toISOString(),
+            },
+            ...experiences,
+          ];
+        }
+        const already = get().content.find((c) => c.sourceExperienceId === experienceId);
+        if (already) {
+          set({
+            experiences,
+            todayJobs: get().todayJobs.map((j) => (j.type === "build" ? { ...j, done: true } : j)),
+          });
+          return already.id;
+        }
+        const contentId = uid("ct");
+        const lesson = session.worksheet || session.outcome || session.objective;
+        set({
+          experiences,
+          content: [
+            {
+              id: contentId,
+              title: lesson.slice(0, 72),
+              format: "post",
+              kind: "authority",
+              status: "draft",
+              sourceExperienceId: experienceId,
+              message: `${lesson}\n\nFrom ${client?.name ?? "a live room"}: ${session.outcome}`,
+              platform: "LinkedIn",
+              questions: [],
+              createdAt: new Date().toISOString(),
+            },
+            ...get().content,
+          ],
+          todayJobs: get().todayJobs.map((j) => (j.type === "build" ? { ...j, done: true } : j)),
+          events: pushEvent(get().events, "LESSON_CAPTURED", "content", contentId),
+        });
+        return contentId;
+      },
+      closeWeek: () => {
+        const state = get();
+        if (state.todayJobs.some((j) => !j.done)) return false;
+        const plan = planNextWeek(state);
+        const jobs = plan.map((j) => ({ ...j, id: uid("job"), done: false }));
+        const clients = state.clients.map((c) => {
+          if (c.status !== "active") return c;
+          const week = clientProgramWeek(state, c);
+          if (!week) return c;
+          if ((c.actions ?? []).some((a) => a.text === week.activity && !a.done)) return c;
+          return {
+            ...c,
+            actions: [
+              { id: uid("ca"), text: week.activity, due: `Week ${week.week}`, done: false },
+              ...(c.actions ?? []),
+            ],
+          };
+        });
+        set({
+          todayJobs: jobs,
+          todayStamp: todayStamp(),
+          weekClosedAt: new Date().toISOString(),
+          clients,
+          events: pushEvent(state.events, "WEEK_CLOSED", "week", todayStamp()),
+        });
+        return true;
+      },
     }),
     {
-      name: "practice-engine-v3",
+      name: "practice-engine-v6",
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
       partialize: (s) => ({
@@ -521,6 +845,7 @@ export const useEngine = create<EngineState & Actions>()(
         events: s.events,
         todayJobs: s.todayJobs,
         todayStamp: s.todayStamp,
+        weekClosedAt: s.weekClosedAt,
         aiAudits: s.aiAudits,
         threads: s.threads,
         settings: s.settings,

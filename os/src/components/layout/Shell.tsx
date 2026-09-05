@@ -43,15 +43,19 @@ function areaTitle(pathname: string) {
 
 export function Shell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const hydrate = useEngine((s) => s.hydrate);
   const coach = useEngine((s) => s.coach);
   const state = useEngine();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    void useEngine.persist.rehydrate();
-    hydrate();
-  }, [hydrate]);
+    let cancelled = false;
+    void Promise.resolve(useEngine.persist.rehydrate()).then(() => {
+      if (!cancelled) useEngine.getState().hydrate();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const score = practiceScore(state);
   const atRisk = conditions(state).filter((c) => c.level === "at_risk").length;

@@ -39,6 +39,20 @@ export function ContentCreate() {
               ))}
             </Select>
           </Field>
+          <Button
+            variant="outline"
+            onClick={() => {
+              const session = state.sessions[0];
+              if (!session) {
+                toast.error("No session to capture.");
+                return;
+              }
+              const id = state.captureLessonFromSession(session.id);
+              toast.success(id ? "This session is now a content draft." : "Could not capture.");
+            }}
+          >
+            This session is the lesson
+          </Button>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Kind">
               <Select value={kind} onChange={(e) => setKind(e.target.value as ContentKind)}>

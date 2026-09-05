@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { DashLink } from "@/components/dash-link";
 import { Button } from "@/components/ui/button";
 import { Kpi, PageHeader, Panel, ProgressBar, StatusBadge } from "@/components/engine";
@@ -8,14 +9,17 @@ import {
   aiNextActions,
   conditions,
   currentStateViews,
+  dueCheckIns,
   nextAction,
   recentWins,
   skillViews,
   stats,
+  weeklyLoop,
 } from "@/lib/compute";
 import { FLYWHEEL, flywheelLit, overallMatchesConditions } from "@/lib/engine-loop";
 import { isLiveMode, liveApi } from "@/lib/live-api";
 import { parseTabSearch } from "@/lib/nav";
+import type { AreaPath } from "@/lib/nav";
 import { useEngine } from "@/lib/store";
 import { fmtDate } from "@/lib/utils";
 
@@ -36,14 +40,13 @@ function Home() {
   const wins = recentWins(state);
   const activity = activityFeed(state);
   const actions = aiNextActions(state);
-  const practiceJob = state.todayJobs.find((j) => j.type === "practice");
-  const lastSession = state.sessions[0];
-  const lastClient = state.clients.find((c) => c.id === lastSession?.clientId);
   const drafts = state.content.filter((c) => c.status !== "published");
   const overall = conditions(state).find((c) => c.id === "c-overall");
   const overallLevel = overallMatchesConditions(state);
   const lit = flywheelLit(state);
   const saleClients = state.clients.filter((c) => c.source === "sale" || c.status === "new");
+  const week = weeklyLoop(state);
+  const checkIns = dueCheckIns(state.threads);
   const [liveLevel, setLiveLevel] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,8 +62,27 @@ function Home() {
       <PageHeader
         kicker="Command center"
         title={`Welcome, ${state.coach.name.split(" ")[0]}.`}
-        detail="Today's focus, current condition, and the next move — computed from practice, clients, and content. Not a list of tools."
+        detail="This week: one skill, one client, one lesson. Completing a job writes an event — that is the only way Home moves."
       />
+
+      <div className="mb-6 grid gap-3 md:grid-cols-3">
+        {([week.skill, week.client, week.lesson] as const).map((item) => (
+          <DashLink
+            key={item.kicker}
+            to={item.to}
+            tab={item.tab}
+            className={`engine-card block p-4 hover:border-primary/40 ${item.done ? "opacity-60" : "border-primary/40"}`}
+          >
+            <div className="engine-kicker text-primary">{item.kicker}</div>
+            <h2 className="mt-2 text-base font-semibold">{item.title}</h2>
+            <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
+            {"when" in item && typeof item.when === "string" ? (
+              <p className="mt-2 font-mono text-[0.625rem] text-muted-foreground">Next {fmtDate(item.when)}</p>
+            ) : null}
+            {item.done ? <p className="mt-2 engine-kicker text-ok">Job done</p> : null}
+          </DashLink>
+        ))}
+      </div>
 
       <div className="engine-card mb-6 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -111,36 +133,76 @@ function Home() {
         <Kpi label="Practice score" value={s.practiceScore} hint="From evidenced skills" />
         <Kpi label="Active clients" value={state.clients.filter((c) => c.status === "active").length} />
         <Kpi label="Published" value={s.contentPublished} hint={`${drafts.length} in draft`} />
-        <Kpi label="Open follow-ups" value={state.threads.filter((t) => t.unread > 0).length} hint="Unread messages" />
+        <Kpi label="Due check-ins" value={checkIns.length} hint="Unread or waiting on you" />
         <Kpi label="New from sale" value={saleClients.length} hint="Won opportunities land here as new" />
       </div>
 
-      <Panel title="Today" className="mb-6">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          <TodayCell kicker="Development focus" title={state.coach.developmentFocus} to="/development" />
-          <TodayCell
-            kicker="Today's practice"
-            title={practiceJob?.title ?? "No drill queued"}
-            meta={practiceJob ? `${practiceJob.minutes} min` : undefined}
-            to="/development"
-            tab="practice"
-          />
-          <TodayCell
-            kicker="Client priorities"
-            title={lastClient ? `${lastClient.name}` : "No live follow-up"}
-            meta={lastSession?.followUp}
-            to="/clients"
-            tab="session"
-          />
-          <TodayCell
-            kicker="Content priorities"
-            title={drafts[0]?.title ?? "No draft waiting"}
-            meta={drafts[0]?.kind}
-            to="/content"
-            tab="create"
-          />
-          <TodayCell kicker="Next action" title={next.title} meta={`${next.minutes} min`} to={next.to} tab={next.tab} />
+      <Panel
+        title="Today — three jobs"
+        className="mb-6"
+        action={
+          <span className="font-mono text-[0.625rem] text-muted-foreground">
+            {state.todayJobs.filter((j) => j.done).length}/{state.todayJobs.length} done · cap 3
+          </span>
+        }
+      >
+        <div className="space-y-3">
+          {state.todayJobs.map((job, i) => (
+            <div
+              key={job.id}
+              className={`flex flex-col gap-3 border p-3 sm:flex-row sm:items-center sm:justify-between ${
+                job.done ? "border-border opacity-60" : "border-primary/40"
+              }`}
+            >
+              <div className="min-w-0">
+                <div className="engine-kicker text-primary">
+                  {i + 1}. {job.type} · {job.minutes} min
+                </div>
+                <div className="mt-1 text-sm font-medium">{job.title}</div>
+                <p className="mt-1 text-xs text-muted-foreground">{job.detail}</p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <DashLink to={job.href as AreaPath} tab={job.tab}>
+                  <Button size="sm">{job.done ? "Review" : "Do this"}</Button>
+                </DashLink>
+                {!job.done ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    aria-label="Mark done"
+                    onClick={() => state.completeJob(job.id)}
+                  >
+                    Mark done
+                  </Button>
+                ) : (
+                  <span className="engine-kicker self-center text-ok">Job done</span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
+        {state.todayJobs.length > 0 && state.todayJobs.every((j) => j.done) ? (
+          <div className="mt-4 border border-primary/40 p-4">
+            <div className="engine-kicker text-primary">Week complete</div>
+            <p className="mt-2 text-sm">
+              Three jobs posted events. Close the week to generate the next skill, client, and lesson — still capped at 3.
+            </p>
+            <Button
+              className="mt-3 min-h-11"
+              onClick={() => {
+                const ok = state.closeWeek();
+                if (ok) toast.success("Next week is loaded: one skill, one client, one lesson.");
+                else toast.error("Finish today's three jobs first.");
+              }}
+            >
+              Close this week
+            </Button>
+          </div>
+        ) : state.weekClosedAt ? (
+          <p className="mt-4 font-mono text-[0.625rem] text-muted-foreground">
+            Last week closed {fmtDate(state.weekClosedAt)}. These three jobs are the new week.
+          </p>
+        ) : null}
       </Panel>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
@@ -240,27 +302,5 @@ function Home() {
         </Panel>
       </div>
     </div>
-  );
-}
-
-function TodayCell({
-  kicker,
-  title,
-  meta,
-  to,
-  tab,
-}: {
-  kicker: string;
-  title: string;
-  meta?: string;
-  to: "/" | "/development" | "/clients" | "/content" | "/messages" | "/help" | "/settings";
-  tab?: string;
-}) {
-  return (
-    <DashLink to={to} tab={tab} className="border border-border p-3 hover:border-primary/40">
-      <div className="engine-kicker">{kicker}</div>
-      <div className="mt-2 text-sm font-medium">{title}</div>
-      {meta ? <p className="mt-1 text-xs text-muted-foreground">{meta}</p> : null}
-    </DashLink>
   );
 }

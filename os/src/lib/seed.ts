@@ -1,4 +1,5 @@
-import { daysAgo } from "./utils";
+import { daysAgo, daysFromNow } from "./utils";
+import { DEFAULT_PROGRAM } from "./catalog";
 import type { EngineState } from "./types";
 
 export function todayStamp() {
@@ -30,14 +31,14 @@ export function createSeed(): EngineState {
     observations: [
       { id: "ob-1", skill: "questioning", score: 72, sourceType: "simulation", sourceId: "pr-1", note: "Opened with a closed question", createdAt: daysAgo(18) },
       { id: "ob-2", skill: "questioning", score: 78, sourceType: "simulation", sourceId: "pr-2", note: "Diagnostic pair landed", createdAt: daysAgo(11) },
-      { id: "ob-3", skill: "questioning", score: 82, sourceType: "session", sourceId: "ds-1", note: "Held silence after the second question", createdAt: daysAgo(6) },
-      { id: "ob-4", skill: "listening", score: 76, sourceType: "session", sourceId: "ds-1", note: "Mirrored the decision bind", createdAt: daysAgo(6) },
+      { id: "ob-3", skill: "questioning", score: 82, sourceType: "session", sourceId: "ds-1", note: "Held silence after the second question", createdAt: daysAgo(6, 10) },
+      { id: "ob-4", skill: "listening", score: 76, sourceType: "session", sourceId: "ds-1", note: "Mirrored the decision bind", createdAt: daysAgo(6, 11) },
       { id: "ob-5", skill: "listening", score: 81, sourceType: "simulation", sourceId: "pr-2", note: "Caught the fear under the objection", createdAt: daysAgo(11) },
       { id: "ob-6", skill: "reframing", score: 58, sourceType: "simulation", sourceId: "pr-1", note: "Reframed before ownership", createdAt: daysAgo(18) },
-      { id: "ob-7", skill: "reframing", score: 61, sourceType: "session", sourceId: "ds-1", note: "Late reframe created movement", createdAt: daysAgo(6) },
+      { id: "ob-7", skill: "reframing", score: 61, sourceType: "session", sourceId: "ds-1", note: "Late reframe created movement", createdAt: daysAgo(6, 12) },
       { id: "ob-8", skill: "challenge", score: 52, sourceType: "simulation", sourceId: "pr-1", note: "Collapsed into advice", createdAt: daysAgo(18) },
       { id: "ob-9", skill: "challenge", score: 58, sourceType: "simulation", sourceId: "pr-2", note: "Named the stall, then over-explained", createdAt: daysAgo(11) },
-      { id: "ob-10", skill: "challenge", score: 55, sourceType: "session", sourceId: "ds-1", note: "Challenge arrived before trust in the room", createdAt: daysAgo(6) },
+      { id: "ob-10", skill: "challenge", score: 55, sourceType: "session", sourceId: "ds-1", note: "Challenge arrived before trust in the room", createdAt: daysAgo(6, 13) },
     ],
     practices: [
       {
@@ -49,7 +50,12 @@ export function createSeed(): EngineState {
         scores: { overall: 64, questioning: 72, challenge: 52, reframing: 58, listening: 76 },
         strengths: "Held the first silence.",
         weaknesses: "Advice landed before diagnosis.",
-        createdAt: daysAgo(18),
+        rubricMarks: [
+          { item: "Do not argue for coaching", hit: true },
+          { item: "Name the stall", hit: false },
+          { item: "Ask who the work is actually for", hit: false },
+        ],
+        createdAt: daysAgo(18, 16),
       },
       {
         id: "pr-2",
@@ -60,7 +66,12 @@ export function createSeed(): EngineState {
         scores: { overall: 74, questioning: 78, challenge: 58, listening: 81 },
         strengths: "Diagnostic questions created a new distinction.",
         weaknesses: "Challenge still over-explained.",
-        createdAt: daysAgo(11),
+        rubricMarks: [
+          { item: "Stay in diagnosis", hit: true },
+          { item: "One diagnostic pair", hit: true },
+          { item: "No advice in the first two turns", hit: false },
+        ],
+        createdAt: daysAgo(11, 16),
       },
     ],
     clients: [
@@ -71,6 +82,25 @@ export function createSeed(): EngineState {
         status: "active",
         objective: "Make slower, cleaner hiring decisions",
         currentState: "Still reversing offers under pressure from the board",
+        offerId: "of-1",
+        remainingSessions: 6,
+        packageSessions: 8,
+        nextSessionAt: daysFromNow(2),
+        currentWeek: 3,
+        packagePaid: true,
+        metrics: [
+          { id: "m-1", label: "Offer reversals / quarter", value: 2, target: 0, unit: "count" },
+          { id: "m-2", label: "Hours to a named decision", value: 72, target: 48, unit: "hrs" },
+        ],
+        actions: [
+          {
+            id: "ca-1",
+            text: "Use the 48-hour decision rule before Thursday's offer.",
+            due: "This week",
+            done: false,
+            sourceSessionId: "ds-1",
+          },
+        ],
       },
       {
         id: "cl-2",
@@ -79,19 +109,37 @@ export function createSeed(): EngineState {
         status: "active",
         objective: "Separate signal from noise in weekly leadership meetings",
         currentState: "Meetings still end without a decision owner",
+        offerId: "of-1",
+        remainingSessions: 7,
+        packageSessions: 8,
+        nextSessionAt: daysFromNow(5),
+        currentWeek: 2,
+        packagePaid: true,
+        metrics: [
+          { id: "m-3", label: "Meetings with a named owner", value: 40, target: 80, unit: "%" },
+        ],
+        actions: [
+          { id: "ca-2", text: "Name the decision owner before the agenda is read.", due: "Monday", done: false },
+        ],
       },
     ],
     sessions: [
       {
         id: "ds-1",
         clientId: "cl-1",
-        date: daysAgo(6),
+        date: daysAgo(6, 14),
         objective: "Name the real constraint in the VP hire",
         notes: "Jordan listed three urgent problems and jumped between them.",
         intervention: "Held a diagnostic pair, then named the stall.",
         clientResponse: "Resistance, then a quieter admission that the board is the audience.",
         outcome: "Committed to a 48-hour decision rule before the next offer.",
         followUp: "Check whether the rule was used on Thursday.",
+        questionsAsked: 4,
+        challengeTiming: "on_time",
+        clientCommitment: "48-hour decision rule before the next offer",
+        worksheet: "Before Thursday: write the decision, the audience, and the 48-hour rule. Send one sentence.",
+        coachSpeakPercent: 38,
+        moments: ["named the stall", "board as hidden client"],
       },
     ],
     experiences: [
@@ -110,7 +158,7 @@ export function createSeed(): EngineState {
         frameworkCandidate: "Ownership → Diagnosis → Alignment → Commitment",
         evidenceGap: "Needs two more high-resistance sessions.",
         validationStatus: "supported",
-        createdAt: daysAgo(6),
+        createdAt: daysAgo(6, 16),
       },
       {
         id: "ex-2",
@@ -125,7 +173,7 @@ export function createSeed(): EngineState {
         insight: "My need to be useful is a coaching risk.",
         principleId: "prnc-1",
         validationStatus: "supported",
-        createdAt: daysAgo(18),
+        createdAt: daysAgo(18, 17),
       },
       {
         id: "ex-3",
@@ -233,7 +281,7 @@ export function createSeed(): EngineState {
         result: "Resistance first, then the board appeared as the hidden client.",
         conclusion: "Supported in this room. Still testing in low-trust first sessions.",
         status: "testing",
-        createdAt: daysAgo(6),
+        createdAt: daysAgo(6, 17),
       },
     ],
     brand: {
@@ -319,6 +367,8 @@ export function createSeed(): EngineState {
         duration: "8 weeks",
         price: "$8,500 / 8 weeks",
         status: "testing",
+        sessionCount: 8,
+        program: DEFAULT_PROGRAM,
       },
     ],
     opportunities: [
@@ -373,21 +423,21 @@ export function createSeed(): EngineState {
       {
         id: "job-2",
         type: "reflect",
-        title: "Capture one experience",
-        detail: "Turn a live or practice moment into a lesson with lineage.",
-        href: "/development",
-        tab: "experience",
-        minutes: 8,
+        title: "Prep Jordan Hale",
+        detail: "Check whether the 48-hour rule was used. Log the session and send one worksheet.",
+        href: "/clients",
+        tab: "session",
+        minutes: 20,
         done: false,
       },
       {
         id: "job-3",
         type: "build",
-        title: "Test the R.E.A.D. protocol",
-        detail: "Attach one more supporting experience or record a limitation.",
+        title: "Capture the lesson",
+        detail: "Turn the live or practice moment into one experience with lineage.",
         href: "/development",
-        tab: "methodology",
-        minutes: 15,
+        tab: "experience",
+        minutes: 8,
         done: false,
       },
     ],
@@ -399,19 +449,20 @@ export function createSeed(): EngineState {
         targetEngine: "4",
         strategy: "Structure experience into lesson / principle candidate",
         evidenceStatus: "candidate",
-        createdAt: daysAgo(6),
+        createdAt: daysAgo(6, 15),
       },
     ],
     threads: [
       {
         id: "th-1",
         channel: "client",
+        kind: "checkin",
         withName: "Jordan Hale",
         withRole: "Founder, Series A ops tool",
         unread: 1,
         priority: true,
         relatedClientId: "cl-1",
-        subject: "Did I use the 48-hour rule?",
+        subject: "Check-in · week 3",
         messages: [
           {
             id: "m-1",
@@ -430,6 +481,7 @@ export function createSeed(): EngineState {
       {
         id: "th-2",
         channel: "client",
+        kind: "conversation",
         withName: "Priya Shah",
         withRole: "CEO, climate hardware",
         unread: 0,
@@ -454,6 +506,7 @@ export function createSeed(): EngineState {
       {
         id: "th-3",
         channel: "lead",
+        kind: "conversation",
         withName: "Elena Voss",
         withRole: "Fintech founder",
         unread: 1,
@@ -472,6 +525,7 @@ export function createSeed(): EngineState {
       {
         id: "th-4",
         channel: "network",
+        kind: "conversation",
         withName: "Marcus Bell",
         withRole: "Mentor · executive coach",
         unread: 0,
@@ -489,8 +543,9 @@ export function createSeed(): EngineState {
     ],
     events: [
       { id: "ev-1", type: "PRACTICE_COMPLETED", entityType: "practice", entityId: "pr-1", at: daysAgo(18) },
-      { id: "ev-2", type: "SESSION_COMPLETED", entityType: "session", entityId: "ds-1", at: daysAgo(6) },
+      { id: "ev-2", type: "SESSION_COMPLETED", entityType: "session", entityId: "ds-1", at: daysAgo(6, 14) },
       { id: "ev-3", type: "CONTENT_PUBLISHED", entityType: "content", entityId: "ct-1", at: daysAgo(5) },
+      { id: "ev-4", type: "SESSION_BOOKED", entityType: "client", entityId: "cl-1", at: daysAgo(6, 18) },
     ],
     settings: {
       assistanceLevel: "medium",

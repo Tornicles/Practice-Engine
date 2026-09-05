@@ -6,7 +6,7 @@ import { OffersWork } from "@/components/areas/offers-work";
 import { DashLink } from "@/components/dash-link";
 import { Kpi, PageHeader, Panel, StatusBadge, TabBar } from "@/components/engine";
 import { CONTENT_TABS, parseTabSearch } from "@/lib/nav";
-import { stats } from "@/lib/compute";
+import { stats, thisWeekLesson } from "@/lib/compute";
 import { useEngine } from "@/lib/store";
 
 export const Route = createFileRoute("/content")({
@@ -19,6 +19,7 @@ function Content() {
   const navigate = useNavigate({ from: "/content" });
   const state = useEngine();
   const s = stats(state);
+  const weekLesson = thisWeekLesson(state);
   const questions = state.content.flatMap((c) => c.questions);
   const ideas = [
     {
@@ -66,6 +67,47 @@ function Content() {
             <Kpi label="Pipeline" value={s.pipeline} hint={`${s.conversion}% conversion`} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
+            <Panel title="This week's lesson">
+              {weekLesson.session ? (
+                <>
+                  <p className="text-sm font-medium">{weekLesson.content?.title ?? weekLesson.session.outcome}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {weekLesson.published
+                      ? "Published. The lesson is live."
+                      : weekLesson.captured
+                        ? "Drafted from the last session. Publish it — do not start a new thread."
+                        : "Last session has no content yet. This is the lesson."}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {!weekLesson.captured ? (
+                      <button
+                        type="button"
+                        className="text-sm text-primary"
+                        onClick={() => {
+                          if (weekLesson.session) state.captureLessonFromSession(weekLesson.session.id);
+                        }}
+                      >
+                        This session is the lesson
+                      </button>
+                    ) : weekLesson.content && weekLesson.content.status !== "published" ? (
+                      <button
+                        type="button"
+                        className="text-sm text-primary"
+                        onClick={() => state.publishContent(weekLesson.content!.id)}
+                      >
+                        Publish the lesson
+                      </button>
+                    ) : (
+                      <DashLink to="/content" tab="create" className="text-sm text-primary">
+                        Open the draft
+                      </DashLink>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">Run a session or a drill, then capture one sentence.</p>
+              )}
+            </Panel>
             <Panel title="Recommended content">
               <p className="text-sm">{ideas[0].title}</p>
               <p className="mt-2 text-xs text-muted-foreground">Drawn from a live lesson, not a content calendar.</p>

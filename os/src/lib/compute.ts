@@ -1,5 +1,6 @@
+import { DEFAULT_PROGRAM, PRACTICE_CATALOG } from "./catalog";
 import type { AreaPath } from "./nav";
-import type { ConditionLevel, EngineState, SkillKey } from "./types";
+import type { Client, ConditionLevel, EngineState, SkillKey, TodayJob } from "./types";
 
 const SKILLS: { key: SkillKey; label: string; target: number }[] = [
   { key: "listening", label: "Listening", target: 88 },
@@ -242,7 +243,30 @@ export function nextAction(state: EngineState) {
   const cond = conditions(state).find((c) => c.level === "at_risk");
   const openInv = state.investigations.find((i) => i.status === "open");
   const weak = skillViews(state).sort((a, b) => a.current - b.current)[0];
+  const newClient = state.clients.find((c) => c.status === "new");
 
+  if (newClient) {
+    return {
+      title: `Intake ${newClient.name.split(",")[0]}`,
+      why: "A won opportunity is not an active client until intake is complete.",
+      action: "Set the goal, remaining sessions, and first metric.",
+      to: "/clients" as AreaPath,
+      tab: "profile",
+      minutes: 8,
+      skill: state.coach.developmentFocus,
+    };
+  }
+  if (job) {
+    return {
+      title: job.title,
+      why: "This week: one skill, one client, one lesson. Nothing else until this job posts an event.",
+      action: job.detail,
+      to: (job.href || "/") as AreaPath,
+      tab: job.tab,
+      minutes: job.minutes,
+      skill: state.coach.developmentFocus,
+    };
+  }
   if (openInv) {
     return {
       title: "Investigate the commercial stall",
@@ -252,17 +276,6 @@ export function nextAction(state: EngineState) {
       tab: "improve",
       minutes: 12,
       skill: "judgment",
-    };
-  }
-  if (job) {
-    return {
-      title: job.title,
-      why: "Today's plan sequences practice, capture, then build.",
-      action: job.detail,
-      to: (job.href || "/") as AreaPath,
-      tab: job.tab,
-      minutes: job.minutes,
-      skill: state.coach.developmentFocus,
     };
   }
   if (cond) {
@@ -285,6 +298,150 @@ export function nextAction(state: EngineState) {
     minutes: 10,
     skill: weak.label,
   };
+}
+
+export function clientProgramWeek(state: EngineState, client: Client) {
+  const offer = state.offers.find((o) => o.id === client.offerId);
+  const weeks = offer?.program?.length ? offer.program : DEFAULT_PROGRAM;
+  const w = client.currentWeek ?? 1;
+  return weeks.find((p) => p.week === w) ?? weeks[0];
+}
+
+export function dueCheckIns(threads: EngineState["threads"]) {
+  return threads.filter((t) => {
+    if (t.kind !== "checkin") return false;
+    const last = t.messages[t.messages.length - 1];
+    return t.unread > 0 || last?.from === "them";
+  });
+}
+
+export function weeklyLoop(state: EngineState) {
+  const practiceJob = state.todayJobs.find((j) => j.type === "practice");
+  const weak = skillViews(state).sort((a, b) => a.current - b.current)[0];
+  const soonest = [...state.clients]
+    .filter((c) => c.status === "active")
+    .sort((a, b) => (a.nextSessionAt ?? "z").localeCompare(b.nextSessionAt ?? "z"))[0];
+  const lastSession = state.sessions[0];
+  const expFromSession = lastSession
+    ? state.experiences.find((e) => e.sourceId === lastSession.id)
+    : undefined;
+  const lessonCaptured = Boolean(
+    expFromSession && state.content.some((c) => c.sourceExperienceId === expFromSession.id),
+  );
+  const captureJob = state.todayJobs.find((j) => j.type === "build");
+  const week = soonest ? clientProgramWeek(state, soonest) : undefined;
+
+  return {
+    skill: {
+      kicker: "One skill",
+      title: practiceJob?.title ?? `${weak?.label} drill`,
+      detail: practiceJob?.detail ?? `Weakest skill is ${weak?.label} at ${weak?.current}.`,
+      to: "/development" as AreaPath,
+      tab: "practice",
+      done: practiceJob?.done ?? false,
+    },
+    client: {
+      kicker: "One client",
+      title: soonest ? soonest.name : "No session booked",
+      detail: soonest
+        ? `Week ${soonest.currentWeek ?? 1}: ${week?.activity ?? "Open the client record."} ${soonest.remainingSessions ?? 0} sessions left.`
+        : "Book the next session from the client record.",
+      to: "/clients" as AreaPath,
+      tab: soonest ? "session" : "profile",
+      done: state.todayJobs.find((j) => j.href === "/clients")?.done ?? false,
+      when: soonest?.nextSessionAt,
+    },
+    lesson: {
+      kicker: "One lesson",
+      title: lastSession && !lessonCaptured ? (captureJob?.title ?? "Capture the lesson") : "Lesson captured",
+      detail: lastSession
+        ? lessonCaptured
+          ? "Last session already has a content draft."
+          : lastSession.outcome
+        : "Run a session or a drill first.",
+      to: (lessonCaptured ? "/content" : "/development") as AreaPath,
+      tab: lessonCaptured ? "create" : "experience",
+      done: lessonCaptured || (captureJob?.done ?? false),
+    },
+  };
+}
+
+export function skillTrack(state: EngineState) {
+  const weak = skillViews(state).sort((a, b) => a.current - b.current)[0];
+  const scenarios = PRACTICE_CATALOG.filter((s) => s.skill === weak.key);
+  const rows = scenarios.map((s) => {
+    const last = state.practices.find((p) => p.scenario === s.title);
+    return { ...s, lastScore: last?.scores.overall, lastAt: last?.createdAt };
+  });
+  const next = rows.find((s) => s.lastScore === undefined) ?? rows[0];
+  return { skill: weak, scenarios: rows, next };
+}
+
+export function thisWeekLesson(state: EngineState) {
+  const lastSession = state.sessions[0];
+  const experience = lastSession
+    ? state.experiences.find((e) => e.sourceId === lastSession.id)
+    : undefined;
+  const fromSession = experience
+    ? state.content.find((c) => c.sourceExperienceId === experience.id)
+    : undefined;
+  const draft = state.content.find((c) => c.status === "draft" || c.status === "idea");
+  const content = fromSession ?? draft;
+  return {
+    session: lastSession,
+    experience,
+    content,
+    captured: Boolean(fromSession),
+    published: fromSession?.status === "published",
+  };
+}
+
+export function planNextWeek(state: EngineState): Omit<TodayJob, "id" | "done">[] {
+  const track = skillTrack(state);
+  const scenario = track.next ?? PRACTICE_CATALOG[0];
+  const soonest = [...state.clients]
+    .filter((c) => c.status === "active")
+    .sort((a, b) => (a.nextSessionAt ?? "z").localeCompare(b.nextSessionAt ?? "z"))[0];
+  const week = soonest ? clientProgramWeek(state, soonest) : undefined;
+  const lesson = thisWeekLesson(state);
+  return [
+    {
+      type: "practice",
+      title: scenario.title,
+      detail: `${scenario.minutes}-minute ${scenario.skill} drill. ${scenario.rubric[0]}.`,
+      href: "/development",
+      tab: "practice",
+      minutes: scenario.minutes,
+    },
+    {
+      type: "reflect",
+      title: soonest ? `Prep ${soonest.name.split(" ")[0]}` : "Book a session",
+      detail: soonest
+        ? `Week ${soonest.currentWeek ?? 1}: ${week?.activity ?? "Open the client record."}`
+        : "Intake or book the next session.",
+      href: "/clients",
+      tab: soonest ? "session" : "profile",
+      minutes: 20,
+    },
+    {
+      type: "build",
+      title: lesson.published
+        ? "Capture the next lesson"
+        : lesson.captured
+          ? "Publish the lesson"
+          : "Capture the lesson",
+      detail: lesson.session
+        ? lesson.published
+          ? "Last lesson is live. Capture the next room."
+          : lesson.captured
+            ? `Draft waiting: ${lesson.content?.title}`
+            : lesson.session.outcome
+        : "Turn this week's drill or session into one public sentence.",
+      href: lesson.captured ? "/content" : "/development",
+      tab: lesson.captured ? "create" : "experience",
+      minutes: 8,
+    },
+  ];
 }
 
 export function aiNextActions(state: EngineState) {
@@ -545,5 +702,8 @@ export function activityFeed(state: EngineState) {
       tab: "assessments",
     });
   }
-  return items.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 8);
+  return items.sort((a, b) => {
+    const t = b.at.localeCompare(a.at);
+    return t !== 0 ? t : a.title.localeCompare(b.title);
+  }).slice(0, 8);
 }

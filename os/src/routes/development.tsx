@@ -6,7 +6,7 @@ import { MethodologyWork } from "@/components/areas/methodology-work";
 import { PracticeStudio } from "@/components/areas/practice-studio";
 import { Kpi, PageHeader, Panel, ProgressBar, StatusBadge, TabBar } from "@/components/engine";
 import { DEV_TABS, parseTabSearch } from "@/lib/nav";
-import { skillViews, stats } from "@/lib/compute";
+import { skillTrack, skillViews, stats } from "@/lib/compute";
 import { useEngine } from "@/lib/store";
 import { fmtDate } from "@/lib/utils";
 
@@ -21,6 +21,7 @@ function Development() {
   const state = useEngine();
   const skills = skillViews(state);
   const s = stats(state);
+  const track = skillTrack(state);
 
   return (
     <div>
@@ -39,6 +40,38 @@ function Development() {
             <Kpi label="Experiences" value={s.experiences} />
             <Kpi label="Frameworks" value={s.frameworks} hint={`${state.methodologyTests.length} tests`} />
           </div>
+          <Panel
+            title={`This week's skill — ${track.skill.label}`}
+            className="mb-6"
+            action={
+              <DashLink to="/development" tab="practice">
+                <span className="text-xs text-primary">Run {track.next?.title ?? "the drill"}</span>
+              </DashLink>
+            }
+          >
+            <p className="mb-3 text-sm text-muted-foreground">
+              Weakest skill is {track.skill.label} at {track.skill.current}. One scenario this week. Last score is evidence, not mastery.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {track.scenarios.map((s) => (
+                <div
+                  key={s.id}
+                  className={`border p-3 ${track.next?.id === s.id ? "border-primary/40" : "border-border"}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="engine-kicker text-primary">{s.tag}</div>
+                    {s.lastScore != null ? (
+                      <span className="font-mono text-xs text-primary">{s.lastScore}</span>
+                    ) : (
+                      <span className="font-mono text-[0.625rem] text-muted-foreground">Not run</span>
+                    )}
+                  </div>
+                  <div className="mt-1 text-sm font-medium">{s.title}</div>
+                  <p className="mt-1 text-xs text-muted-foreground">{s.rubric[0]}</p>
+                </div>
+              ))}
+            </div>
+          </Panel>
           <div className="grid gap-4 lg:grid-cols-2">
             <Panel title="Skills">
               <div className="space-y-4">
