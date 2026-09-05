@@ -46,23 +46,14 @@ function rejectScoreWrites(body: unknown) {
   if (!body || typeof body !== "object") return;
   for (const key of forbiddenScoreKeys) {
     if (key in body) {
-      throw new HttpError(
-        403,
-        "FORBIDDEN",
-        "Settings cannot write practice_score or streak.",
-        { field: key },
-      );
+      throw new HttpError(403, "FORBIDDEN", "Settings cannot write practice_score or streak.", { field: key });
     }
   }
 }
 
 function sendError(res: { status: (n: number) => { json: (v: unknown) => void } }, error: unknown) {
   if (error instanceof HttpError) {
-    res.status(error.status).json({
-      error: error.code,
-      message: error.message,
-      ...error.extra,
-    });
+    res.status(error.status).json({ error: error.code, message: error.message, ...error.extra });
     return;
   }
   throw error;
@@ -81,15 +72,19 @@ router.get("/me", async (req, res): Promise<void> => {
         goal: coach.goal,
         developmentFocus: coach.developmentFocus,
         workingPreferences: coach.workingPreferences,
+        accountStatus: passport.accountStatus,
       },
       passport: {
         id: passport.id,
         version: passport.version,
         source: passport.source,
+        accountStatus: passport.accountStatus,
         identitySummary: passport.identitySummary,
         specialty: passport.specialty,
         audience: passport.audience,
         developmentFocus: passport.developmentFocus,
+        timezone: passport.timezone,
+        capacityMinutesPerDay: passport.capacityMinutesPerDay,
       },
     });
   } catch (error) {
@@ -106,19 +101,28 @@ router.patch("/me", async (req, res): Promise<void> => {
       return;
     }
     const userId = authenticatedUserId(req);
-    const { coach } = await ensurePassport(userId);
+    const { coach, passport } = await ensurePassport(userId);
+    if (passport.accountStatus === "closed") {
+      throw new HttpError(409, "INVALID_STATE_TRANSITION", "Closed coach cannot update profile.");
+    }
     const [updated] = await db
       .update(coachProfilesTable)
       .set({
         ...(parsed.data.name ? { name: parsed.data.name } : {}),
         ...(parsed.data.niche ? { niche: parsed.data.niche } : {}),
         ...(parsed.data.audience ? { audience: parsed.data.audience } : {}),
-        ...(parsed.data.workingPreferences
-          ? { workingPreferences: parsed.data.workingPreferences }
-          : {}),
+        ...(parsed.data.workingPreferences ? { workingPreferences: parsed.data.workingPreferences } : {}),
       })
       .where(eq(coachProfilesTable.id, coach.id))
       .returning();
+    if (parsed.data.timezone !== undefined || parsed.data.capacityMinutesPerDay !== undefined) {
+      await db.update(coachPassportsTable).set({
+        ...(parsed.data.timezone !== undefined ? { timezone: parsed.data.timezone } : {}),
+        ...(parsed.data.capacityMinutesPerDay !== undefined
+          ? { capacityMinutesPerDay: parsed.data.capacityMinutesPerDay }
+          : {}),
+      }).where(eq(coachPassportsTable.id, passport.id));
+    }
     await appendAudit({
       coachId: coach.id,
       userId,
@@ -126,13 +130,36 @@ router.patch("/me", async (req, res): Promise<void> => {
       action: "coach.updateProfile",
       entityType: "coach",
       entityId: String(coach.id),
-      after: {
-        name: updated?.name,
-        niche: updated?.niche,
-        audience: updated?.audience,
-      },
+      after: { name: updated?.name },
     });
     res.json({ coach: updated });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+router.post("/me/close", async (req, res): Promise<void> => {
+  try {
+    const userId = authenticatedUserId(req);
+    const { coach, passport } = await ensurePassport(userId);
+    if (passport.accountStatus === "closed") {
+      throw new HttpError(409, "INVALID_STATE_TRANSITION", "Account is already closed.");
+    }
+    const [updated] = await db
+      .update(coachPassportsTable)
+      .set({ accountStatus: "closed" })
+      .where(eq(coachPassportsTable.id, passport.id))
+      .returning();
+    await appendAudit({
+      coachId: coach.id,
+      userId,
+      actorType: "coach",
+      action: "coach.close",
+      entityType: "coach",
+      entityId: String(coach.id),
+      after: { accountStatus: "closed" },
+    });
+    res.json({ accountStatus: updated?.accountStatus });
   } catch (error) {
     sendError(res, error);
   }
@@ -157,6 +184,9 @@ router.patch("/me/passport", async (req, res): Promise<void> => {
     }
     const userId = authenticatedUserId(req);
     const { coach, passport } = await ensurePassport(userId);
+    if (passport.accountStatus === "closed") {
+      throw new HttpError(409, "INVALID_STATE_TRANSITION", "Closed coach cannot update passport.");
+    }
     const [updated] = await db
       .update(coachPassportsTable)
       .set({
