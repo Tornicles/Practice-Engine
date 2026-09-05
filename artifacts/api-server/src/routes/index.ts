@@ -11,6 +11,7 @@ import methodsRouter from "./methods.ts";
 import conditionsRouter from "./conditions.ts";
 import investigationsRouter from "./investigations.ts";
 import workflowsRouter from "./workflows.ts";
+import commercialRouter from "./commercial.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -28,6 +29,7 @@ router.use(methodsRouter);
 router.use(conditionsRouter);
 router.use(investigationsRouter);
 router.use(workflowsRouter);
+router.use(commercialRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
