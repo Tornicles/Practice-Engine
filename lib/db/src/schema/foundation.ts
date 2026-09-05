@@ -16,6 +16,9 @@ export const coachPassportsTable = pgTable("coach_passports", {
     .notNull()
     .references(() => coachProfilesTable.id, { onDelete: "restrict" }),
   userId: text("user_id").notNull(),
+  accountStatus: text("account_status").notNull().default("active"),
+  timezone: text("timezone"),
+  capacityMinutesPerDay: integer("capacity_minutes_per_day"),
   identitySummary: text("identity_summary").notNull().default(""),
   specialty: text("specialty").notNull().default(""),
   audience: text("audience").notNull().default(""),
