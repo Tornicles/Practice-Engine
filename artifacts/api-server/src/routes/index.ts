@@ -8,6 +8,7 @@ import developmentRouter from "./development.ts";
 import clientsRouter from "./clients.ts";
 import expertiseRouter from "./expertise.ts";
 import methodsRouter from "./methods.ts";
+import conditionsRouter from "./conditions.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -22,6 +23,7 @@ router.use(developmentRouter);
 router.use(clientsRouter);
 router.use(expertiseRouter);
 router.use(methodsRouter);
+router.use(conditionsRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
