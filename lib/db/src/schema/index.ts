@@ -6,3 +6,4 @@ export * from "./clients.ts";
 export * from "./evidence.ts";
 export * from "./methodology.ts";
 export * from "./conditions.ts";
+export * from "./investigations.ts";
