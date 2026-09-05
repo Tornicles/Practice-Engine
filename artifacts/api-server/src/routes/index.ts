@@ -13,6 +13,7 @@ import investigationsRouter from "./investigations.ts";
 import workflowsRouter from "./workflows.ts";
 import commercialRouter from "./commercial.ts";
 import productsRouter from "./products.ts";
+import aiGatewayRouter from "./ai-gateway.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -32,6 +33,7 @@ router.use(investigationsRouter);
 router.use(workflowsRouter);
 router.use(commercialRouter);
 router.use(productsRouter);
+router.use(aiGatewayRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
