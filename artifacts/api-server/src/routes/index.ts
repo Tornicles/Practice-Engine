@@ -6,6 +6,7 @@ import objectivesRouter from "./objectives.ts";
 import programsRouter from "./programs.ts";
 import developmentRouter from "./development.ts";
 import clientsRouter from "./clients.ts";
+import expertiseRouter from "./expertise.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -18,6 +19,7 @@ router.use(objectivesRouter);
 router.use(programsRouter);
 router.use(developmentRouter);
 router.use(clientsRouter);
+router.use(expertiseRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
