@@ -41,7 +41,7 @@ export function Kpi({ label, value, hint }: { label: string; value: string | num
 
 export function StatusBadge({ status }: { status: ValidationStatus | ConditionLevel | string }) {
   const tone =
-    status === "validated" || status === "healthy" || status === "improving" || status === "verified"
+    status === "validated" || status === "healthy" || status === "improving" || status === "verified" || status === "new" || status === "won"
       ? "ok"
       : status === "at_risk" || status === "retired" || status === "lost" || status === "critical"
         ? "danger"

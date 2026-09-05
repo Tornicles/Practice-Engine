@@ -40,6 +40,7 @@ function Clients() {
         <div>
           <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Kpi label="Active" value={state.clients.filter((c) => c.status === "active").length} />
+            <Kpi label="New from sale" value={state.clients.filter((c) => c.status === "new").length} />
             <Kpi label="Sessions" value={state.sessions.length} />
             <Kpi label="Follow-ups" value={state.sessions.filter((s) => s.followUp).length} />
             <Kpi label="Unread" value={state.threads.filter((t) => t.channel === "client" && t.unread > 0).length} />

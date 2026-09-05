@@ -487,6 +487,11 @@ export function createSeed(): EngineState {
         ],
       },
     ],
+    events: [
+      { id: "ev-1", type: "PRACTICE_COMPLETED", entityType: "practice", entityId: "pr-1", at: daysAgo(18) },
+      { id: "ev-2", type: "SESSION_COMPLETED", entityType: "session", entityId: "ds-1", at: daysAgo(6) },
+      { id: "ev-3", type: "CONTENT_PUBLISHED", entityType: "content", entityId: "ct-1", at: daysAgo(5) },
+    ],
     settings: {
       assistanceLevel: "medium",
       generationStyle: "conservative",

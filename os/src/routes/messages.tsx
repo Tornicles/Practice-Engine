@@ -40,8 +40,9 @@ function Messages() {
   async function assist(kind: "draft" | "summarize" | "followup" | "commitment" | "opportunity" | "action") {
     if (!active) return;
     if (kind === "followup" || kind === "action") {
-      convertThreadToFollowUp(active.id);
-      toast.success("Turned into a follow-up on Home.");
+      const ok = convertThreadToFollowUp(active.id);
+      if (ok) toast.success("Turned into a follow-up on Home.");
+      else toast.error("Today is full. Finish or drop a job before adding another (cap is 3).");
       return;
     }
     if (kind === "commitment") {

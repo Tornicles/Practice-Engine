@@ -181,6 +181,15 @@ export function OffersWork() {
                       onChange={(e) => {
                         const stage = e.target.value as Opportunity["stage"];
                         state.moveOpportunity(o.id, stage, stage === "lost" ? o.reason ?? "unspecified" : undefined);
+                        if (stage === "won") {
+                          const client = useEngine.getState().clients.find((c) => c.relatedOpportunityId === o.id);
+                          toast.success(
+                            client
+                              ? `${client.name} is now a client in status new. Intake is still required.`
+                              : "Sale recorded.",
+                          );
+                          return;
+                        }
                         toast.message("Pipeline updated.");
                       }}
                     >

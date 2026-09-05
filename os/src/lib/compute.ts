@@ -104,12 +104,26 @@ export function conditions(state: EngineState): ConditionView[] {
   const practice: ConditionView = {
     id: "c-practice",
     domain: "Practice",
-    level: recentPractice === 0 ? "declining" : recentPractice >= 2 ? "improving" : "healthy",
-    title: recentPractice === 0 ? "No practice this week" : "Practice is in motion",
+    level:
+      state.practices.length === 0 && (state.events?.length ?? 0) === 0
+        ? "insufficient_evidence"
+        : recentPractice === 0
+          ? "declining"
+          : recentPractice >= 2
+            ? "improving"
+            : "healthy",
+    title:
+      state.practices.length === 0 && (state.events?.length ?? 0) === 0
+        ? "Insufficient evidence — not poor performance"
+        : recentPractice === 0
+          ? "No practice this week"
+          : "Practice is in motion",
     why:
-      recentPractice === 0
-        ? "Skill scores go stale without a recent drill. Today's resistance simulation is still open."
-        : `${recentPractice} practice session(s) in the last 7 days.`,
+      state.practices.length === 0 && (state.events?.length ?? 0) === 0
+        ? "No events recorded. Insufficient evidence is not a decline."
+        : recentPractice === 0
+          ? "Skill scores go stale without a recent drill. Today's resistance simulation is still open."
+          : `${recentPractice} practice session(s) in the last 7 days.`,
     evidence: `${state.practices.length} sessions on record`,
     next: "Complete today's resistance drill.",
     to: "/development",

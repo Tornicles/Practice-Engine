@@ -81,9 +81,11 @@ export interface Client {
   id: string;
   name: string;
   role: string;
-  status: "active" | "paused";
+  status: "new" | "active" | "paused";
   objective: string;
   currentState: string;
+  source?: "manual" | "sale";
+  relatedOpportunityId?: string;
 }
 
 export interface DeliverySession {
@@ -270,6 +272,7 @@ export interface Opportunity {
   stage: "lead" | "qualified" | "conversation" | "proposed" | "won" | "lost";
   value: number;
   reason?: string;
+  clientId?: string;
 }
 
 export interface Product {
@@ -354,6 +357,14 @@ export interface AppSettings {
   };
 }
 
+export interface PracticeEvent {
+  id: string;
+  type: string;
+  entityType: string;
+  entityId: string;
+  at: string;
+}
+
 export interface EngineState {
   hydrated: boolean;
   coach: Coach;
@@ -379,6 +390,7 @@ export interface EngineState {
   opportunities: Opportunity[];
   products: Product[];
   investigations: Investigation[];
+  events: PracticeEvent[];
   todayJobs: TodayJob[];
   todayStamp: string;
   aiAudits: AiAudit[];

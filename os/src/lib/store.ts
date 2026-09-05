@@ -16,6 +16,26 @@ import type {
   ValidationStatus,
 } from "./types";
 import { uid } from "./utils";
+import { WIP_CAP } from "./engine-loop";
+import type { PracticeEvent } from "./types";
+
+function pushEvent(
+  events: PracticeEvent[] | undefined,
+  type: string,
+  entityType: string,
+  entityId: string,
+): PracticeEvent[] {
+  return [
+    {
+      id: uid("ev"),
+      type,
+      entityType,
+      entityId,
+      at: new Date().toISOString(),
+    },
+    ...(events ?? []),
+  ].slice(0, 80);
+}
 
 type Actions = {
   hydrate: () => void;
@@ -47,7 +67,7 @@ type Actions = {
   addPrincipleCandidate: (statement: string, explanation: string, experienceId?: string) => void;
   sendMessage: (threadId: string, text: string) => void;
   markThreadRead: (threadId: string) => void;
-  convertThreadToFollowUp: (threadId: string) => void;
+  convertThreadToFollowUp: (threadId: string) => boolean;
   updateCoach: (patch: Partial<Coach>) => void;
   updateSettings: (patch: Partial<AppSettings>) => void;
 };
@@ -75,6 +95,7 @@ export const useEngine = create<EngineState & Actions>()(
         if (!cur.aiAudits) patch.aiAudits = seed.aiAudits;
         if (!cur.threads?.length) patch.threads = seed.threads;
         if (!cur.settings) patch.settings = seed.settings;
+        if (!cur.events) patch.events = seed.events;
         if (!cur.brand?.tagline) {
           patch.brand = { ...seed.brand, ...cur.brand, tagline: cur.brand?.tagline || seed.brand.tagline };
         }
@@ -103,11 +124,15 @@ export const useEngine = create<EngineState & Actions>()(
           practices: [{ ...session, id, createdAt }, ...get().practices],
           observations: [...observations, ...get().observations],
           todayJobs: get().todayJobs.map((j) => (j.type === "practice" ? { ...j, done: true } : j)),
+          events: pushEvent(get().events, "PRACTICE_COMPLETED", "practice", id),
         });
       },
       addDelivery: (session) => {
         const id = uid("ds");
-        set({ sessions: [{ ...session, id }, ...get().sessions] });
+        set({
+          sessions: [{ ...session, id }, ...get().sessions],
+          events: pushEvent(get().events, "SESSION_COMPLETED", "session", id),
+        });
       },
       addExperience: (exp) => {
         const id = uid("ex");
@@ -115,6 +140,7 @@ export const useEngine = create<EngineState & Actions>()(
         set({
           experiences: [{ ...exp, id, createdAt }, ...get().experiences],
           todayJobs: get().todayJobs.map((j) => (j.type === "reflect" ? { ...j, done: true } : j)),
+          events: pushEvent(get().events, "EXPERIENCE_CAPTURED", "experience", id),
         });
       },
       attachPrinciple: (experienceId, principleId) => {
@@ -262,6 +288,7 @@ export const useEngine = create<EngineState & Actions>()(
       publishContent: (id) =>
         set({
           content: get().content.map((c) => (c.id === id ? { ...c, status: "published" } : c)),
+          events: pushEvent(get().events, "CONTENT_PUBLISHED", "content", id),
         }),
       addAudienceQuestion: (id, q) =>
         set({
@@ -269,12 +296,39 @@ export const useEngine = create<EngineState & Actions>()(
             c.id === id ? { ...c, questions: [...c.questions, q] } : c,
           ),
         }),
-      moveOpportunity: (id, stage, reason) =>
+      moveOpportunity: (id, stage, reason) => {
+        const opp = get().opportunities.find((o) => o.id === id);
+        if (!opp) return;
+        if (stage === "won") {
+          const existing = get().clients.find((c) => c.relatedOpportunityId === id || c.name === opp.prospect);
+          const clientId = existing?.id ?? uid("cl");
+          const client = existing ?? {
+            id: clientId,
+            name: opp.prospect,
+            role: "New client from sale",
+            status: "new" as const,
+            objective: "Intake not yet complete",
+            currentState: "Won — starts as new, not active.",
+            source: "sale" as const,
+            relatedOpportunityId: id,
+          };
+          let events = pushEvent(get().events, "SALE_WON", "opportunity", id);
+          if (!existing) events = pushEvent(events, "CLIENT_CREATED", "client", clientId);
+          set({
+            opportunities: get().opportunities.map((o) =>
+              o.id === id ? { ...o, stage, reason, clientId } : o,
+            ),
+            clients: existing ? get().clients : [client, ...get().clients],
+            events,
+          });
+          return;
+        }
         set({
           opportunities: get().opportunities.map((o) =>
             o.id === id ? { ...o, stage, reason } : o,
           ),
-        }),
+        });
+      },
       addOpportunity: (prospect, offerId) =>
         set({
           opportunities: [
@@ -412,7 +466,9 @@ export const useEngine = create<EngineState & Actions>()(
         }),
       convertThreadToFollowUp: (threadId) => {
         const thread = get().threads.find((t) => t.id === threadId);
-        if (!thread) return;
+        if (!thread) return false;
+        const open = get().todayJobs.filter((j) => !j.done).length;
+        if (open >= WIP_CAP) return false;
         const last = thread.messages[thread.messages.length - 1];
         set({
           todayJobs: [
@@ -429,6 +485,7 @@ export const useEngine = create<EngineState & Actions>()(
             ...get().todayJobs,
           ],
         });
+        return true;
       },
       updateCoach: (patch) => set({ coach: { ...get().coach, ...patch } }),
       updateSettings: (patch) => set({ settings: { ...get().settings, ...patch } }),
@@ -461,6 +518,7 @@ export const useEngine = create<EngineState & Actions>()(
         opportunities: s.opportunities,
         products: s.products,
         investigations: s.investigations,
+        events: s.events,
         todayJobs: s.todayJobs,
         todayStamp: s.todayStamp,
         aiAudits: s.aiAudits,

@@ -1,16 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { DashLink } from "@/components/dash-link";
 import { Button } from "@/components/ui/button";
 import { Kpi, PageHeader, Panel, ProgressBar, StatusBadge } from "@/components/engine";
 import {
   activityFeed,
   aiNextActions,
+  conditions,
   currentStateViews,
   nextAction,
   recentWins,
   skillViews,
   stats,
 } from "@/lib/compute";
+import { FLYWHEEL, flywheelLit, overallMatchesConditions } from "@/lib/engine-loop";
+import { isLiveMode, liveApi } from "@/lib/live-api";
 import { parseTabSearch } from "@/lib/nav";
 import { useEngine } from "@/lib/store";
 import { fmtDate } from "@/lib/utils";
@@ -36,6 +40,19 @@ function Home() {
   const lastSession = state.sessions[0];
   const lastClient = state.clients.find((c) => c.id === lastSession?.clientId);
   const drafts = state.content.filter((c) => c.status !== "published");
+  const overall = conditions(state).find((c) => c.id === "c-overall");
+  const overallLevel = overallMatchesConditions(state);
+  const lit = flywheelLit(state);
+  const saleClients = state.clients.filter((c) => c.source === "sale" || c.status === "new");
+  const [liveLevel, setLiveLevel] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isLiveMode()) return;
+    void liveApi
+      .home()
+      .then((row) => setLiveLevel(row.overallLevel))
+      .catch(() => setLiveLevel(null));
+  }, []);
 
   return (
     <div>
@@ -45,6 +62,37 @@ function Home() {
         detail="Today's focus, current condition, and the next move — computed from practice, clients, and content. Not a list of tools."
       />
 
+      <div className="engine-card mb-6 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="engine-kicker text-primary">Overall practice state</div>
+            <div className="mt-2 flex items-center gap-2">
+              <StatusBadge status={liveLevel ?? overallLevel} />
+              <span className="text-sm">{overall?.title}</span>
+            </div>
+            <p className="mt-1 max-w-xl text-xs text-muted-foreground">{overall?.why}</p>
+          </div>
+          <p className="font-mono text-[0.625rem] text-muted-foreground">
+            Home wording matches conditions · {(state.events ?? []).length} events
+          </p>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-1.5">
+          {FLYWHEEL.map((step, i) => {
+            const on = lit[step.id];
+            return (
+              <span
+                key={step.id}
+                className={`inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider ${
+                  on ? "border-primary/50 text-primary" : "border-border text-muted-foreground"
+                }`}
+              >
+                {step.label}
+                {i < FLYWHEEL.length - 1 ? <span className="text-muted-foreground">→</span> : null}
+              </span>
+            );
+          })}
+        </div>
+      </div>
       <div className="engine-card mb-6 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -59,11 +107,12 @@ function Home() {
         </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
         <Kpi label="Practice score" value={s.practiceScore} hint="From evidenced skills" />
         <Kpi label="Active clients" value={state.clients.filter((c) => c.status === "active").length} />
         <Kpi label="Published" value={s.contentPublished} hint={`${drafts.length} in draft`} />
         <Kpi label="Open follow-ups" value={state.threads.filter((t) => t.unread > 0).length} hint="Unread messages" />
+        <Kpi label="New from sale" value={saleClients.length} hint="Won opportunities land here as new" />
       </div>
 
       <Panel title="Today" className="mb-6">
