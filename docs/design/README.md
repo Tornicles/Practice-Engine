@@ -1,15 +1,15 @@
 # Practice Engine design
 
-Design-only. Engines and rules first. Dashboards last.
+Design program complete. Implementation starts at Batch 1 schema.
 
-Seven coach-facing systems stay: Home, Development, Clients, Content, Messages, Help, Settings.
-
-## Cadence
+Seven systems: Home, Development, Clients, Content, Messages, Help, Settings.
 
 | Push | Batches | Status |
 |---|---|---|
-| A | 1 Foundation, 2 Objectives and planning, 3 Development core | on main |
-| B | 4 Clients, 5 Evidence, 6 Methodology | on main |
-| C | 7 Conditions, 8 Investigation, 9 Workflows | on main |
-| D | 10 Commercial, 11 Products, 12 AI gateway | on main |
-| E | 13 Dashboards as interfaces, 14 Proof | not started |
+| A | 1–3 Foundation, planning, development | on main |
+| B | 4–6 Clients, evidence, methodology | on main |
+| C | 7–9 Conditions, investigation, workflows | on main |
+| D | 10–12 Commercial, products, AI gateway | on main |
+| E | 13–14 Dashboards as interfaces, proof | on main |
+
+Full long-form specs also live in the working `docs/design/` folder.
