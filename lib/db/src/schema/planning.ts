@@ -8,7 +8,6 @@ import {
   serial,
   text,
   timestamp,
-  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { coachProfilesTable } from "./practice.ts";
 
@@ -95,6 +94,7 @@ export const objectivesTable = pgTable("objectives", {
   strategyId: integer("strategy_id"),
   title: text("title").notNull(),
   purpose: text("purpose").notNull().default(""),
+  servesWin: boolean("serves_win").notNull().default(false),
   type: text("type").notNull().default("development"),
   role: text("role").notNull().default("supporting"),
   priority: text("priority").notNull().default("medium"),
@@ -104,3 +104,27 @@ export const objectivesTable = pgTable("objectives", {
 }, (table) => [
   index("objectives_coach_idx").on(table.coachId, table.status),
 ]);
+
+export const programsTable = pgTable("programs", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").notNull(),
+  strategyId: integer("strategy_id"),
+  objectiveId: integer("objective_id"),
+  name: text("name").notNull(),
+  domain: text("domain").notNull().default("development"),
+  purpose: text("purpose").notNull().default(""),
+  tier: text("tier").notNull().default("basic"),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const targetsTable = pgTable("targets", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").notNull(),
+  objectiveId: integer("objective_id"),
+  programId: integer("program_id"),
+  parentTargetId: integer("parent_target_id"),
+  level: text("level").notNull(),
+  title: text("title").notNull(),
+  status: text("status").notNull().default("draft"),
+});
