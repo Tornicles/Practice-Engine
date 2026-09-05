@@ -10,6 +10,7 @@ import expertiseRouter from "./expertise.ts";
 import methodsRouter from "./methods.ts";
 import conditionsRouter from "./conditions.ts";
 import investigationsRouter from "./investigations.ts";
+import workflowsRouter from "./workflows.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -26,6 +27,7 @@ router.use(expertiseRouter);
 router.use(methodsRouter);
 router.use(conditionsRouter);
 router.use(investigationsRouter);
+router.use(workflowsRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
