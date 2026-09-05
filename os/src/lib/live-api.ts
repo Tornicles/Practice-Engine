@@ -23,12 +23,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export const liveApi = {
   me: () => request("/me"),
-  home: () => request("/home"),
+  home: () =>
+    request<{ overallLevel: string; overallExplanation: string; strategyStatus: string }>("/home"),
   today: () => request("/home/today"),
   conditions: () => request("/conditions"),
   recomputeConditions: () => request("/conditions/recompute", { method: "POST" }),
-  invokeAi: (prompt: string) => request("/ai/invoke", {
-    method: "POST",
-    body: JSON.stringify({ prompt }),
-  }),
+  invokeAi: (prompt: string) =>
+    request("/ai/invoke", {
+      method: "POST",
+      body: JSON.stringify({ prompt }),
+    }),
 };
