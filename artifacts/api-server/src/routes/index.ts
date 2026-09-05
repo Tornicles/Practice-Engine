@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health.ts";
 import meRouter from "./me.ts";
+import strategyRouter from "./strategy.ts";
 import practiceRouter from "./practice.ts";
 import intelligenceRouter from "./intelligence.ts";
 
@@ -8,6 +9,7 @@ const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(meRouter);
+router.use(strategyRouter);
 router.use(practiceRouter);
 router.use(intelligenceRouter);
 
