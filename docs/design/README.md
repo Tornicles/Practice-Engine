@@ -10,8 +10,8 @@ Push to `Tornicles/Practice-Engine` `main` after every three batches.
 
 | Push | Batches | Status |
 |---|---|---|
-| A | 1 Foundation, 2 Objectives and planning, 3 Development core | this folder |
-| B | 4 Clients, 5 Evidence, 6 Methodology | not started |
+| A | 1 Foundation, 2 Objectives and planning, 3 Development core | on main |
+| B | 4 Clients, 5 Evidence, 6 Methodology | on main |
 | C | 7 Conditions, 8 Investigation, 9 Workflows | not started |
 | D | 10 Commercial, 11 Products, 12 AI gateway | not started |
 | E | 13 Dashboards as interfaces, 14 Proof | not started |
