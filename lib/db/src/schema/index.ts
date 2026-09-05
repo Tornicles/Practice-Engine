@@ -9,3 +9,4 @@ export * from "./conditions.ts";
 export * from "./investigations.ts";
 export * from "./workflows.ts";
 export * from "./commercial.ts";
+export * from "./products.ts";
