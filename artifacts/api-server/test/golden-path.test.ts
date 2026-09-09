@@ -38,6 +38,7 @@ import {
   statisticsTable,
   strategyLocksTable,
   winningDefinitionsTable,
+  workLimitsTable,
   workflowsTable,
   workflowStepsTable,
 } from "@workspace/db";
@@ -254,6 +255,7 @@ test("Golden path: lock, practice, client, expertise, method, signal, sale, clie
     await db.delete(workflowStepsTable).where(eq(workflowStepsTable.coachId, coach.id));
     await db.delete(workflowsTable).where(eq(workflowsTable.coachId, coach.id));
     await db.delete(recommendationsTable).where(eq(recommendationsTable.coachId, coach.id));
+    await db.delete(workLimitsTable).where(eq(workLimitsTable.coachId, coach.id));
     await db.delete(skillObservationsTable).where(eq(skillObservationsTable.coachId, coach.id));
     await db.delete(skillStatesTable).where(eq(skillStatesTable.coachId, coach.id));
     await db.delete(policiesTable).where(eq(policiesTable.coachId, coach.id));

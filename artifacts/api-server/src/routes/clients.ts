@@ -46,6 +46,9 @@ router.get("/clients", async (req, res): Promise<void> => {
 
 router.post("/clients", async (req, res): Promise<void> => {
   try {
+    if (req.body && typeof req.body === "object" && "source" in req.body && req.body.source === "sale") {
+      throw new HttpError(409, "INVALID_STATE_TRANSITION", "Sale-sourced clients wait for Batch 10.");
+    }
     const parsed = z.object({
       name: z.string().min(1),
       role: z.string().default(""),
@@ -54,9 +57,6 @@ router.post("/clients", async (req, res): Promise<void> => {
     if (!parsed.success) {
       res.status(400).json({ error: "VALIDATION", message: parsed.error.message });
       return;
-    }
-    if (req.body && typeof req.body === "object" && "source" in req.body && req.body.source === "sale") {
-      throw new HttpError(409, "INVALID_STATE_TRANSITION", "Sale-sourced clients wait for Batch 10.");
     }
     const userId = authenticatedUserId(req);
     const { coach } = await ensurePassport(userId);

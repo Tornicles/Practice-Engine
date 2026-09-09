@@ -12,6 +12,7 @@ import {
   db,
   recommendationsTable,
   statisticsTable,
+  workLimitsTable,
   workflowsTable,
   workflowStepsTable,
 } from "@workspace/db";
@@ -82,6 +83,7 @@ test("Home overallLevel matches GET /conditions and Today lists accepted ready s
       await db.delete(workflowStepsTable).where(eq(workflowStepsTable.coachId, coach.id));
       await db.delete(workflowsTable).where(eq(workflowsTable.coachId, coach.id));
       await db.delete(recommendationsTable).where(eq(recommendationsTable.coachId, coach.id));
+      await db.delete(workLimitsTable).where(eq(workLimitsTable.coachId, coach.id));
       await db.delete(conditionsTable).where(eq(conditionsTable.coachId, coach.id));
       await db.delete(statisticsTable).where(eq(statisticsTable.coachId, coach.id));
       await db.delete(coachPassportsTable).where(eq(coachPassportsTable.coachId, coach.id));

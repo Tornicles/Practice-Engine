@@ -7,13 +7,20 @@ import {
 } from "@workspace/db";
 
 export class HttpError extends Error {
+  public status: number;
+  public code: string;
+  public extra: Record<string, unknown>;
+
   constructor(
-    public status: number,
-    public code: string,
+    status: number,
+    code: string,
     message: string,
-    public extra: Record<string, unknown> = {},
+    extra: Record<string, unknown> = {},
   ) {
     super(message);
+    this.status = status;
+    this.code = code;
+    this.extra = extra;
   }
 }
 
