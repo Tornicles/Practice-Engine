@@ -12,6 +12,13 @@ import {
 
 const app: Express = express();
 
+const sendServiceStatus = (_req: express.Request, res: express.Response) => {
+  res.json({ status: "ok", service: "startup-man-api", basePath: "/api" });
+};
+
+app.get("/", sendServiceStatus);
+app.get(["/api", "/api/"], sendServiceStatus);
+
 app.use(
   pinoHttp({
     logger,
