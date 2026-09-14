@@ -35,6 +35,7 @@ import {
   classifyIntelligenceFailure,
   launchOperationalWrites,
 } from "../lib/intelligence-operation-policy.ts";
+import { normalizeGeneratedText } from "../lib/generated-text.ts";
 import { logger } from "../lib/logger.ts";
 import {
   selectStrategies,
@@ -274,7 +275,14 @@ Return JSON only with title, lesson, principle, insight, frameworkCandidate, evi
     );
     const result = generated.data;
 
-    const output = ExtractExperienceKnowledgeResponse.parse(result);
+    const output = ExtractExperienceKnowledgeResponse.parse({
+      title: normalizeGeneratedText(result.title, "title"),
+      lesson: normalizeGeneratedText(result.lesson, "lesson"),
+      principle: normalizeGeneratedText(result.principle, "principle"),
+      insight: normalizeGeneratedText(result.insight, "insight"),
+      frameworkCandidate: normalizeGeneratedText(result.frameworkCandidate, "frameworkCandidate"),
+      evidenceGap: normalizeGeneratedText(result.evidenceGap, "evidenceGap"),
+    });
     await recordPromptRun(
       "Experience & Knowledge",
       selection.families.join(", "),
