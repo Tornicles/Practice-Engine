@@ -1,1 +1,2 @@
 - [Node 24 TypeScript ESM imports](node24-typescript-esm-imports.md) — source-run tests require explicit .ts paths; declaration-only libraries must allow them.
+- [Shared React Query context](shared-react-query-context.md) — API hooks must share each consumer’s Query runtime; duplicate peer builds break providers.
