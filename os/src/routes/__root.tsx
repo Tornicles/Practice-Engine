@@ -2,9 +2,9 @@ import { Shell } from "@/components/layout/Shell";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Practice Engine";
+const APP_NAME = "Forge — AI Personal Trainer";
 const APP_DESCRIPTION =
-  "A coach-development operating system: practice, deliver, capture expertise, and commercialize only what is evidenced.";
+  "Forge is your AI personal trainer for home fitness: adaptive home workouts, grocery-photo meal plans, work-aware programming, and run training. AI suggests, you decide.";
 
 export const Route = createRootRoute({
   head: () => ({
