@@ -10,115 +10,36 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BrandRouteImport } from './routes/brand'
-import { Route as ClientsRouteImport } from './routes/clients'
-import { Route as ContentRouteImport } from './routes/content'
-import { Route as CoursesRouteImport } from './routes/courses'
-import { Route as DeliveryRouteImport } from './routes/delivery'
-import { Route as DevelopmentRouteImport } from './routes/development'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as IntelligenceRouteImport } from './routes/intelligence'
-import { Route as InvestigateRouteImport } from './routes/investigate'
-import { Route as KnowledgeRouteImport } from './routes/knowledge'
-import { Route as LabRouteImport } from './routes/lab'
-import { Route as MessagesRouteImport } from './routes/messages'
-import { Route as MethodologyRouteImport } from './routes/methodology'
-import { Route as OffersRouteImport } from './routes/offers'
-import { Route as PassportRouteImport } from './routes/passport'
-import { Route as PracticeRouteImport } from './routes/practice'
-import { Route as ProofRouteImport } from './routes/proof'
+import { Route as CoachRouteImport } from './routes/coach'
+import { Route as FuelRouteImport } from './routes/fuel'
+import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as RunRouteImport } from './routes/run'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as StatsRouteImport } from './routes/stats'
-import { Route as TodayRouteImport } from './routes/today'
+import { Route as TrainRouteImport } from './routes/train'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BrandRoute = BrandRouteImport.update({
-  id: '/brand',
-  path: '/brand',
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientsRoute = ClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
+const FuelRoute = FuelRouteImport.update({
+  id: '/fuel',
+  path: '/fuel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContentRoute = ContentRouteImport.update({
-  id: '/content',
-  path: '/content',
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CoursesRoute = CoursesRouteImport.update({
-  id: '/courses',
-  path: '/courses',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DeliveryRoute = DeliveryRouteImport.update({
-  id: '/delivery',
-  path: '/delivery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevelopmentRoute = DevelopmentRouteImport.update({
-  id: '/development',
-  path: '/development',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IntelligenceRoute = IntelligenceRouteImport.update({
-  id: '/intelligence',
-  path: '/intelligence',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestigateRoute = InvestigateRouteImport.update({
-  id: '/investigate',
-  path: '/investigate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeRoute = KnowledgeRouteImport.update({
-  id: '/knowledge',
-  path: '/knowledge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LabRoute = LabRouteImport.update({
-  id: '/lab',
-  path: '/lab',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MethodologyRoute = MethodologyRouteImport.update({
-  id: '/methodology',
-  path: '/methodology',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OffersRoute = OffersRouteImport.update({
-  id: '/offers',
-  path: '/offers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PassportRoute = PassportRouteImport.update({
-  id: '/passport',
-  path: '/passport',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PracticeRoute = PracticeRouteImport.update({
-  id: '/practice',
-  path: '/practice',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProofRoute = ProofRouteImport.update({
-  id: '/proof',
-  path: '/proof',
+const RunRoute = RunRouteImport.update({
+  id: '/run',
+  path: '/run',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -126,181 +47,65 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StatsRoute = StatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TodayRoute = TodayRouteImport.update({
-  id: '/today',
-  path: '/today',
+const TrainRoute = TrainRouteImport.update({
+  id: '/train',
+  path: '/train',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/brand': typeof BrandRoute
-  '/clients': typeof ClientsRoute
-  '/content': typeof ContentRoute
-  '/courses': typeof CoursesRoute
-  '/delivery': typeof DeliveryRoute
-  '/development': typeof DevelopmentRoute
-  '/help': typeof HelpRoute
-  '/intelligence': typeof IntelligenceRoute
-  '/investigate': typeof InvestigateRoute
-  '/knowledge': typeof KnowledgeRoute
-  '/lab': typeof LabRoute
-  '/messages': typeof MessagesRoute
-  '/methodology': typeof MethodologyRoute
-  '/offers': typeof OffersRoute
-  '/passport': typeof PassportRoute
-  '/practice': typeof PracticeRoute
-  '/proof': typeof ProofRoute
+  '/coach': typeof CoachRoute
+  '/fuel': typeof FuelRoute
+  '/progress': typeof ProgressRoute
+  '/run': typeof RunRoute
   '/settings': typeof SettingsRoute
-  '/stats': typeof StatsRoute
-  '/today': typeof TodayRoute
+  '/train': typeof TrainRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/brand': typeof BrandRoute
-  '/clients': typeof ClientsRoute
-  '/content': typeof ContentRoute
-  '/courses': typeof CoursesRoute
-  '/delivery': typeof DeliveryRoute
-  '/development': typeof DevelopmentRoute
-  '/help': typeof HelpRoute
-  '/intelligence': typeof IntelligenceRoute
-  '/investigate': typeof InvestigateRoute
-  '/knowledge': typeof KnowledgeRoute
-  '/lab': typeof LabRoute
-  '/messages': typeof MessagesRoute
-  '/methodology': typeof MethodologyRoute
-  '/offers': typeof OffersRoute
-  '/passport': typeof PassportRoute
-  '/practice': typeof PracticeRoute
-  '/proof': typeof ProofRoute
+  '/coach': typeof CoachRoute
+  '/fuel': typeof FuelRoute
+  '/progress': typeof ProgressRoute
+  '/run': typeof RunRoute
   '/settings': typeof SettingsRoute
-  '/stats': typeof StatsRoute
-  '/today': typeof TodayRoute
+  '/train': typeof TrainRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/brand': typeof BrandRoute
-  '/clients': typeof ClientsRoute
-  '/content': typeof ContentRoute
-  '/courses': typeof CoursesRoute
-  '/delivery': typeof DeliveryRoute
-  '/development': typeof DevelopmentRoute
-  '/help': typeof HelpRoute
-  '/intelligence': typeof IntelligenceRoute
-  '/investigate': typeof InvestigateRoute
-  '/knowledge': typeof KnowledgeRoute
-  '/lab': typeof LabRoute
-  '/messages': typeof MessagesRoute
-  '/methodology': typeof MethodologyRoute
-  '/offers': typeof OffersRoute
-  '/passport': typeof PassportRoute
-  '/practice': typeof PracticeRoute
-  '/proof': typeof ProofRoute
+  '/coach': typeof CoachRoute
+  '/fuel': typeof FuelRoute
+  '/progress': typeof ProgressRoute
+  '/run': typeof RunRoute
   '/settings': typeof SettingsRoute
-  '/stats': typeof StatsRoute
-  '/today': typeof TodayRoute
+  '/train': typeof TrainRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/brand'
-    | '/clients'
-    | '/content'
-    | '/courses'
-    | '/delivery'
-    | '/development'
-    | '/help'
-    | '/intelligence'
-    | '/investigate'
-    | '/knowledge'
-    | '/lab'
-    | '/messages'
-    | '/methodology'
-    | '/offers'
-    | '/passport'
-    | '/practice'
-    | '/proof'
-    | '/settings'
-    | '/stats'
-    | '/today'
+    '/' | '/coach' | '/fuel' | '/progress' | '/run' | '/settings' | '/train'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/brand'
-    | '/clients'
-    | '/content'
-    | '/courses'
-    | '/delivery'
-    | '/development'
-    | '/help'
-    | '/intelligence'
-    | '/investigate'
-    | '/knowledge'
-    | '/lab'
-    | '/messages'
-    | '/methodology'
-    | '/offers'
-    | '/passport'
-    | '/practice'
-    | '/proof'
-    | '/settings'
-    | '/stats'
-    | '/today'
+  to: '/' | '/coach' | '/fuel' | '/progress' | '/run' | '/settings' | '/train'
   id:
     | '__root__'
     | '/'
-    | '/brand'
-    | '/clients'
-    | '/content'
-    | '/courses'
-    | '/delivery'
-    | '/development'
-    | '/help'
-    | '/intelligence'
-    | '/investigate'
-    | '/knowledge'
-    | '/lab'
-    | '/messages'
-    | '/methodology'
-    | '/offers'
-    | '/passport'
-    | '/practice'
-    | '/proof'
+    | '/coach'
+    | '/fuel'
+    | '/progress'
+    | '/run'
     | '/settings'
-    | '/stats'
-    | '/today'
+    | '/train'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BrandRoute: typeof BrandRoute
-  ClientsRoute: typeof ClientsRoute
-  ContentRoute: typeof ContentRoute
-  CoursesRoute: typeof CoursesRoute
-  DeliveryRoute: typeof DeliveryRoute
-  DevelopmentRoute: typeof DevelopmentRoute
-  HelpRoute: typeof HelpRoute
-  IntelligenceRoute: typeof IntelligenceRoute
-  InvestigateRoute: typeof InvestigateRoute
-  KnowledgeRoute: typeof KnowledgeRoute
-  LabRoute: typeof LabRoute
-  MessagesRoute: typeof MessagesRoute
-  MethodologyRoute: typeof MethodologyRoute
-  OffersRoute: typeof OffersRoute
-  PassportRoute: typeof PassportRoute
-  PracticeRoute: typeof PracticeRoute
-  ProofRoute: typeof ProofRoute
+  CoachRoute: typeof CoachRoute
+  FuelRoute: typeof FuelRoute
+  ProgressRoute: typeof ProgressRoute
+  RunRoute: typeof RunRoute
   SettingsRoute: typeof SettingsRoute
-  StatsRoute: typeof StatsRoute
-  TodayRoute: typeof TodayRoute
+  TrainRoute: typeof TrainRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,123 +117,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/brand': {
-      id: '/brand'
-      path: '/brand'
-      fullPath: '/brand'
-      preLoaderRoute: typeof BrandRouteImport
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clients': {
-      id: '/clients'
-      path: '/clients'
-      fullPath: '/clients'
-      preLoaderRoute: typeof ClientsRouteImport
+    '/fuel': {
+      id: '/fuel'
+      path: '/fuel'
+      fullPath: '/fuel'
+      preLoaderRoute: typeof FuelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/content': {
-      id: '/content'
-      path: '/content'
-      fullPath: '/content'
-      preLoaderRoute: typeof ContentRouteImport
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/courses': {
-      id: '/courses'
-      path: '/courses'
-      fullPath: '/courses'
-      preLoaderRoute: typeof CoursesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/delivery': {
-      id: '/delivery'
-      path: '/delivery'
-      fullPath: '/delivery'
-      preLoaderRoute: typeof DeliveryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/development': {
-      id: '/development'
-      path: '/development'
-      fullPath: '/development'
-      preLoaderRoute: typeof DevelopmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/intelligence': {
-      id: '/intelligence'
-      path: '/intelligence'
-      fullPath: '/intelligence'
-      preLoaderRoute: typeof IntelligenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investigate': {
-      id: '/investigate'
-      path: '/investigate'
-      fullPath: '/investigate'
-      preLoaderRoute: typeof InvestigateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge': {
-      id: '/knowledge'
-      path: '/knowledge'
-      fullPath: '/knowledge'
-      preLoaderRoute: typeof KnowledgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lab': {
-      id: '/lab'
-      path: '/lab'
-      fullPath: '/lab'
-      preLoaderRoute: typeof LabRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/methodology': {
-      id: '/methodology'
-      path: '/methodology'
-      fullPath: '/methodology'
-      preLoaderRoute: typeof MethodologyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/offers': {
-      id: '/offers'
-      path: '/offers'
-      fullPath: '/offers'
-      preLoaderRoute: typeof OffersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/passport': {
-      id: '/passport'
-      path: '/passport'
-      fullPath: '/passport'
-      preLoaderRoute: typeof PassportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/practice': {
-      id: '/practice'
-      path: '/practice'
-      fullPath: '/practice'
-      preLoaderRoute: typeof PracticeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proof': {
-      id: '/proof'
-      path: '/proof'
-      fullPath: '/proof'
-      preLoaderRoute: typeof ProofRouteImport
+    '/run': {
+      id: '/run'
+      path: '/run'
+      fullPath: '/run'
+      preLoaderRoute: typeof RunRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -438,18 +152,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/stats': {
-      id: '/stats'
-      path: '/stats'
-      fullPath: '/stats'
-      preLoaderRoute: typeof StatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/today': {
-      id: '/today'
-      path: '/today'
-      fullPath: '/today'
-      preLoaderRoute: typeof TodayRouteImport
+    '/train': {
+      id: '/train'
+      path: '/train'
+      fullPath: '/train'
+      preLoaderRoute: typeof TrainRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -457,26 +164,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BrandRoute: BrandRoute,
-  ClientsRoute: ClientsRoute,
-  ContentRoute: ContentRoute,
-  CoursesRoute: CoursesRoute,
-  DeliveryRoute: DeliveryRoute,
-  DevelopmentRoute: DevelopmentRoute,
-  HelpRoute: HelpRoute,
-  IntelligenceRoute: IntelligenceRoute,
-  InvestigateRoute: InvestigateRoute,
-  KnowledgeRoute: KnowledgeRoute,
-  LabRoute: LabRoute,
-  MessagesRoute: MessagesRoute,
-  MethodologyRoute: MethodologyRoute,
-  OffersRoute: OffersRoute,
-  PassportRoute: PassportRoute,
-  PracticeRoute: PracticeRoute,
-  ProofRoute: ProofRoute,
+  CoachRoute: CoachRoute,
+  FuelRoute: FuelRoute,
+  ProgressRoute: ProgressRoute,
+  RunRoute: RunRoute,
   SettingsRoute: SettingsRoute,
-  StatsRoute: StatsRoute,
-  TodayRoute: TodayRoute,
+  TrainRoute: TrainRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
