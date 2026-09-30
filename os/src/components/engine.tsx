@@ -2,9 +2,7 @@ import { DashLink } from "@/components/dash-link";
 import type { ReactNode, SelectHTMLAttributes } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { ConditionLevel, ValidationStatus } from "@/lib/types";
-import { flywheel } from "@/lib/compute";
-import { useEngine } from "@/lib/store";
+import type { AreaPath } from "@/lib/nav";
 
 export function PageHeader({
   kicker,
@@ -39,18 +37,20 @@ export function Kpi({ label, value, hint }: { label: string; value: string | num
   );
 }
 
-export function StatusBadge({ status }: { status: ValidationStatus | ConditionLevel | string }) {
-  const tone =
-    status === "validated" || status === "healthy" || status === "improving" || status === "verified" || status === "new" || status === "won"
+export function StatusBadge({ status, tone }: { status: string; tone?: "ok" | "warn" | "danger" | "muted" | "gold" }) {
+  const s = status.toLowerCase();
+  const inferred =
+    tone ??
+    (["active", "done", "just right", "just_right"].includes(s)
       ? "ok"
-      : status === "at_risk" || status === "retired" || status === "lost" || status === "critical"
-        ? "danger"
-        : status === "testing" || status === "declining" || status === "candidate" || status === "needs_revision"
-          ? "warn"
-          : status === "supported"
+      : ["draft", "paused"].includes(s)
+        ? "warn"
+        : ["too hard", "too_hard", "cold"].includes(s)
+          ? "danger"
+          : s === "ai" || s === "vision"
             ? "gold"
-            : "muted";
-  return <Badge tone={tone}>{status.replaceAll("_", " ")}</Badge>;
+            : "muted");
+  return <Badge tone={inferred}>{status.replaceAll("_", " ")}</Badge>;
 }
 
 export function ProgressBar({ value }: { value: number }) {
@@ -70,33 +70,9 @@ export function EmptyState({ title, detail }: { title: string; detail: string })
   );
 }
 
-export function LineageList({
-  items,
-}: {
-  items: { label: string; href?: string; meta?: string }[];
-}) {
+export function Field({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
   return (
-    <ol className="relative ml-2 space-y-4 border-l border-border pl-4">
-      {items.map((item, i) => (
-        <li key={`${item.label}-${i}`} className="relative">
-          <span className="absolute -left-[21px] top-1.5 size-2 rounded-full bg-primary" />
-          {item.href ? (
-            <DashLink to={item.href as "/development"} className="text-sm font-medium text-foreground hover:text-primary">
-              {item.label}
-            </DashLink>
-          ) : (
-            <div className="text-sm font-medium">{item.label}</div>
-          )}
-          {item.meta ? <div className="text-xs text-muted-foreground">{item.meta}</div> : null}
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-export function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block space-y-1.5">
+    <label className={`block space-y-1.5 ${className ?? ""}`}>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
       {children}
     </label>
@@ -129,37 +105,6 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
   return <select className={cn("engine-select", className)} {...props} />;
 }
 
-export function Flywheel() {
-  const nodes = flywheel(useEngine());
-  return (
-    <div className="engine-card p-4">
-      <div className="engine-kicker mb-3 text-primary">Operating flywheel</div>
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {nodes.map((n, i) => (
-          <div key={n.id} className="flex items-center gap-2">
-            <DashLink
-              to={n.to}
-              tab={n.tab}
-              className="min-w-40 shrink-0 border border-border px-3 py-2 hover:border-primary/50"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium">{n.label}</span>
-                <StatusBadge status={n.level} />
-              </div>
-              <div className="mt-1 font-mono text-[0.625rem] text-muted-foreground">{n.meta}</div>
-            </DashLink>
-            {i < nodes.length - 1 ? (
-              <span className="hidden text-muted-foreground sm:inline" aria-hidden>
-                →
-              </span>
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function TabBar({
   tabs,
   value,
@@ -186,5 +131,21 @@ export function TabBar({
         </button>
       ))}
     </div>
+  );
+}
+
+export function SourceNote({ source }: { source: string }) {
+  return (
+    <span className="font-mono text-[0.625rem] uppercase tracking-wider text-muted-foreground">
+      {source === "ai" || source === "vision" ? "AI suggestion — confirm to activate" : `${source} plan`}
+    </span>
+  );
+}
+
+export function AreaLink({ to, tab, className, children }: { to: AreaPath; tab?: string; className?: string; children: ReactNode }) {
+  return (
+    <DashLink to={to} tab={tab} className={className}>
+      {children}
+    </DashLink>
   );
 }
