@@ -1,409 +1,255 @@
-export type ValidationStatus =
-  | "raw"
-  | "candidate"
-  | "draft"
-  | "testing"
-  | "supported"
-  | "validated"
-  | "needs_revision"
-  | "retired";
+// Forge — AI personal trainer domain types.
+// AI suggests, you decide: every AI-generated plan starts as a draft.
 
-export type ConditionLevel =
-  | "healthy"
-  | "improving"
-  | "declining"
-  | "at_risk"
-  | "insufficient_evidence";
+export type EquipmentKey =
+  | "bodyweight"
+  | "dumbbells"
+  | "bands"
+  | "chair"
+  | "pullupBar"
+  | "kettlebell";
 
-export type SkillKey = "listening" | "questioning" | "reframing" | "challenge";
+export type Equipment = Record<EquipmentKey, boolean>;
 
-export type JobType = "practice" | "reflect" | "build";
+export const EQUIPMENT_LABELS: Record<EquipmentKey, string> = {
+  bodyweight: "Bodyweight",
+  dumbbells: "Dumbbells",
+  bands: "Resistance bands",
+  chair: "Chair / bench",
+  pullupBar: "Pull-up bar",
+  kettlebell: "Kettlebell",
+};
 
-export type ReuseDest =
-  | "coaching"
-  | "content"
-  | "course"
-  | "workshop"
-  | "assessment"
-  | "book"
-  | "offer";
+export type WorkType = "sedentary" | "standing" | "physical" | "shift";
 
-export type ContentKind =
-  | "authority"
-  | "educational"
-  | "relationship"
-  | "demand"
-  | "conversion"
-  | "proof";
+export const WORK_TYPE_LABELS: Record<WorkType, string> = {
+  sedentary: "Desk / sedentary",
+  standing: "Standing / retail / hospitality",
+  physical: "Physical labor",
+  shift: "Shift work / nights",
+};
 
-export interface Coach {
-  name: string;
-  niche: string;
-  audience: string;
-  experienceLevel: string;
-  philosophy: string;
-  goal: string;
-  developmentFocus: string;
-}
-
-export interface Objective {
-  id: string;
-  title: string;
-  type: string;
-  priority: "high" | "medium" | "low";
-  status: "active" | "done";
-  successCriteria: string;
-}
-
-export interface Observation {
-  id: string;
-  skill: SkillKey;
-  score: number;
-  sourceType: "simulation" | "session" | "assessment";
-  sourceId: string;
-  note: string;
-  createdAt: string;
-}
-
-export interface RubricMark {
-  item: string;
-  hit: boolean;
-}
-
-export interface PracticeSession {
-  id: string;
-  scenario: string;
-  skill: SkillKey;
-  difficulty: number;
-  turns: { role: "coach" | "client"; text: string }[];
-  scores: Partial<Record<SkillKey, number>> & { overall: number };
-  strengths: string;
-  weaknesses: string;
-  rubricMarks?: RubricMark[];
-  createdAt: string;
-}
-
-export interface ClientMetric {
-  id: string;
+export interface OccupationProfile {
+  workType: WorkType;
   label: string;
-  value: number;
-  target: number;
-  unit: string;
+  hoursPerDay: number;
+  workDays: string[];
+  preferredTrainingTime: "morning" | "lunch" | "evening";
+  shiftWork: boolean;
+  shiftNotes: string;
 }
 
-export interface ClientAction {
+export type DietKind = "omnivore" | "vegetarian" | "vegan" | "halal" | "kosher";
+
+export const DIET_LABELS: Record<DietKind, string> = {
+  omnivore: "Omnivore",
+  vegetarian: "Vegetarian",
+  vegan: "Vegan",
+  halal: "Halal",
+  kosher: "Kosher",
+};
+
+export interface DietaryPrefs {
+  diet: DietKind;
+  allergies: string[];
+  dislikes: string[];
+  calorieTarget?: number;
+  proteinTargetG?: number;
+}
+
+export type FitnessGoal = "lose" | "build" | "endurance" | "habit";
+
+export const GOAL_LABELS: Record<FitnessGoal, string> = {
+  lose: "Lose weight",
+  build: "Build strength",
+  endurance: "Run farther",
+  habit: "Build the habit",
+};
+
+export type FitnessLevel = "beginner" | "intermediate" | "advanced";
+export type Sex = "male" | "female" | "other";
+export type AvatarStyle = "spark" | "bolt" | "wave";
+
+export interface AvatarSpec {
+  skin: string;
+  color: string;
+  style: AvatarStyle;
+}
+
+export interface UserProfile {
+  name: string;
+  age: number;
+  sex?: Sex;
+  heightCm: number;
+  weightKg: number;
+  goal: FitnessGoal;
+  goalDetail: string;
+  fitnessLevel: FitnessLevel;
+  injuries: string;
+  avatar: AvatarSpec;
+}
+
+export type MuscleGroup =
+  | "chest"
+  | "back"
+  | "shoulders"
+  | "arms"
+  | "core"
+  | "glutes"
+  | "legs"
+  | "full";
+
+export type MovementPattern = "push" | "pull" | "squat" | "hinge" | "core" | "cardio";
+
+export interface Exercise {
   id: string;
-  text: string;
-  due: string;
-  done: boolean;
-  sourceSessionId?: string;
+  name: string;
+  muscles: MuscleGroup[];
+  pattern: MovementPattern;
+  equipment: EquipmentKey[];
+  level: 1 | 2 | 3;
+  impact: "low" | "high";
+  cues: string[];
+  regressTo?: string;
+  progressTo?: string;
 }
 
-export interface ProgramWeek {
-  week: number;
+export interface WorkoutBlock {
+  exerciseId: string;
+  sets: number;
+  reps?: number;
+  seconds?: number;
+  restSec: number;
+}
+
+export interface WorkoutPlan {
+  id: string;
   title: string;
-  activity: string;
-  skill: SkillKey;
-}
-
-export interface Client {
-  id: string;
-  name: string;
-  role: string;
-  status: "new" | "active" | "paused";
-  objective: string;
-  currentState: string;
-  source?: "manual" | "sale";
-  relatedOpportunityId?: string;
-  offerId?: string;
-  remainingSessions?: number;
-  packageSessions?: number;
-  metrics?: ClientMetric[];
-  actions?: ClientAction[];
-  nextSessionAt?: string;
-  currentWeek?: number;
-  packagePaid?: boolean;
-}
-
-export interface DeliverySession {
-  id: string;
-  clientId: string;
-  date: string;
-  objective: string;
-  notes: string;
-  intervention: string;
-  clientResponse: string;
-  outcome: string;
-  followUp: string;
-  questionsAsked?: number;
-  challengeTiming?: "early" | "on_time" | "late" | "none";
-  clientCommitment?: string;
-  worksheet?: string;
-  coachSpeakPercent?: number;
-  moments?: string[];
-}
-
-export interface Experience {
-  id: string;
-  title: string;
-  sourceType: "session" | "simulation" | "career" | "manual";
-  sourceId?: string;
-  situation: string;
-  action: string;
-  result: string;
-  reflection: string;
-  lesson: string;
-  insight: string;
-  principleId?: string;
-  frameworkCandidate?: string;
-  evidenceGap?: string;
-  validationStatus: ValidationStatus;
-  createdAt: string;
-}
-
-export interface Principle {
-  id: string;
-  statement: string;
-  explanation: string;
-  context?: string;
-  experienceIds: string[];
-  contradictingIds: string[];
-  validationStatus: ValidationStatus;
-  confidence: number;
-}
-
-export interface Method {
-  id: string;
-  name: string;
-  purpose: string;
-  whenToUse: string;
-  whenNotToUse: string;
-  steps: string[];
-  expectedOutcome: string;
-  principleIds: string[];
-  validationStatus: ValidationStatus;
-}
-
-export interface Framework {
-  id: string;
-  name: string;
-  problem: string;
-  components: string[];
-  sequence: string;
-  principleIds: string[];
-  methodId?: string;
-  validationStatus: ValidationStatus;
-  version: number;
-  changeNote?: string;
-}
-
-export interface Protocol {
-  id: string;
-  name: string;
-  methodId: string;
-  steps: string[];
-}
-
-export interface Drill {
-  id: string;
-  name: string;
-  skill: SkillKey;
-  protocolId: string;
+  focus: string;
   minutes: number;
-  href: string;
-  tab?: string;
+  level: "beginner" | "intermediate" | "advanced";
+  blocks: WorkoutBlock[];
+  status: "draft" | "active" | "archived";
+  source: "ai" | "template" | "manual";
+  createdAt: string;
+  adaptedNote?: string;
 }
 
-export interface IPAsset {
+export type DifficultyRating = "too_easy" | "just_right" | "too_hard";
+
+export const DIFFICULTY_LABELS: Record<DifficultyRating, string> = {
+  too_easy: "Too easy",
+  just_right: "Just right",
+  too_hard: "Too hard",
+};
+
+export interface WorkoutSession {
   id: string;
-  type: "framework" | "method" | "protocol" | "exercise" | "playbook";
+  planId?: string;
   title: string;
-  description: string;
-  frameworkId?: string;
-  status: ValidationStatus;
-  version: number;
-  sourceLineage: string[];
-  reuse: ReuseDest[];
+  date: string;
+  minutes: number;
+  blocksDone: number;
+  blocksTotal: number;
+  difficulty?: DifficultyRating;
+  notes?: string;
 }
 
-export interface MethodologyTest {
-  id: string;
-  frameworkId: string;
-  context: string;
-  hypothesis: string;
-  application: string;
-  result: string;
-  conclusion: string;
-  status: ValidationStatus;
-  createdAt: string;
-}
-
-export interface MessagingPillar {
-  id: string;
+export interface Ingredient {
   name: string;
-  principleId: string;
-  problem: string;
-  proofIds: string[];
-  contentIds: string[];
+  qty?: string;
 }
 
-export interface BrandState {
-  positioning: string;
-  audience: string;
-  problem: string;
-  promise: string;
-  differentiator: string;
-  pov: string;
-  tagline: string;
-  shortBio: string;
-  longBio: string;
-  values: string[];
-  claims: { claim: string; proofIds: string[] }[];
-}
-
-export interface ProofItem {
+export interface GroceryScan {
   id: string;
-  type: "outcome" | "case-study" | "testimonial" | "framework";
-  claim: string;
-  source: string;
-  verificationStatus: "unverified" | "verified";
+  scannedAt: string;
+  ingredients: Ingredient[];
+  note?: string;
+  visionUsed: boolean;
 }
 
-export interface AudienceSegment {
-  id: string;
+export interface Meal {
   name: string;
-  characteristics: string;
-  problems: string[];
-  objections: string[];
-  interests: string[];
+  ingredients: string[];
+  prepMin: number;
+  calories?: number;
+  proteinG?: number;
+  tags: string[];
 }
 
-export interface ContentItem {
+export interface MealPlan {
   id: string;
-  title: string;
-  format: "post" | "article" | "thread" | "case-study" | "video" | "newsletter" | "carousel";
-  kind: ContentKind;
-  status: "idea" | "draft" | "review" | "published";
-  sourceExperienceId?: string;
-  principleId?: string;
-  message: string;
-  platform: string;
-  questions: string[];
-  createdAt: string;
+  date: string;
+  meals: Meal[];
+  source: "ai" | "vision" | "template" | "manual";
+  groceryScanId?: string;
 }
 
-export interface Offer {
-  id: string;
-  name: string;
-  type: string;
-  audience: string;
-  problem: string;
-  promise: string;
-  methodology: string;
-  frameworkId?: string;
-  components: string[];
-  deliveryModel: string;
-  duration: string;
-  price: string;
-  status: "idea" | "draft" | "testing" | "validated" | "needs_revision" | "paused";
-  sessionCount?: number;
-  program?: ProgramWeek[];
-}
+export type RunWorkoutType = "walk_run" | "easy" | "intervals" | "tempo" | "long";
 
-export interface Opportunity {
-  id: string;
-  offerId: string;
-  prospect: string;
-  stage: "lead" | "qualified" | "conversation" | "proposed" | "won" | "lost";
-  value: number;
-  reason?: string;
-  clientId?: string;
-}
+export const RUN_TYPE_LABELS: Record<RunWorkoutType, string> = {
+  walk_run: "Walk / run",
+  easy: "Easy run",
+  intervals: "Intervals",
+  tempo: "Tempo",
+  long: "Long run",
+};
 
-export interface Product {
-  id: string;
-  name: string;
-  type: string;
-  outcome: string;
-  methodology: string;
-  frameworkId?: string;
-  modules: { title: string; objective: string }[];
-  status: "draft" | "pilot" | "validated";
-}
-
-export interface Investigation {
-  id: string;
-  trigger: string;
-  problem: string;
-  hypotheses: { text: string; for: string; against: string; selected?: boolean }[];
-  rootCause?: string;
-  correction?: string;
-  expected?: string;
-  status: "open" | "correcting" | "verified" | "closed";
-  createdAt: string;
-}
-
-export interface TodayJob {
-  id: string;
-  type: JobType;
+export interface RunWorkout {
+  week: number;
+  day: string;
+  type: RunWorkoutType;
   title: string;
   detail: string;
-  href: string;
-  tab?: string;
-  minutes: number;
-  done: boolean;
+  targetKm?: number;
+  targetMin?: number;
 }
 
-export interface AiAudit {
+export interface RunPlan {
   id: string;
-  actionType: string;
-  targetEngine: string;
-  strategy: string;
-  evidenceStatus: string;
+  title: string;
+  goal: "5k" | "10k" | "habit";
+  weeks: RunWorkout[][];
+  currentWeek: number;
+  status: "draft" | "active" | "done";
+  source: "ai" | "template";
   createdAt: string;
 }
 
-export type MessageChannel = "client" | "lead" | "network";
-
-export interface ChatMessage {
+export interface RunSession {
   id: string;
-  from: "coach" | "them";
+  date: string;
+  distanceKm: number;
+  durationMin: number;
+  effort?: 1 | 2 | 3 | 4 | 5;
+  planRef?: string;
+  notes?: string;
+}
+
+export type AvatarStage = "spark" | "ember" | "forge" | "titan";
+
+export const AVATAR_STAGES: { id: AvatarStage; label: string; xp: number }[] = [
+  { id: "spark", label: "Spark", xp: 0 },
+  { id: "ember", label: "Ember", xp: 100 },
+  { id: "forge", label: "Forge", xp: 300 },
+  { id: "titan", label: "Titan", xp: 600 },
+];
+
+export interface AvatarState {
+  xp: number;
+  stage: AvatarStage;
+}
+
+export interface Nudge {
+  id: string;
+  kind: "reminder" | "cold" | "rest" | "streak" | "fuel";
   text: string;
-  at: string;
+  href: "/train" | "/fuel" | "/run" | "/progress" | "/coach" | "/settings" | "/";
+  createdAt: string;
+  dismissed?: boolean;
 }
 
-export interface MessageThread {
-  id: string;
-  channel: MessageChannel;
-  withName: string;
-  withRole: string;
-  unread: number;
-  priority: boolean;
-  relatedClientId?: string;
-  relatedOpportunityId?: string;
-  subject: string;
-  messages: ChatMessage[];
-  kind?: "checkin" | "conversation";
-}
-
-export interface AppSettings {
-  assistanceLevel: "low" | "medium" | "high";
-  generationStyle: "conservative" | "balanced" | "bold";
-  notifications: {
-    development: boolean;
-    clients: boolean;
-    content: boolean;
-    messages: boolean;
-    conditions: boolean;
-    recommendations: boolean;
-  };
-  privacy: {
-    clientDataVisible: boolean;
-    aiPermissions: boolean;
-  };
-}
-
-export interface PracticeEvent {
+export interface FitnessEvent {
   id: string;
   type: string;
   entityType: string;
@@ -411,36 +257,55 @@ export interface PracticeEvent {
   at: string;
 }
 
-export interface EngineState {
+export interface AppSettings {
+  units: "metric" | "imperial";
+  reminders: boolean;
+  coachPersona: "steady" | "drill" | "cheer";
+}
+
+export const PERSONA_LABELS: Record<AppSettings["coachPersona"], string> = {  steady: "Steady",
+  drill: "Drill sergeant",
+  cheer: "Cheerleader",
+};
+
+export interface FitnessState {
   hydrated: boolean;
-  coach: Coach;
-  objectives: Objective[];
-  observations: Observation[];
-  practices: PracticeSession[];
-  clients: Client[];
-  sessions: DeliverySession[];
-  experiences: Experience[];
-  principles: Principle[];
-  methods: Method[];
-  frameworks: Framework[];
-  protocols: Protocol[];
-  drills: Drill[];
-  ipAssets: IPAsset[];
-  methodologyTests: MethodologyTest[];
-  brand: BrandState;
-  proofs: ProofItem[];
-  pillars: MessagingPillar[];
-  segments: AudienceSegment[];
-  content: ContentItem[];
-  offers: Offer[];
-  opportunities: Opportunity[];
-  products: Product[];
-  investigations: Investigation[];
-  events: PracticeEvent[];
-  todayJobs: TodayJob[];
+  profile: UserProfile;
+  occupation: OccupationProfile;
+  equipment: Equipment;
+  dietary: DietaryPrefs;
+  workoutPlans: WorkoutPlan[];
+  activePlanId?: string;
+  workoutSessions: WorkoutSession[];
+  groceryScans: GroceryScan[];
+  mealPlans: MealPlan[];
+  runPlans: RunPlan[];
+  activeRunPlanId?: string;
+  runSessions: RunSession[];
+  avatar: AvatarState;
+  nudges: Nudge[];
+  events: FitnessEvent[];
   todayStamp: string;
-  weekClosedAt?: string;
-  aiAudits: AiAudit[];
-  threads: MessageThread[];
   settings: AppSettings;
 }
+
+export const MEDICAL_DISCLAIMER =
+  "Forge is a fitness companion, not a medical professional. Plans are suggestions, not medical advice. Check with a clinician before starting if you have a health condition, injury, or are pregnant.";
+
+export const FITNESS_LEVEL_LABELS: Record<FitnessLevel, string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
+
+export const SEX_LABELS: Record<Sex, string> = {
+  male: "Male",
+  female: "Female",
+  other: "Other",
+};
+
+export const AVATAR_STYLE_LABELS: Record<AvatarStyle, string> = {
+  spark: "Spark",
+  bolt: "Bolt",
+  wave: "Wave",
+};

@@ -1,27 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { DashLink } from "@/components/dash-link";
+import { Flame } from "lucide-react";
+import { AvatarFigure, AvatarStageBadge } from "@/components/avatar";
 import { Button } from "@/components/ui/button";
-import { Kpi, PageHeader, Panel, ProgressBar, StatusBadge } from "@/components/engine";
-import {
-  activityFeed,
-  aiNextActions,
-  conditions,
-  currentStateViews,
-  dueCheckIns,
-  nextAction,
-  recentWins,
-  skillViews,
-  stats,
-  weeklyLoop,
-} from "@/lib/compute";
-import { FLYWHEEL, flywheelLit, overallMatchesConditions } from "@/lib/engine-loop";
-import { isLiveMode, liveApi } from "@/lib/live-api";
+import { AreaLink, Kpi, PageHeader, Panel } from "@/components/engine";
+import { readiness, streakDays, todaysSchedule, weeklyVolume } from "@/lib/engine-loop";
 import { parseTabSearch } from "@/lib/nav";
-import type { AreaPath } from "@/lib/nav";
-import { useEngine } from "@/lib/store";
-import { fmtDate } from "@/lib/utils";
+import { useForge } from "@/lib/store";
+import { GOAL_LABELS } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
   validateSearch: parseTabSearch,
@@ -29,278 +14,150 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const state = useEngine();
-  const s = stats(state);
-  const next = nextAction(state);
-  const current = currentStateViews(state);
-  const skills = skillViews(state);
-  const improving = skills.filter((sk) => sk.trend === "improving");
-  const declining = skills.filter((sk) => sk.trend === "declining");
-  const developing = skills.filter((sk) => sk.gap > 0);
-  const wins = recentWins(state);
-  const activity = activityFeed(state);
-  const actions = aiNextActions(state);
-  const drafts = state.content.filter((c) => c.status !== "published");
-  const overall = conditions(state).find((c) => c.id === "c-overall");
-  const overallLevel = overallMatchesConditions(state);
-  const lit = flywheelLit(state);
-  const saleClients = state.clients.filter((c) => c.source === "sale" || c.status === "new");
-  const week = weeklyLoop(state);
-  const checkIns = dueCheckIns(state.threads);
-  const [liveLevel, setLiveLevel] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isLiveMode()) return;
-    void liveApi
-      .home()
-      .then((row) => setLiveLevel(row.overallLevel))
-      .catch(() => setLiveLevel(null));
-  }, []);
+  const state = useForge();
+  const dismissNudge = useForge((s) => s.dismissNudge);
+  const streak = streakDays(state);
+  const ready = readiness(state);
+  const sched = todaysSchedule(state);
+  const volume = weeklyVolume(state, 4);
+  const weekWorkouts = volume[volume.length - 1]?.workouts ?? 0;
+  const weekKm = volume[volume.length - 1]?.km ?? 0;
+  const firstName = state.profile.name.split(" ")[0];
+  const nudges = state.nudges.filter((n) => !n.dismissed);
 
   return (
     <div>
       <PageHeader
-        kicker="Command center"
-        title={`Welcome, ${state.coach.name.split(" ")[0]}.`}
-        detail="This week: one skill, one client, one lesson. Completing a job writes an event — that is the only way Home moves."
+        kicker="Today"
+        title={`Morning, ${firstName}.`}
+        detail="AI suggests, you decide. Check the plan, adapt it to your day, then train."
+        action={
+          <div className="flex items-center gap-3">
+            <AvatarFigure spec={state.profile.avatar} stage={state.avatar.stage} size={52} />
+            <AvatarStageBadge stage={state.avatar.stage} xp={state.avatar.xp} />
+          </div>
+        }
       />
 
-      <div className="mb-6 grid gap-3 md:grid-cols-3">
-        {([week.skill, week.client, week.lesson] as const).map((item) => (
-          <DashLink
-            key={item.kicker}
-            to={item.to}
-            tab={item.tab}
-            className={`engine-card block p-4 hover:border-primary/40 ${item.done ? "opacity-60" : "border-primary/40"}`}
-          >
-            <div className="engine-kicker text-primary">{item.kicker}</div>
-            <h2 className="mt-2 text-base font-semibold">{item.title}</h2>
-            <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
-            {"when" in item && typeof item.when === "string" ? (
-              <p className="mt-2 font-mono text-[0.625rem] text-muted-foreground">Next {fmtDate(item.when)}</p>
-            ) : null}
-            {item.done ? <p className="mt-2 engine-kicker text-ok">Job done</p> : null}
-          </DashLink>
-        ))}
-      </div>
-
-      <div className="engine-card mb-6 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="engine-kicker text-primary">Overall practice state</div>
-            <div className="mt-2 flex items-center gap-2">
-              <StatusBadge status={liveLevel ?? overallLevel} />
-              <span className="text-sm">{overall?.title}</span>
-            </div>
-            <p className="mt-1 max-w-xl text-xs text-muted-foreground">{overall?.why}</p>
-          </div>
-          <p className="font-mono text-[0.625rem] text-muted-foreground">
-            Home wording matches conditions · {(state.events ?? []).length} events
-          </p>
-        </div>
-        <div className="mt-5 flex flex-wrap gap-1.5">
-          {FLYWHEEL.map((step, i) => {
-            const on = lit[step.id];
-            return (
-              <span
-                key={step.id}
-                className={`inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider ${
-                  on ? "border-primary/50 text-primary" : "border-border text-muted-foreground"
-                }`}
-              >
-                {step.label}
-                {i < FLYWHEEL.length - 1 ? <span className="text-muted-foreground">→</span> : null}
-              </span>
-            );
-          })}
-        </div>
-      </div>
-      <div className="engine-card mb-6 p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="engine-kicker text-primary">Recommended next action</div>
-            <h2 className="mt-1 text-lg font-semibold">{next.title}.</h2>
-            <p className="mt-1 max-w-xl text-sm text-muted-foreground">{next.why}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{next.action}</p>
-          </div>
-          <DashLink to={next.to} tab={next.tab}>
-            <Button>{next.title}</Button>
-          </DashLink>
-        </div>
-      </div>
-
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Kpi label="Practice score" value={s.practiceScore} hint="From evidenced skills" />
-        <Kpi label="Active clients" value={state.clients.filter((c) => c.status === "active").length} />
-        <Kpi label="Published" value={s.contentPublished} hint={`${drafts.length} in draft`} />
-        <Kpi label="Due check-ins" value={checkIns.length} hint="Unread or waiting on you" />
-        <Kpi label="New from sale" value={saleClients.length} hint="Won opportunities land here as new" />
-      </div>
-
-      <Panel
-        title="Today — three jobs"
-        className="mb-6"
-        action={
-          <span className="font-mono text-[0.625rem] text-muted-foreground">
-            {state.todayJobs.filter((j) => j.done).length}/{state.todayJobs.length} done · cap 3
-          </span>
-        }
-      >
-        <div className="space-y-3">
-          {state.todayJobs.map((job, i) => (
-            <div
-              key={job.id}
-              className={`flex flex-col gap-3 border p-3 sm:flex-row sm:items-center sm:justify-between ${
-                job.done ? "border-border opacity-60" : "border-primary/40"
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="engine-kicker text-primary">
-                  {i + 1}. {job.type} · {job.minutes} min
-                </div>
-                <div className="mt-1 text-sm font-medium">{job.title}</div>
-                <p className="mt-1 text-xs text-muted-foreground">{job.detail}</p>
-              </div>
+      {nudges.length > 0 ? (
+        <div className="mb-6 space-y-2">
+          {nudges.map((n) => (
+            <div key={n.id} className="engine-card flex items-start justify-between gap-3 border-primary/30 p-3">
+              <p className="text-sm">{n.text}</p>
               <div className="flex shrink-0 gap-2">
-                <DashLink to={job.href as AreaPath} tab={job.tab}>
-                  <Button size="sm">{job.done ? "Review" : "Do this"}</Button>
-                </DashLink>
-                {!job.done ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    aria-label="Mark done"
-                    onClick={() => state.completeJob(job.id)}
-                  >
-                    Mark done
-                  </Button>
-                ) : (
-                  <span className="engine-kicker self-center text-ok">Job done</span>
-                )}
+                <AreaLink to={n.href} className="text-xs font-medium text-primary hover:underline">
+                  Open
+                </AreaLink>
+                <button
+                  type="button"
+                  onClick={() => dismissNudge(n.id)}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Dismiss
+                </button>
               </div>
             </div>
           ))}
         </div>
-        {state.todayJobs.length > 0 && state.todayJobs.every((j) => j.done) ? (
-          <div className="mt-4 border border-primary/40 p-4">
-            <div className="engine-kicker text-primary">Week complete</div>
-            <p className="mt-2 text-sm">
-              Three jobs posted events. Close the week to generate the next skill, client, and lesson — still capped at 3.
-            </p>
-            <Button
-              className="mt-3 min-h-11"
-              onClick={() => {
-                const ok = state.closeWeek();
-                if (ok) toast.success("Next week is loaded: one skill, one client, one lesson.");
-                else toast.error("Finish today's three jobs first.");
-              }}
-            >
-              Close this week
-            </Button>
-          </div>
-        ) : state.weekClosedAt ? (
-          <p className="mt-4 font-mono text-[0.625rem] text-muted-foreground">
-            Last week closed {fmtDate(state.weekClosedAt)}. These three jobs are the new week.
-          </p>
-        ) : null}
-      </Panel>
+      ) : null}
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <Panel title="Current state">
-          <div className="space-y-3">
-            {current.map((c) => (
-              <DashLink key={c.id} to={c.to} tab={c.tab} className="block border border-border p-3 hover:border-primary/40">
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="engine-kicker">{c.domain}</span>
-                  <StatusBadge status={c.level} />
-                </div>
-                <div className="text-sm font-medium">{c.title}</div>
-                <p className="mt-1 text-xs text-muted-foreground">{c.why}</p>
-              </DashLink>
-            ))}
-          </div>
-        </Panel>
-        <Panel title="Progress">
-          <div className="space-y-4">
-            {developing.map((sk) => (
-              <div key={sk.key}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span>{sk.label}</span>
-                  <span className="font-mono text-xs tabular-nums text-primary">
-                    {sk.current}
-                    <span className="ml-2 text-muted-foreground">{sk.trend}</span>
-                  </span>
-                </div>
-                <ProgressBar value={sk.current} />
-              </div>
-            ))}
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <div className="engine-kicker mb-1">Improving</div>
-                <p className="text-sm">{improving.map((s) => s.label).join(", ") || "None this cycle"}</p>
-              </div>
-              <div>
-                <div className="engine-kicker mb-1">Declining</div>
-                <p className="text-sm">{declining.map((s) => s.label).join(", ") || "None"}</p>
-              </div>
-            </div>
-            <div>
-              <div className="engine-kicker mb-1">Current objectives</div>
-              {state.objectives.map((o) => (
-                <p key={o.id} className="text-sm">
-                  {o.title}
-                </p>
-              ))}
-            </div>
-            <div>
-              <div className="engine-kicker mb-1">Recent wins</div>
-              {wins.map((w) => (
-                <p key={w.title} className="text-sm">
-                  {w.title} <span className="text-xs text-muted-foreground">· {w.meta}</span>
-                </p>
-              ))}
-            </div>
-            <div>
-              <div className="engine-kicker mb-1">Current gaps</div>
-              {skills
-                .filter((sk) => sk.gap > 10)
-                .map((sk) => (
-                  <p key={sk.key} className="text-sm">
-                    {sk.label} · gap {sk.gap}
-                  </p>
-                ))}
-            </div>
-          </div>
-        </Panel>
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Kpi label="Day streak" value={streak} hint={streak > 0 ? "Keep the chain unbroken" : "Log a session to start"} />
+        <Kpi label="Readiness" value={ready} hint="From recent ratings + work load" />
+        <Kpi label="Sessions this week" value={weekWorkouts} hint="Strength workouts" />
+        <Kpi label="Run km this week" value={weekKm} hint="Across all runs" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="Activity">
-          <div className="space-y-3">
-            {activity.map((a, i) => (
-              <DashLink key={`${a.title}-${i}`} to={a.to} tab={a.tab} className="flex items-start justify-between gap-3 border border-border p-3 hover:border-primary/40">
-                <div>
-                  <div className="engine-kicker">{a.kind}</div>
-                  <div className="mt-1 text-sm font-medium">{a.title}</div>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{a.meta}</p>
-                </div>
-                <span className="shrink-0 font-mono text-[0.625rem] text-muted-foreground">{fmtDate(a.at)}</span>
-              </DashLink>
-            ))}
-          </div>
+        <Panel
+          title="Today's training"
+          action={<AreaLink to="/train" className="text-xs font-medium text-primary hover:underline">Train →</AreaLink>}
+        >
+          {sched.restSuggested ? (
+            <div>
+              <p className="text-sm font-medium text-warn">Rest day suggested</p>
+              <p className="mt-1 text-sm text-muted-foreground">{sched.restReason}</p>
+              <p className="mt-3 text-xs text-muted-foreground">A walk or mobility counts. The plan will be here tomorrow.</p>
+            </div>
+          ) : sched.strengthDue ? (
+            <div>
+              <div className="engine-kicker text-primary">Strength · {sched.activePlan?.minutes} min</div>
+              <h3 className="mt-1 text-base font-semibold">{sched.activePlan?.title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {sched.activePlan?.blocks.length} blocks · {sched.activePlan?.focus}
+                {sched.activePlan?.adaptedNote ? ` · adapted for ${state.occupation.workType} work` : ""}
+              </p>
+              <AreaLink to="/train" tab="today">
+                <Button className="mt-4" size="sm">Open today's session</Button>
+              </AreaLink>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-muted-foreground">
+                No strength session scheduled. {sched.activePlan ? "Your plan runs Mon / Wed / Fri." : "Generate a plan to get scheduled sessions."}
+              </p>
+              <AreaLink to="/train" tab="plans">
+                <Button className="mt-4" size="sm" variant="outline">Browse plans</Button>
+              </AreaLink>
+            </div>
+          )}
+          {sched.runDue ? (
+            <div className="mt-4 border-t border-border pt-4">
+              <div className="engine-kicker text-primary">Run · {sched.runDue.day}</div>
+              <h3 className="mt-1 text-base font-semibold">{sched.runDue.title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{sched.runDue.detail}</p>
+              <AreaLink to="/run" tab="log">
+                <Button className="mt-3" size="sm" variant="outline">Log run</Button>
+              </AreaLink>
+            </div>
+          ) : null}
         </Panel>
-        <Panel title="Next actions">
-          <div className="space-y-3">
-            {actions.map((a) => (
-              <DashLink key={a.verb} to={a.to} tab={a.tab} className="block border border-border p-3 hover:border-primary/40">
-                <div className="engine-kicker text-primary">{a.verb}</div>
-                <div className="mt-1 text-sm font-medium">{a.title}</div>
-                <p className="mt-1 text-xs text-muted-foreground">{a.why}</p>
-              </DashLink>
-            ))}
-          </div>
+
+        <Panel
+          title="Today's fuel"
+          action={<AreaLink to="/fuel" className="text-xs font-medium text-primary hover:underline">Fuel →</AreaLink>}
+        >
+          {(() => {
+            const today = new Date().toISOString().slice(0, 10);
+            const plan = state.mealPlans.find((m) => m.date.slice(0, 10) === today);
+            if (!plan) {
+              return (
+                <div>
+                  <p className="text-sm text-muted-foreground">No meals planned yet today.</p>
+                  <AreaLink to="/fuel" tab="groceries">
+                    <Button className="mt-4" size="sm" variant="outline">Plan from groceries</Button>
+                  </AreaLink>
+                </div>
+              );
+            }
+            return (
+              <ul className="space-y-2">
+                {plan.meals.map((m, i) => (
+                  <li key={i} className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-medium">{m.name}</div>
+                      <div className="text-xs text-muted-foreground">{m.ingredients.slice(0, 4).join(", ")}</div>
+                    </div>
+                    {m.calories ? <span className="font-mono text-xs text-muted-foreground">{m.calories} kcal</span> : null}
+                  </li>
+                ))}
+              </ul>
+            );
+          })()}
         </Panel>
       </div>
+
+      <Panel title="Your goal" className="mt-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="grid size-9 place-items-center rounded-full bg-primary/15 text-primary">
+            <Flame className="size-4" />
+          </span>
+          <div>
+            <div className="text-sm font-semibold">{GOAL_LABELS[state.profile.goal]}</div>
+            <div className="text-xs text-muted-foreground">{state.profile.goalDetail}</div>
+          </div>
+        </div>
+      </Panel>
     </div>
   );
 }
