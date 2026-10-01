@@ -101,6 +101,9 @@ export type MuscleGroup =
 
 export type MovementPattern = "push" | "pull" | "squat" | "hinge" | "core" | "cardio";
 
+/** Leap-style grouping: which muscle-program an exercise belongs to. */
+export type ExerciseGroup = "chest" | "abs" | "legs" | "arms" | "butt" | "fullbody";
+
 export interface Exercise {
   id: string;
   name: string;
@@ -112,6 +115,46 @@ export interface Exercise {
   cues: string[];
   regressTo?: string;
   progressTo?: string;
+  /** Movement archetype key consumed by <ExerciseAnimation /> (e.g. "squat"). */
+  anim: string;
+  /** Primary muscle-group program this exercise belongs to. */
+  group: ExerciseGroup;
+}
+
+/** Segment of a session: warm-up / main work / cool-down. */
+export type Segment = "warmup" | "main" | "cooldown";
+
+export interface MuscleProgram {
+  id: string;
+  name: string;
+  tagline: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  minutes: number;
+  blocks: WorkoutBlock[];
+}
+
+export interface ChallengeDay {
+  day: number;
+  focus: string;
+  rest: boolean;
+  blocks: WorkoutBlock[];
+}
+
+export interface ChallengeDef {
+  id: string;
+  name: string;
+  tagline: string;
+  /** Returns the plan for day 1..30 (rest days have rest: true and no blocks). */
+  buildDay: (day: number) => ChallengeDay;
+}
+
+export interface ChallengeProgress {
+  challengeId: string;
+  /** Next day to do (1-based). > 30 means the challenge is complete. */
+  day: number;
+  /** Work days completed (rest-day skips are not recorded here). */
+  completedDays: number[];
+  startedAt: string;
 }
 
 export interface WorkoutBlock {
@@ -328,6 +371,7 @@ export interface FitnessState {
   chat: ChatMessage[];
   events: FitnessEvent[];
   pbs: Record<string, PBEntry[]>;
+  challenge: ChallengeProgress | null;
   todayStamp: string;
   settings: AppSettings;
 }

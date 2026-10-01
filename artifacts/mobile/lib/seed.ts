@@ -207,6 +207,7 @@ export function createSeed(): FitnessState {
     pbs: {
       "ember-circuit": [{ seconds: 754, date: daysAgo(12, 18) }],
     },
+    challenge: null,
     todayStamp: todayStamp(),
     settings: { units: "metric", reminders: true, reminderHour: 7, reminderMinute: 0, coachPersona: "steady" },
   };

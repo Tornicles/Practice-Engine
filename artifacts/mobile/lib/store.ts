@@ -62,6 +62,10 @@ interface ForgeStore extends FitnessState {
   recordPB: (benchmarkId: string, seconds: number) => void;
   addEvent: (type: string, entityType: string, entityId: string) => void;
   markHydrated: () => void;
+  startChallenge: (challengeId: string) => void;
+  completeChallengeDay: (challengeId: string) => void;
+  skipChallengeDay: (challengeId: string) => void;
+  quitChallenge: () => void;
   resetAll: () => void;
 }
 
@@ -114,6 +118,7 @@ export const useForge = create<ForgeStore>()(
           nudges: [],
           drafts: [],
           pbs: {},
+          challenge: null,
           chat: [
             {
               id: uid("ch"),
@@ -297,6 +302,39 @@ export const useForge = create<ForgeStore>()(
         })),
       resetAll: () => set({ ...createSeed(), nudges: [] }),
       markHydrated: () => set({ hydrated: true }),
+
+      startChallenge: (challengeId) =>
+        set({
+          challenge: {
+            challengeId,
+            day: 1,
+            completedDays: [],
+            startedAt: new Date().toISOString(),
+          },
+        }),
+
+      completeChallengeDay: (challengeId) =>
+        set((state) => {
+          const c = state.challenge;
+          if (!c || c.challengeId !== challengeId) return {};
+          const day = c.day;
+          return {
+            challenge: {
+              ...c,
+              completedDays: c.completedDays.includes(day) ? c.completedDays : [...c.completedDays, day],
+              day: day + 1,
+            },
+          };
+        }),
+
+      skipChallengeDay: (challengeId) =>
+        set((state) => {
+          const c = state.challenge;
+          if (!c || c.challengeId !== challengeId) return {};
+          return { challenge: { ...c, day: c.day + 1 } };
+        }),
+
+      quitChallenge: () => set({ challenge: null }),
     }),
     {
       name: STORAGE_KEY,
