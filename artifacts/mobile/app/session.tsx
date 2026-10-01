@@ -5,18 +5,38 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { C } from "../components/theme";
 import { Body, Button, Card, Muted, ProgressBar, Row, Title } from "../components/ui";
+import ExerciseAnimation from "../components/ExerciseAnimation";
 import { BENCHMARKS, benchmarkById } from "../lib/benchmarks";
-import { buildTemplateSession, exerciseById, filterExercises } from "../lib/exercises";
+import {
+  buildTemplateSession,
+  challengeById,
+  exerciseById,
+  filterExercises,
+  programById,
+  withWarmupCooldown,
+} from "../lib/exercises";
 import { adaptationForRating } from "../lib/engine";
 import { dayKey, fmtDuration } from "../lib/format";
 import { useForge } from "../lib/store";
-import type { DifficultyRating, WorkoutBlock } from "../lib/types";
+import type { DifficultyRating, Segment, WorkoutBlock } from "../lib/types";
 
 type Phase = "work" | "rest" | "rating";
 
 interface PlayerBlock extends WorkoutBlock {
   name: string;
   cues: string[];
+  anim: string;
+  segment: Segment;
+}
+
+function enrich(b: WorkoutBlock & { segment: Segment }): PlayerBlock {
+  const ex = exerciseById.get(b.exerciseId);
+  return {
+    ...b,
+    name: ex?.name ?? b.exerciseId,
+    cues: ex?.cues ?? [],
+    anim: ex?.anim ?? "bounce",
+  };
 }
 
 function adaptBlocks(blocks: WorkoutBlock[], opts: { quick: boolean; lowImpact: boolean; bwOnly: boolean }): WorkoutBlock[] {
@@ -51,6 +71,9 @@ export default function Session() {
   const params = useLocalSearchParams<{
     planId?: string;
     benchmarkId?: string;
+    programId?: string;
+    challengeId?: string;
+    day?: string;
     quick?: string;
     lowImpact?: string;
     bwOnly?: string;
@@ -66,10 +89,36 @@ export default function Session() {
         forTime: true,
         planId: undefined as string | undefined,
         benchmarkId: benchmark.id,
-        blocks: benchmark.blocks.map((b) => {
-          const ex = exerciseById.get(b.exerciseId);
-          return { ...b, name: ex?.name ?? b.exerciseId, cues: ex?.cues ?? [] };
-        }),
+        challengeId: undefined as string | undefined,
+        blocks: benchmark.blocks.map((b) => enrich({ ...b, segment: "main" as const })),
+      };
+    }
+    // Muscle-group program session (warm-up + cool-down attached automatically).
+    if (params.programId) {
+      const prog = programById.get(params.programId);
+      if (!prog) return null;
+      return {
+        title: prog.name,
+        forTime: false,
+        planId: undefined as string | undefined,
+        benchmarkId: undefined as string | undefined,
+        challengeId: undefined as string | undefined,
+        blocks: withWarmupCooldown(prog.blocks).map(enrich),
+      };
+    }
+    // 30-day challenge day session.
+    if (params.challengeId && params.day) {
+      const def = challengeById.get(params.challengeId);
+      if (!def) return null;
+      const cd = def.buildDay(parseInt(params.day, 10));
+      if (cd.rest) return null;
+      return {
+        title: `${def.name} · Day ${cd.day}`,
+        forTime: false,
+        planId: undefined as string | undefined,
+        benchmarkId: undefined as string | undefined,
+        challengeId: def.id,
+        blocks: withWarmupCooldown(cd.blocks).map(enrich),
       };
     }
     const plan = s.workoutPlans.find((p) => p.id === params.planId);
@@ -94,10 +143,8 @@ export default function Session() {
       forTime: false,
       planId: plan.id,
       benchmarkId: undefined as string | undefined,
-      blocks: finalBlocks.map((b) => {
-        const ex = exerciseById.get(b.exerciseId);
-        return { ...b, name: ex?.name ?? b.exerciseId, cues: ex?.cues ?? [] };
-      }),
+      challengeId: undefined as string | undefined,
+      blocks: withWarmupCooldown(finalBlocks).map(enrich),
     };
   }, [params]);
 
@@ -197,6 +244,9 @@ export default function Session() {
       benchmarkSec: setup.forTime ? elapsed : undefined,
     });
     const adapt = rating ? adaptationForRating(rating) : null;
+    if (setup.challengeId) {
+      useForge.getState().completeChallengeDay(setup.challengeId);
+    }
     router.back();
     // Surface the adaptation note as a coach message after save
     if (adapt) {
@@ -273,11 +323,17 @@ export default function Session() {
           </>
         ) : (
           <>
+            {block.segment !== "main" && (
+              <Text style={block.segment === "warmup" ? styles.segWarm : styles.segCool}>
+                {block.segment === "warmup" ? "WARM-UP" : "COOL-DOWN"}
+              </Text>
+            )}
             <Text style={styles.exName}>{block.name}</Text>
-            <Muted style={{ marginBottom: 6 }}>
+            <Muted style={{ marginBottom: 2 }}>
               Set {setIdx} of {block.sets}
               {block.reps ? ` · ${block.reps} reps` : ""}
             </Muted>
+            <ExerciseAnimation archetype={block.anim} size={116} />
             {block.seconds ? (
               <Text style={styles.timer}>{timeLeft ?? block.seconds}s</Text>
             ) : (
@@ -313,6 +369,8 @@ const styles = StyleSheet.create({
   timer: { color: C.accent, fontSize: 84, fontWeight: "800", fontVariant: ["tabular-nums"] },
   reps: { color: C.text, fontSize: 84, fontWeight: "800", fontVariant: ["tabular-nums"] },
   restLabel: { color: C.teal, fontSize: 16, fontWeight: "800", letterSpacing: 4 },
+  segWarm: { color: C.teal, fontSize: 13, fontWeight: "800", letterSpacing: 3, marginBottom: 4 },
+  segCool: { color: C.gold, fontSize: 13, fontWeight: "800", letterSpacing: 3, marginBottom: 4 },
   cue: { color: C.text, fontSize: 14, marginBottom: 6, lineHeight: 20 },
   input: {
     backgroundColor: C.surface,

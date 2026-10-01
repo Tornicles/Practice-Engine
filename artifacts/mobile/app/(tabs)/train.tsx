@@ -1,14 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { C } from "../../components/theme";
-import { Body, Button, Card, Chip, EmptyState, Muted, Row, Screen, SectionTitle, Title } from "../../components/ui";
+import { Body, Button, Card, Chip, EmptyState, Muted, ProgressBar, Row, Screen, SectionTitle, Title } from "../../components/ui";
+import ExerciseAnimation from "../../components/ExerciseAnimation";
 import { BENCHMARKS } from "../../lib/benchmarks";
-import { exerciseById } from "../../lib/exercises";
+import { CHALLENGES, MUSCLE_PROGRAMS, challengeById, exerciseById } from "../../lib/exercises";
 import { fmtDate, fmtDuration } from "../../lib/format";
 import { useForge } from "../../lib/store";
-import type { WorkoutBlock } from "../../lib/types";
+import type { ChallengeProgress, MuscleProgram, WorkoutBlock } from "../../lib/types";
 
 function BlockPreview({ block, index }: { block: WorkoutBlock; index: number }) {
   const [open, setOpen] = useState(false);
@@ -45,11 +47,116 @@ function BlockPreview({ block, index }: { block: WorkoutBlock; index: number }) 
   );
 }
 
+function ProgramDetail({ program, onClose }: { program: MuscleProgram; onClose: () => void }) {
+  return (
+    <Modal visible animationType="slide" onRequestClose={onClose}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+        <Pressable onPress={onClose} hitSlop={12} style={styles.backRow}>
+          <Ionicons name="chevron-back" size={22} color={C.text} />
+          <Text style={styles.backText}>Back</Text>
+        </Pressable>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}>
+          <Title>{program.name}</Title>
+          <Muted style={{ marginTop: 4 }}>{program.tagline}</Muted>
+          <Row gap={8} style={{ marginTop: 10, marginBottom: 12 }}>
+            <Chip label={program.difficulty} />
+            <Chip label={`~${program.minutes} min`} />
+            <Chip label={`${program.blocks.length} exercises`} />
+          </Row>
+          {program.blocks.map((b, i) => {
+            const ex = exerciseById.get(b.exerciseId);
+            if (!ex) return null;
+            const dose = b.reps ? `${b.sets} × ${b.reps} reps` : `${b.sets} × ${b.seconds}s`;
+            return (
+              <Row key={i} gap={12} style={styles.detailRow}>
+                <View style={styles.thumb}>
+                  <ExerciseAnimation archetype={ex.anim} size={56} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Body style={{ fontWeight: "700" }}>
+                    {i + 1}. {ex.name}
+                  </Body>
+                  <Muted>{dose}</Muted>
+                </View>
+              </Row>
+            );
+          })}
+          <Button
+            title="Start workout"
+            onPress={() => {
+              onClose();
+              router.push(`/session?programId=${program.id}` as never);
+            }}
+            style={{ marginTop: 16 }}
+          />
+          <Muted style={{ marginTop: 8, textAlign: "center" }}>
+            Warm-up and cool-down are added automatically.
+          </Muted>
+        </ScrollView>
+      </SafeAreaView>
+    </Modal>
+  );
+}
+
+function ChallengeCard({ progress }: { progress: ChallengeProgress }) {
+  const store = useForge.getState();
+  const def = challengeById.get(progress.challengeId);
+  if (!def) return null;
+
+  if (progress.day > 30) {
+    return (
+      <Card>
+        <Body style={{ fontWeight: "800" }}>{def.name} — complete! 🎉</Body>
+        <Muted style={{ marginBottom: 10 }}>
+          {progress.completedDays.length} workouts finished. Beast mode.
+        </Muted>
+        <Button title="Start again" variant="secondary" onPress={() => store.startChallenge(def.id)} />
+      </Card>
+    );
+  }
+
+  const today = def.buildDay(progress.day);
+  return (
+    <Card>
+      <Body style={{ fontWeight: "800" }}>
+        {def.name} — Day {progress.day} of 30
+      </Body>
+      <ProgressBar value={progress.completedDays.length} max={30} style={{ marginVertical: 10 }} />
+      {today.rest ? (
+        <>
+          <Muted style={{ marginBottom: 10 }}>
+            Rest day — recover, stretch, hydrate. Your muscles are rebuilding.
+          </Muted>
+          <Button
+            title="Skip rest day"
+            variant="secondary"
+            onPress={() => store.skipChallengeDay(def.id)}
+          />
+        </>
+      ) : (
+        <>
+          <Muted style={{ marginBottom: 10 }}>
+            {today.focus} · {today.blocks.length} exercises · progressive overload
+          </Muted>
+          <Button
+            title={`Continue — Day ${progress.day}`}
+            onPress={() => router.push(`/session?challengeId=${def.id}&day=${progress.day}` as never)}
+          />
+        </>
+      )}
+      <Pressable onPress={() => store.quitChallenge()} style={{ marginTop: 10, alignSelf: "center" }}>
+        <Text style={{ color: C.muted, fontSize: 13 }}>Quit challenge</Text>
+      </Pressable>
+    </Card>
+  );
+}
+
 export default function Train() {
   const s = useForge();
   const [quick, setQuick] = useState(false);
   const [lowImpact, setLowImpact] = useState(false);
   const [bwOnly, setBwOnly] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<MuscleProgram | null>(null);
 
   const active = s.workoutPlans.find((p) => p.id === s.activePlanId && p.status === "active");
   const drafts = s.workoutPlans.filter((p) => p.status === "draft");
@@ -59,6 +166,48 @@ export default function Train() {
     <Screen>
       <Title>Train</Title>
       <Muted style={{ marginBottom: 12 }}>Home workouts. AI suggests — you decide.</Muted>
+
+      <SectionTitle>Train by muscle group</SectionTitle>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 12, paddingVertical: 4 }}
+      >
+        {MUSCLE_PROGRAMS.map((p) => (
+          <Pressable key={p.id} onPress={() => setSelectedProgram(p)} style={styles.progCard}>
+            <Body style={{ fontWeight: "800", fontSize: 16 }}>{p.name}</Body>
+            <Muted numberOfLines={2} style={{ marginTop: 4 }}>
+              {p.tagline}
+            </Muted>
+            <Row gap={6} style={{ marginTop: 10 }}>
+              <Chip label={p.difficulty} />
+              <Chip label={`${p.minutes} min`} />
+            </Row>
+          </Pressable>
+        ))}
+      </ScrollView>
+
+      <SectionTitle>30-Day Challenge</SectionTitle>
+      {s.challenge ? (
+        <ChallengeCard progress={s.challenge} />
+      ) : (
+        CHALLENGES.map((c) => (
+          <Card key={c.id}>
+            <Body style={{ fontWeight: "800" }}>{c.name}</Body>
+            <Muted style={{ marginBottom: 4 }}>{c.tagline}</Muted>
+            <Muted style={{ marginBottom: 10 }}>30 days · progressive · rest every 4th day</Muted>
+            <Button
+              title="Start challenge"
+              variant="secondary"
+              onPress={() => useForge.getState().startChallenge(c.id)}
+            />
+          </Card>
+        ))
+      )}
+
+      {selectedProgram && (
+        <ProgramDetail program={selectedProgram} onClose={() => setSelectedProgram(null)} />
+      )}
 
       {active ? (
         <Card>
@@ -152,3 +301,35 @@ export default function Train() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  progCard: {
+    width: 190,
+    backgroundColor: C.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: 14,
+  },
+  backRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  backText: { color: C.text, fontWeight: "700", fontSize: 16 },
+  thumb: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: C.surface2,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  detailRow: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: C.border,
+  },
+});
