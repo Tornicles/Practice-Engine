@@ -10,9 +10,9 @@ export type SpecializationCategory =
   | "lifestyle_occupational"
   | "age_life_stages"
   | "strength_conditioning"
-  | "adaptive_specialized"
+  | "adaptive_fitness"
   | "mind_body"
-  | "practical_goals";
+  | "practical_fitness_goals";
 
 /** The 13 base movement tracks (exercise-eligibility layer, doc 17). */
 export type BaseTrack =

@@ -1,7 +1,8 @@
 # 28 — Forty Specializations: Catalog & Composition Model
 
 **Status:** Design draft · **Date:** 2026-10-11
-**Source brief:** "PRACTICE-ENGINE — Complete Guide to the 40 Fitness Specializations" (2026-10-11)
+**Amendment (2026-10-11):** Aligned to the Elite Mastery OS spec ("Complete Application Sequence and Elite Mastery Operating System"). Changes: (1) the secondary objective may be a second specialization **or** a capability objective from a controlled list; (2) category names updated to the OS names — "Adaptive Fitness" and "Practical Fitness Goals". The 40→13 base-track mapping and the composition model are otherwise unchanged.
+**Source brief:** "PRACTICE-ENGINE — Complete Guide to the 40 Fitness Specializations" (2026-10-11); "Complete Application Sequence and Elite Mastery Operating System" (2026-10-11)
 **Depends on:** Doc 17 (specializations table, safety rules R1–R8), Doc 18 (composer, progression), Doc 19 (V1 curriculum pattern)
 **Engines covered:** 2 (Specialization), 3 (Personalization), 17 (Curriculum Production)
 
@@ -45,16 +46,16 @@
 | 28 | Endurance Training Fitness | Strength & conditioning | standard | weight_loss |
 | 29 | Speed & Agility Fitness | Strength & conditioning | standard | athletics |
 | 30 | Mobility & Flexibility Fitness | Strength & conditioning | standard | office_worker |
-| 31 | Disability & Adaptive Fitness | Adaptive & specialized | **elevated** | obesity |
-| 32 | Low-Impact Fitness | Adaptive & specialized | standard | obesity |
-| 33 | Balance & Fall Prevention Fitness | Adaptive & specialized | **elevated** | older_adult |
-| 34 | Return-to-Exercise After Injury | Adaptive & specialized | **elevated** | obesity |
+| 31 | Disability & Adaptive Fitness | Adaptive Fitness | **elevated** | obesity |
+| 32 | Low-Impact Fitness | Adaptive Fitness | standard | obesity |
+| 33 | Balance & Fall Prevention Fitness | Adaptive Fitness | **elevated** | older_adult |
+| 34 | Return-to-Exercise After Injury | Adaptive Fitness | **elevated** | obesity |
 | 35 | Yoga Fitness | Mind–body | standard | office_worker |
 | 36 | Pilates Fitness | Mind–body | standard | office_worker |
 | 37 | Dance Fitness | Mind–body | standard | weight_loss |
 | 38 | Movement & Breathing Fitness | Mind–body | standard | office_worker |
-| 39 | Beginner Fitness | Practical goals | standard | obesity |
-| 40 | Fitness for Physical Job Tests | Practical goals | standard | blue_collar |
+| 39 | Beginner Fitness | Practical Fitness Goals | standard | obesity |
+| 40 | Fitness for Physical Job Tests | Practical Fitness Goals | standard | blue_collar |
 
 Base-track assignment rule: when a specialization has no exact base track, it inherits the closest track's **exercise eligibility**, and its `priorityFamilies` carry the specificity. Eligibility is permissive; safety rules are restrictive (doc 17 R1/R2 always apply).
 
@@ -64,9 +65,9 @@ Base-track assignment rule: when a specialization has no exact base track, it in
 
 The 40 are **not** mutually exclusive. At enrollment (and any time after), the user sets:
 
-```
+```ts
 primary:        SpecializationSlug          // what they want to master — exactly 1
-secondary:      SpecializationSlug | null   // what else they want to improve — 0 or 1
+secondary:      SecondaryObjective | null   // what else they want to improve — 0 or 1
 characteristics: {
   ageBand:        "child" | "teen" | "adult" | "older_adult"
   experience:     "beginner" | "some" | "experienced"
@@ -75,6 +76,15 @@ characteristics: {
   space:          SpaceRequired
   schedule:       { daysPerWeek, minutesPerSession, shiftWork? }
 }
+
+/** Elite OS, Screen 4: the secondary is a specialization OR a capability objective. */
+type SecondaryObjective =
+  | { kind: "specialization", slug: SpecializationSlug }
+  | { kind: "capability",     objective: CapabilityObjective };
+
+type CapabilityObjective =
+  | "strength" | "stamina" | "muscle_development" | "mobility"
+  | "body_composition" | "agility" | "movement_confidence";
 ```
 
 ### B.1 What each input controls
@@ -82,8 +92,25 @@ characteristics: {
 | Input | Drives | Never drives |
 |---|---|---|
 | Primary | Curriculum phases, weekly themes, assessment checkpoints, lesson map | — |
-| Secondary | Emphasis: 1 focused session/week OR accessory-block swaps within primary sessions | Phase structure, assessments, safety constraints |
+| Secondary (specialization) | Emphasis: 1 focused session/week OR accessory-block swaps within primary sessions | Phase structure, assessments, safety constraints |
+| Secondary (capability) | Emphasis blocks mapped from the objective (see B.1a) inside primary sessions | Phase structure, assessments, safety constraints |
 | Characteristics | Safety filtering (R1/R2), difficulty caps, session length, scheduling | Curriculum identity |
+
+### B.1a Capability-objective → emphasis-block mapping
+
+A capability objective does not bring its own curriculum. Engine 2 translates it into emphasis blocks drawn from exercise families, inserted into the primary's sessions (never as standalone conflicting workouts):
+
+| Capability objective | Emphasis blocks (families / patterns) |
+|---|---|
+| `strength` | Lower-body + push/pull accessory blocks; progressive loading within demonstrated difficulty |
+| `stamina` | Conditioning finishers; interval marching / step circuits; work-capacity extensions |
+| `muscle_development` | Higher-volume accessory blocks (glutes, shoulders, arms); tempo variants |
+| `mobility` | Thoracic / hip / ankle mobility sequences; dedicated 5-min mobility blocks |
+| `body_composition` | Conditioning volume + full-body resistance emphasis; paired with nutrition guidance (Engine 11) |
+| `agility` | Footwork, direction-change, and coordination drills at the user's balance level |
+| `movement_confidence` | Technique-first regressions, supported variants, extra demonstration + practice reps |
+
+All emphasis blocks respect the primary's safety envelope and the user's difficulty cap (doc 18). If an objective's natural expression conflicts with either, Engine 2 substitutes the closest safe alternative and notes it in the plan.
 
 ### B.2 Precedence (conflicts resolve deterministically)
 
@@ -103,6 +130,8 @@ characteristics: {
 
 **Shift worker + strength training.** Primary: shift-worker-fitness (readiness-based scheduling, Engine 8 drives session timing). Secondary: strength-training-fitness → progressive resistance blocks scheduled on high-readiness days only.
 
+**Office worker + mobility (capability objective).** Primary: office-worker-fitness. Secondary: `{ kind: "capability", objective: "mobility" }` → mobility emphasis blocks (thoracic rotation + hip-flexor sequences, 5-min blocks) inside two sessions/week; movement-break templates (doc 19, §F) gain a mobility variant. The objective adds no new curriculum, phases, or assessments.
+
 ### B.4 What the composer receives
 
 Engine 2 (Specialization) resolves the triple into a single **resolved profile**:
@@ -111,7 +140,7 @@ Engine 2 (Specialization) resolves the triple into a single **resolved profile**
 resolvedProfile = {
   curriculumId,            // from primary
   phaseObjectives,         // from primary
-  emphasisBlocks,          // from secondary (0–2/week)
+  emphasisBlocks,          // from secondary — specialization or capability (0–2/week)
   eligibility,             // characteristics → R1/R2 filter output
   difficultyCap,
   assessmentSchedule,      // from primary
@@ -166,7 +195,9 @@ specializations {
 // user_specialization_selections: the composition triple (§B)
 user_specialization_selections {
   id uuid PK, user_id FK,
-  primary_slug FK, secondary_slug FK nullable,
+  primary_slug FK,
+  secondary_kind: "specialization" | "capability" | null,
+  secondary_ref text nullable,     // specialization slug OR capability objective name
   characteristics jsonb,           // age band, experience, limitations, equipment, space, schedule
   resolved_profile jsonb,          // Engine 2 output (§B.4)
   created_at, updated_at
@@ -192,11 +223,13 @@ user_specialization_selections {
 - **40 user-facing specializations over 13 base movement tracks.** Keeps the exercise library's eligibility model stable (the 525-exercise seed keys off 13 tracks) while the catalog grows. New specializations map; they don't fork the library.
 - **Composition above the composer.** Primary/secondary/characteristics resolve into one profile; the composer, safety filter, and progression engine are unchanged. One integration point, not three.
 - **Precedence is fixed and deterministic** (safety > characteristics > primary > secondary) — no AI judgment in conflict resolution.
+- **Secondary as specialization or capability objective (Elite OS, Screen 4).** A capability objective carries no curriculum — it maps to emphasis blocks via §B.1a. This keeps the composition model intact while matching the onboarding UX, where users pick outcome-oriented objectives ("I want to run faster") as well as tracks.
 - **Tiered curriculum coverage.** Selectability requires Tier 2 + safeguards; full curricula roll out by priority. Prevents 40 shallow tracks.
 - **Doc 17's 13-track table is superseded by this catalog** for product purposes; the 13 live on as `baseTracks`.
 
 ## H. Next
 
 - **Doc 27 — Master exercise library:** dedup methodology, catalog stats, review workflow, how the 525-entry seed becomes selectable records. (In progress — seed conversion running.)
+- **Doc 29 — Elite Mastery OS alignment:** maps the application-sequence spec onto docs 17–28 (in progress).
 - **Implementation, brief §12:** 60 prompts in 12 batches; batch 1 (repo audit, consolidation plan) takes docs 17–26 + 28 as input.
 - Remaining work after that: Tier-1 full curricula beyond Office Worker; Tier-2 blueprints for the other 39; Tier-3 media production.

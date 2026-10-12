@@ -372,7 +372,7 @@ export const SPECIALIZATIONS: SpecializationRecord[] = [
   {
     slug: "disability-adaptive-fitness",
     name: "Disability and Adaptive Fitness",
-    category: "adaptive_specialized",
+    category: "adaptive_fitness",
     tagline: "For people with physical disabilities or movement limitations seeking accessible, individualized exercise.",
     trainingFocus: "Seated strength, adapted resistance exercises, accessible cardio, functional movement, balance where appropriate, and individualized modifications.",
     outcomes: "Improved accessible fitness participation, strength, endurance, and functional ability toward individual goals.",
@@ -385,7 +385,7 @@ export const SPECIALIZATIONS: SpecializationRecord[] = [
   {
     slug: "low-impact-fitness",
     name: "Low-Impact Fitness",
-    category: "adaptive_specialized",
+    category: "adaptive_fitness",
     tagline: "For people who prefer or require lower-impact activity, including beginners and those managing impact tolerance.",
     trainingFocus: "Walking, marching, step patterns, controlled strength training, seated cardio, and low-impact conditioning.",
     outcomes: "Improved fitness and strength while minimizing unnecessary impact.",
@@ -398,7 +398,7 @@ export const SPECIALIZATIONS: SpecializationRecord[] = [
   {
     slug: "balance-fall-prevention-fitness",
     name: "Balance and Fall Prevention Fitness",
-    category: "adaptive_specialized",
+    category: "adaptive_fitness",
     tagline: "For people seeking better balance, stability, and confidence with walking and daily movements.",
     trainingFocus: "Supported balance, sit-to-stands, stepping drills, lower-body strength, gait activities, and progressive coordination.",
     outcomes: "Improved balance and functional strength, with potential fall-risk reduction when delivered appropriately.",
@@ -411,7 +411,7 @@ export const SPECIALIZATIONS: SpecializationRecord[] = [
   {
     slug: "return-to-exercise-fitness",
     name: "Return-to-Exercise After Injury",
-    category: "adaptive_specialized",
+    category: "adaptive_fitness",
     tagline: "For people cleared to resume exercise after completing medical treatment or rehabilitation.",
     trainingFocus: "Graduated strength, mobility, balance, conditioning, and controlled return to activity within established restrictions.",
     outcomes: "Improved fitness, confidence, and tolerance for general exercise.",
@@ -473,7 +473,7 @@ export const SPECIALIZATIONS: SpecializationRecord[] = [
   {
     slug: "beginner-fitness",
     name: "Beginner Fitness",
-    category: "practical_goals",
+    category: "practical_fitness_goals",
     tagline: "For people new to structured fitness or restarting after prolonged inactivity.",
     trainingFocus: "Basic squats, wall push-ups, walking, simple resistance exercises, balance, mobility, and introductory fitness education.",
     outcomes: "Foundational strength, endurance, movement competence, and the confidence to enter specialized training.",
@@ -485,7 +485,7 @@ export const SPECIALIZATIONS: SpecializationRecord[] = [
   {
     slug: "job-test-fitness",
     name: "Fitness for Physical Job Tests",
-    category: "practical_goals",
+    category: "practical_fitness_goals",
     tagline: "For people preparing for occupation-related physical assessments — public safety, military, emergency response, and demanding jobs.",
     trainingFocus: "Push-ups, sit-ups or approved core alternatives, running, loaded carries, stair climbing, agility, strength, and test-specific movement.",
     outcomes: "Improved physical preparation for the selected test and understanding of its requirements.",
