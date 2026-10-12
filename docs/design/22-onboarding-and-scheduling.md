@@ -1,6 +1,7 @@
 # 22 — Onboarding & Scheduling
 
 **Status:** Design draft · **Date:** 2026-10-11
+**Amendment (2026-10-11):** aligned to the Elite Mastery OS spec — onboarding is exactly the 8 spec screens (§A.1); specialization selection covers 40 specializations in 8 categories with outcome search (§B.1).
 **Source brief:** "Practice-Engine — Complete Product and Operating Architecture" (2026-10-11)
 **Depends on:** Doc 17 (safety rules R1–R8, specializations table, content lifecycle)
 **Engines covered:** 1 (Onboarding), 2 (Specialization), 3 (Personalization), 4 (Scheduling)
@@ -11,23 +12,25 @@
 
 ## A. Onboarding (Engine 1)
 
-### A.1 Flow: one question per screen, mostly tap-based
+### A.1 Flow: exactly 8 screens, one question per screen, tap-based
 
-Sections in fixed order. Each screen = one question, large tap targets, back button, progress indicator, "save and finish later" on every screen.
+Each screen = one question, large tap targets, back button, progress indicator, "save and finish later" on every screen.
 
-| # | Section | Questions (tap-based unless noted) |
-|---|---|---|
-| 1 | Identity & eligibility | Age band (5 bands, §E); country/region (list); preferred language (list) |
-| 2 | Fitness profile | Experience (new / returning / active); activity level (4 taps); primary objectives (multi-tap, max 3); previous training (free text, optional); current exercise tolerance (4 taps); limitations or injuries? (yes → §A.3 follow-ups) |
-| 3 | Home environment | Floor space (small/medium/large); indoor/outdoor access; equipment multi-tap: mat, chair, light dumbbells, resistance bands, stairs, pull-up bar, none |
-| 4 | Lifestyle | Occupation (list incl. office / warehouse / student / retired / other); training days per week (1–7 stepper); minutes per day (15/20/30/45/60); sleep (poor/ok/good) |
-| 5 | Food | "Want nutrition guidance?" (yes/no — detail deferred to Engine 10); common meals (free text, optional); allergies / restrictions (multi-tap + free text) |
-| 6 | Trainer ambitions | "Fitness mastery only" / "Mastery + coaching pathway" (Engine 16 opt-in) |
+| # | Screen | Content | Engine |
+|---|---|---|---|
+| 1 | Welcome | Headline **"MASTER YOUR BODY."** Subhead: "Choose your discipline. Follow a six-month system. Train, study, prove your progress, and earn your next level." Primary action: **Begin Your Mastery**. Secondary: Explore Specializations, How It Works, Sign In. Show real exercise demonstrations, clear progression examples, actual program requirements. No unrealistic transformation guarantees. | — |
+| 2 | Account creation | Email/password plus available secure sign-in providers. Collect only essential account information initially. Confirm applicable age requirements and guardian consent **before** allowing minors into relevant programs. | Auth service |
+| 3 | Primary specialization | **"Choose Your Discipline — one primary specialization. Your entire training system starts here."** 8 categories, 40 choices (Doc 28 catalog). Plus outcome search: "I want to run faster", "I want to build muscle", "I want to become physically stronger", "I want to train for soccer". | 2 |
+| 4 | Secondary objective | Tap one: **strength, stamina, muscle development, mobility, body composition, agility, confidence with movement.** Modifies the primary without creating conflicting programs (Doc 28, §B). | 2 |
+| 5 | Training environment | Available equipment (multi-tap), indoor/outdoor space, training duration, weekly availability. **Bodyweight-first default — no gym membership required** for the core experience. | 1 |
+| 6 | Readiness & safety | Relevant exercise experience, current limitations, symptoms that affect exercise, circumstances requiring adaptations. High-risk answers → additional questions (§A.3), an appropriately restricted program, or a recommendation for professional evaluation — **never an automatically demanding workout**. | 1 |
+| 7 | Food & lifestyle | What the user normally eats, food budget preferences, restrictions, whether they want to photograph meals. The system learns existing foods and suggests realistic adjustments instead of imposing unfamiliar meal plans. | 1 |
+| 8 | Baseline assessment | Movement and exercise history, comfortable exercise tolerance, basic strength or functional movement checks, specialization-relevant assessments, optional technique videos, self-reported recovery and limitations. **No single physical test is mandatory for every specialization.** | 1, 9 |
 
 ### A.2 Time target and deferral
 
 - Target: **3–6 minutes**, ~18–24 taps total.
-- Rule: anything not needed for the first plan is **deferred**, not asked. Deferred items enter a contextual queue surfaced later (e.g. detailed food preferences appear when the user first opens Food; equipment re-check appears if plans stall).
+- Rule: anything not needed for the first plan is **deferred**, not asked. Deferred items enter a contextual queue surfaced later (e.g. detailed food preferences appear when the user first opens Food; equipment re-check appears if plans stall; "Mastery + coaching pathway" opt-in for trainer ambitions appears on first Today visit, not in onboarding).
 - Skipping is allowed on every non-safety screen. Safety screens (§A.3, §E) cannot be skipped — but they can be paused and resumed.
 
 ### A.3 Safety answers trigger follow-ups (never skipped for speed)
@@ -40,6 +43,7 @@ A safety-related answer opens a follow-up branch instead of advancing:
 | "Back issue" | Location? → During what movement? → Diagnosed? | Same as above |
 | "Pregnant" | Prenatal track offered; stage? → routes to prenatal eligibility (§E) | Only prenatal-approved content eligible (Doc 17, R1) |
 | "Dizzy spells" | Frequency? → During exercise? | `balance_risk` flag; balance screening before unsupported work |
+| High-risk readiness answer (e.g. chest symptoms, recent surgery) | Additional questions → can this be exercised around safely? | Appropriately restricted program, or recommendation for professional evaluation — never an auto-demanding workout |
 | Age band < 18 | Guardian consent screen (§E) | Kids track only until consent recorded |
 
 If follow-ups can't resolve to a safe default within 3 questions, the profile is flagged `needs_review` and a human/coach review task is created — the user still gets a conservative D1 plan in the meantime (bodyweight fundamentals, no flagged areas).
@@ -52,16 +56,15 @@ If follow-ups can't resolve to a safe default within 3 questions, the profile is
   "age_band": "25-34",
   "country": "US",
   "language": "en",
-  "objectives": ["strength", "mobility"],
+  "primary_specialization": "soccer-fitness",
+  "secondary_objective": "strength",
   "flags": ["knee:mild:screen"],
   "equipment": ["none", "chair", "mat"],
   "space": "small_indoor",
-  "occupation": "office",
   "training_days": 4,
   "minutes_per_day": 30,
-  "sleep": "ok",
   "food_opt_in": true,
-  "trainer_ambitions": "mastery_only",
+  "meal_photo_opt_in": false,
   "difficulty_cap": 1,
   "withheld_exercises": [],
   "consents": ["data:granted"],
@@ -76,11 +79,14 @@ Defaults are conservative: `difficulty_cap: 1`, no flags assumed, everything rev
 
 ## B. Specialization (Engine 2)
 
-### B.1 Selection flow (after onboarding)
+Covers onboarding screens 3–4 and any later change.
 
-1. Track cards: 13 specializations shown as cards (focus, typical location, time commitment, difficulty honesty — "starts gentle").
-2. **Recommendation, not assignment:** deterministic scoring (objectives × limitations × environment × age band) surfaces 1–3 recommended tracks; the user picks. The recommendation explains itself in one line ("Matches your knee flag and home setup").
-3. Confirm screen: 180-day structure, 6 phases, "calendar opens phases, evidence moves difficulty" (brief §3).
+### B.1 Selection flow
+
+1. Category view: 8 categories; each opens its specialization cards (40 total, Doc 28 catalog) showing focus, typical location, time commitment, difficulty honesty — "starts gentle".
+2. **Outcome search:** free-text ("I want to run faster") maps to matching specializations via tags on each catalog record.
+3. **Recommendation, not assignment:** deterministic scoring (secondary objective × limitations × environment × age band) surfaces 1–3 recommended tracks; the user picks. The recommendation explains itself in one line ("Matches your knee flag and home setup").
+4. Confirm screen: 180-day structure, 6 phases, "calendar opens phases, evidence moves difficulty" (brief §3).
 
 ### B.2 Change flow
 
@@ -171,12 +177,12 @@ Rules:
 profiles {
   id uuid PK, user_id FK unique,
   age_band text, country text, language text,
-  experience text, activity_level text, objectives text[],
+  experience text, activity_level text,
+  primary_specialization text, secondary_objective text nullable,
   limitations text[], flags text[],          // e.g. ["knee:mild:screen"]
   equipment text[], space text,
-  occupation text, training_days int[], minutes_per_day int,
-  sleep text, food_opt_in bool default false,
-  trainer_ambitions text default 'mastery_only',
+  training_days int[], minutes_per_day int,
+  food_opt_in bool default false, meal_photo_opt_in bool default false,
   difficulty_cap int default 1,
   needs_review bool default false,
   profile_version int default 1,
@@ -235,9 +241,10 @@ Relations: `profiles.user_id` 1:1; `consents` / `specialization_enrollments` / `
 
 ## Decision log
 
-- **Onboarding collects; specialization is chosen after, by the user.** Recommendation is deterministic and explained in one line.
-- **Defer > lengthen.** Anything not needed for plan #1 waits for its context.
-- **Safety screens can't be skipped, but can be paused.** The 3–6 minute target never overrides a safety follow-up; unresolved cases get a conservative plan + human review task.
+- **Onboarding is exactly the 8 Elite-Mastery-OS screens.** Specialization choice (screens 3–4) lives inside onboarding, owned by Engine 2; the engine framing is unchanged.
+- **Recommendation is deterministic and explained in one line.** Outcome search maps to catalog tags.
+- **Defer > lengthen.** Anything not needed for plan #1 waits for its context — including the trainer-pathway opt-in.
+- **Safety screens can't be skipped, but can be paused.** The 3–6 minute target never overrides a safety follow-up; high-risk readiness answers get extra questions, a restricted program, or a professional-evaluation recommendation — never an auto-demanding workout; unresolved cases get a conservative plan + human review task.
 - **Defaults are conservative** (D1 cap, no assumed flags). The system earns trust by starting easy.
 - **Reminders are bundled and quiet-hours-aware.** One ping per event; no nag sequences.
 - **Missed ≠ punished.** Restart logic is supportive by design (brief §7: "should not automatically generate punitive exercise volume").

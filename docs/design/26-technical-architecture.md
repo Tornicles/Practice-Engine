@@ -1,6 +1,7 @@
 # 26 — Technical Architecture
 
 **Status:** Design draft · **Date:** 2026-10-11
+**Amendment (2026-10-11):** aligned to the Elite Mastery OS spec — mobile navigation is the 5 primary destinations (§B); AI coach behavior table added (§D.1).
 **Source brief:** "Practice-Engine — Complete Product and Operating Architecture" (2026-10-11), §10 (Technical connections)
 **Depends on:** Docs 17–25 (all engine designs)
 **Engines covered:** Cross-cutting — consolidation target for all 24 logical engines
@@ -21,20 +22,20 @@ Current sprawl: `os/` (React web app), `artifacts/` (Express API + Drizzle, Reac
 
 Migration principle (brief §12, batch 1): audit the repo, port features worth keeping, retire the rest. No parallel clients shipping the same feature twice. Prototype HTML builds stay as reference, not products.
 
-## B. Mobile app — 8 tabs
+## B. Mobile app — 5 primary destinations
 
-| Tab | Owns | Key engines |
+| Destination | Contains | Key engines |
 |---|---|---|
-| Onboarding | Gated question-per-screen flow (specialization, goals, equipment, space, schedule, consent); shown until profile complete, then lives under Profile | 1, 2, 23 |
-| Today | Daily plan, readiness check-in entry, streak/summary, lesson teaser | 4, 6, 8, 13 |
-| Workouts | Session player (warm-up/main/cool-down), set logging, plan regeneration, history | 6, 7, 8, 9 |
-| Food | Meal photo capture, food journal, confirmation flow, meal guidance | 10, 11 |
-| Learning | Lessons, quizzes, assignments, spaced review | 13, 14, 16 |
-| Progress | Measured-only charts (Doc 25, B.2), assessment trends, adherence | 9, 15, 22 |
-| Portfolio | Evidence gallery (privacy-controlled), achievements, trainer-pathway artifacts | 15, 16, 23 |
-| Profile | Settings, notification prefs, privacy/sharing, subscription, consent, data deletion | 21, 23, 24 |
+| Today | Daily mission, workout, lessons, food, recovery — the mission-control dashboard: day X of 180, phase, streak, journey %, primary mission + time, knowledge mission, evidence mission, nutrition nudge, recovery check-in | 4, 6, 8, 10, 13 |
+| Masteries | 40 specializations browser, active blueprint, competency map, rank requirements, upcoming + completed assessments, achievements | 2, 9, 15 |
+| Journal | Workout history, food photos, videos, notes, reflections | 10, 15 |
+| Progress | Physical metrics (measured-only), milestones, knowledge progress, portfolio | 9, 15, 22 |
+| Profile | Goals, equipment, schedule, safety preferences, notification prefs, privacy/sharing, subscription, consent, data deletion | 21, 23, 24 |
 
-Offline: downloaded workouts/lessons remain fully usable; evidence and feedback queue locally and sync on reconnect (last-write-wins, conflicts logged, never silent data loss).
+Rules:
+- **Onboarding is a gated full-screen flow, not a destination** — the 8 screens (Doc 22, §A.1) show until the profile is complete; afterwards it is re-enterable only via Profile.
+- **Once enrolled, the current mastery path is the center of the experience.** The app does not overwhelm the user with all 40 specializations every day. Masteries opens on the active discipline — competency tree, rank requirements, upcoming assessments, completed achievements — with the full catalog one tap away.
+- Offline: downloaded workouts/lessons remain fully usable; evidence and feedback queue locally and sync on reconnect (last-write-wins, conflicts logged, never silent data loss).
 
 ## C. Backend services
 
@@ -81,6 +82,22 @@ The 6 capabilities from brief §11 behind a single orchestrator:
 
 Orchestrator duties: route by capability, inject **approved content IDs + structured user data only**, validate structured outputs against contracts (Doc 17, R8 — AI can never publish, override safety, grant achievements, or invent exercises), log every call (Doc 25, §D.2).
 
+### D.1 AI coach behavior (Elite Mastery OS, Part 11)
+
+The AI coach is integrated into the workflow, not a disconnected chatbot. It understands the user's selected specialization, approved exercise curriculum, recent sessions, learning progress, preferences, and documented limitations.
+
+| Situation | AI action |
+|---|---|
+| User asks how to perform a movement | Retrieves the approved demonstration and explains the technique |
+| Exercise is too difficult | Offers an eligible regression |
+| Workout was missed | Rebuilds the schedule without stacking punishment workouts |
+| User asks about food | Uses confirmed food preferences and relevant nutrition guidance |
+| User wants to improve a skill | Explains the competency gap and available practice |
+| User submits evidence | Produces a tentative structured analysis where supported |
+| User asks about a milestone | Explains the exact assessment requirements |
+
+**Hard boundary: the AI coach must not override exercise eligibility and safety rules** (Doc 17, R1–R8). Every coaching action — explanation, regression offer, schedule rebuild, food answer — runs through the safety filter before reaching the user. Tentative analyses are labeled as such and never substitute for professional assessment.
+
 **Cost-control rules:**
 - Deterministic templates + cache serve all routine ops (reminder copy, standard cues, cached plans, FAQ answers). AI is called only where interpretation or personalization is genuinely needed.
 - Cache keys include content versions — a content update busts the cache; a software deploy does not.
@@ -126,8 +143,10 @@ Two halves, one login, role-gated (Doc 25, §C.5):
 
 ## I. Decision log
 
+- **5 primary destinations, not 8 tabs** (Elite Mastery OS, Part 13). Today / Masteries / Journal / Progress / Profile; onboarding is a gated flow, not a destination; the enrolled mastery path is the center, not the 40-catalog.
 - **Modular monolith first, not microservices.** The 24 engines are logical modules; splitting comes only with measured scaling pain.
 - **Safety rules as a versioned library**, not a network service — it sits on the hottest paths (composer, check-in, feedback) and must be unit-testable in isolation.
+- **AI coach integrated into the workflow** with the 7-situation behavior contract (§D.1) and the hard eligibility/safety boundary — never a disconnected chatbot, never an override path.
 - **Postgres-backed event log + job queue for V1**, not Kafka — at-least-once with idempotent consumers is enough at this scale; revisit at 100k+ MAU.
 - **Expo as the single client.** No second web client for training features; web is admin-only.
 - **Evidence media private by default at the storage layer** (separate buckets, signed URLs) — privacy enforced by infrastructure, not just UI.

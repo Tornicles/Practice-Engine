@@ -1,6 +1,7 @@
 # 18 — Workout Composer + Adaptive Progression
 
 **Status:** Design draft · **Date:** 2026-10-11
+**Amendment (2026-10-11):** Aligned to the Elite Mastery OS spec ("Complete Application Sequence and Elite Mastery Operating System", Parts 3–4). Changes: per-set feedback model added to §C.3; session-completion hard rule added (§C.4); exercise-player UX extracted to new doc 30 (linked below). All other sections unchanged.
 **Source brief:** "Practice-Engine — Complete Product and Operating Architecture" (2026-10-11)
 **Depends on:** Doc 17 (content standards, exercise DB, safety rules engine)
 **Engines covered:** 6 (Workout Composer), 7 (Adaptive Progression), 8 (Recovery & Readiness — composer interface)
@@ -161,9 +162,26 @@ Runs every 7 days: reassess training load vs. recovery, adherence, per-exercise 
 | Illness, significant soreness, or severe pain | `rest` / `refer` | Recovery session or referral guidance; no loading |
 | 3rd consecutive `reduce`/`rest` | — | Flag for human/coach review; don't just keep shrinking the plan silently |
 
-### C.3 Post-workout feedback (feeds §B.2)
+### C.3 Per-set + post-workout feedback (feeds §B.2)
 
-Per session: completion (full / partial / skipped), RPE 1–10, per-exercise difficulty rating (too easy / just right / too hard), pain flag + location. Stored on `completed_sets`; drives promotion/hold/regress and the pain pathway.
+Feedback is recorded **per set, in the player** (player UX: doc 30, §A), then summarized post-workout.
+
+Per-set record (`set_feedback`):
+- `exercise` (`content_id` + variant), `set_index`, `reps_done` (or duration)
+- `difficulty_rating`: `too_easy` | `challenging` | `too_difficult`
+  (player labels: "Too easy" / "Challenging but manageable" / "Too difficult")
+- `pain_flag` (+ location) — player label: "Pain or concerning symptoms"
+
+Mapping to Engine 7:
+- `too_easy` / `challenging` → **successful set** (counts toward the 3-consecutive-successes promotion rule, §B.2); `too_easy` additionally marks the exercise promotion-candidate at the next evaluation.
+- `too_difficult` → **incomplete set**; two consecutive incomplete/failed sessions on an exercise trigger regress (§B.2).
+- `pain_flag` → R3 safety pathway immediately: exercise stopped + withheld, safety event logged, plan regenerated without it (Doc 17, R3).
+
+Post-workout summary (per session): completion (`completed` | `stopped` | `skipped`), optional overall RPE 1–10, notes. Stored on `scheduled_sessions`.
+
+### C.4 Session-completion hard rule
+
+A session reaches status `completed` **only when per-exercise feedback has been recorded for every exercise** — all sets recorded, or the exercise explicitly skipped or substituted. **Timer expiry alone never marks a session successful.** A session abandoned mid-way without feedback is `stopped`, not failed: it does not count toward regress rules and reschedules without penalty. For offline sessions, completion is evaluated at sync time under the same rules.
 
 ---
 
@@ -188,11 +206,13 @@ session_exercises {
   order_index int, sets int, reps int nullable, duration_s int nullable, rest_s int
 }
 
-// completed_sets: evidence for progression
-completed_sets {
-  id uuid PK, session_id FK, content_id text,
-  set_index int, reps_done int, rpe int nullable,
-  difficulty_rating text nullable, pain_flag bool default false
+// set_feedback: per-set evidence for progression (player-recorded, doc 30 §A.3)
+set_feedback {
+  id uuid PK, session_id FK, content_id text, variant text,
+  set_index int, reps_done int, duration_s int nullable,
+  difficulty_rating text,   // too_easy | challenging | too_difficult
+  pain_flag bool default false, pain_location text nullable,
+  recorded_at timestamp
 }
 
 // progression_state: B.1, one row per user × exercise
@@ -220,7 +240,8 @@ safety_events {
 
 Key queries:
 - Withdrawal regeneration: `SELECT DISTINCT session_id FROM session_exercises WHERE content_id = $1 AND version < $2` joined to future `scheduled_sessions`.
-- Weekly volume balance: aggregate `completed_sets` by muscle group over 7 days.
+- Weekly volume balance: aggregate `set_feedback` by muscle group over 7 days.
+- Completion check: exercises in `session_exercises` with no matching `set_feedback` rows and no explicit skip/substitute record → the session cannot complete.
 
 ---
 
@@ -231,7 +252,8 @@ Key queries:
 | `POST /sessions/plan` | Generate plan | In: `user_id`, `date`, `time_available_min` (optional override). Out: A.2 contract |
 | `GET /sessions/today?user_id=` | Cached today plan | Returns current plan or generates if none |
 | `POST /sessions/:id/start` | Mark in-progress | — |
-| `POST /sessions/:id/feedback` | Post-workout feedback | C.3 fields → updates progression_state |
+| `POST /sessions/:id/sets` | Record per-set feedback | `set_feedback` fields → updates progression_state, safety_events |
+| `POST /sessions/:id/complete` | Complete session | Validates per-exercise feedback present (§C.4); 422 lists anything missing |
 | `POST /checkins/readiness` | Pre-workout check-in | C.1 fields → readiness level |
 | `GET /progression?user_id=` | Progression dashboard data | Per-exercise B.1 rows |
 | `POST /assessments/:id/complete` | Record assessment result | May trigger promotions (B.2) |
@@ -252,6 +274,7 @@ All write paths run the safety rules engine before persisting; validation failur
 8. Phase boundary reached without passing assessment → next phase curriculum opens, difficulty stays put.
 9. Minor on kids track → only kids-track content, consent verified at onboarding.
 10. User deletes progress photos → evidence removed; training history (sets/reps) retained per retention policy.
+11. Timer expires with no feedback recorded → session stays `in_progress`/`stopped`, never `completed`; the player prompts the user to record or explicitly skip each remaining exercise.
 
 Each scenario gets: setup, expected plan diff, assertions on `progression_state` and `safety_events`.
 
@@ -264,9 +287,11 @@ Each scenario gets: setup, expected plan diff, assertions on `progression_state`
 - **Readiness is a separate engine's output**, consumed by the composer — not a composer concern. Keeps the pain/recovery logic in one place.
 - **Plans are immutable; regeneration creates new plans.** Full audit trail of what the user was actually shown.
 - **Promotion is pull-based (evidence), never push-based (calendar).** The 180-day clock opens curriculum phases; only evidence moves difficulty.
+- **Completion is evidence-based, not time-based.** Timer expiry alone never completes a session; only recorded per-exercise feedback does. Skipped is not failed; stopped is not failed.
 
 ## H. Next design docs
 
+- **30 — Exercise Player & Daily Command Center**: player UX, per-set feedback screens, Today command-center contract (Elite Mastery OS, Parts 3–4).
 - **19 — Office-Worker Fitness curriculum** (V1 specialization): 6 phases, weekly themes, lesson map, assessment checkpoints, trainer-development assignments. (Still queued from the previous round.)
 - **20 — Nutrition engines** (10–12): food-capture confirmation UX, observation-period rules, meal-guidance templates.
 - **21 — Education & portfolio** (13–16): lesson delivery, knowledge assessment, mastery tracking, trainer-development pathway.
